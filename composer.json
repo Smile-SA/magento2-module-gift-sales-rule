@@ -1,0 +1,36 @@
+{
+    "name": "smile/module-gift-sales-rule",
+    "type": "magento2-module",
+    "description": "Extension of Magento2 Sales Rule to provide gifted (free) products.",
+    "keywords": ["magento2", "salesrule", "gift", "cart", "free"],
+    "license": "OSL-3.0",
+    "require": {
+        "magento/framework": "^102.0.0",
+        "magento/module-sales-rule": "^101.1.0"
+    },
+    "require-dev": {
+        "smile/magento2-smilelab-quality-suite": "^1.1.0"
+    },
+    "authors":[
+        {
+            "name": "Maxime Queneau",
+            "email": "maxime.queneau@smile.fr",
+            "homepage": "https://www.smile.eu/",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Smile\\GiftSalesRule\\": ""
+        }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://repo.magento.com/"
+        }
+    ]
+}
