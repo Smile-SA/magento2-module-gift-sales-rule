@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this module to newer
+ * versions in the future.
+ *
+ * @category  Smile
+ * @package   Smile\GiftSalesRule
+ * @author    Maxime Queneau <maxime.queneau@smile.fr>
+ * @copyright 2019 Smile
+ * @license   Open Software License ("OSL") v. 3.0
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- plugins -->
+    <type name="Magento\SalesRule\Model\Rule\Metadata\ValueProvider">
+        <plugin name="gift_sales_rules_value_provider" type="Smile\GiftSalesRule\Plugin\Model\Rule\Metadata\ValueProviderPlugin" />
+    </type>
+    <type name="Magento\SalesRule\Api\RuleRepositoryInterface">
+        <plugin name="gift_sales_rules_repository" type="Smile\GiftSalesRule\Plugin\Model\RuleRepositoryPlugin"/>
+    </type>
+    <type name="Magento\SalesRule\Model\Rule\Action\Discount\CalculatorFactory">
+        <plugin name="gift_sales_rules_calculator_factory" type="Smile\GiftSalesRule\Plugin\Model\Rule\Action\Discount\CalculatorFactoryPlugin" />
+    </type>
+    <type name="Magento\SalesRule\Model\Rule\Condition\Product\Combine">
+        <plugin name="gift_sales_rules_condition_product_combine" type="Smile\GiftSalesRule\Plugin\Model\Rule\Condition\Product\CombinePlugin" />
+    </type>
+
+    <!-- Proxy -->
+    <type name="Smile\GiftSalesRule\Model\GiftRuleService">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Smile\GiftSalesRule\Model\Rule\Action\Discount\OfferProduct">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Smile\GiftSalesRule\Model\Rule\Action\Discount\OfferProductPerPriceRange">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Smile\GiftSalesRule\Observer\CollectGiftRule">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Smile\GiftSalesRule\Helper\GiftRule">
+        <arguments>
+            <argument name="giftRule" xsi:type="array">
+                <item name="1" xsi:type="const">Smile\GiftSalesRule\Api\Data\GiftRuleInterface::OFFER_PRODUCT</item>
+                <item name="2" xsi:type="const">Smile\GiftSalesRule\Api\Data\GiftRuleInterface::OFFER_PRODUCT_PER_PRICE_RANGE</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Handlers -->
+    <type name="Magento\Framework\EntityManager\Operation\ExtensionPool">
+        <arguments>
+            <argument name="extensionActions" xsi:type="array">
+                <item name="Magento\SalesRule\Api\Data\RuleInterface" xsi:type="array">
+                    <item name="create" xsi:type="array">
+                        <item name="create_reward" xsi:type="string">Smile\GiftSalesRule\Model\SalesRule\SaveHandler</item>
+                    </item>
+                    <item name="update" xsi:type="array">
+                        <item name="update_reward" xsi:type="string">Smile\GiftSalesRule\Model\SalesRule\SaveHandler</item>
+                    </item>
+                    <item name="read" xsi:type="array">
+                        <item name="read_reward" xsi:type="string">Smile\GiftSalesRule\Model\SalesRule\ReadHandler</item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <preference for="Smile\GiftSalesRule\Api\Data\GiftRuleSearchResultsInterface" type="Magento\Framework\Api\SearchResults" />
+    <preference for="Smile\GiftSalesRule\Api\Data\GiftRuleInterface" type="Smile\GiftSalesRule\Model\GiftRule" />
+    <preference for="Smile\GiftSalesRule\Api\GiftRuleRepositoryInterface" type="Smile\GiftSalesRule\Model\GiftRuleRepository" />
+    <preference for="Smile\GiftSalesRule\Api\GiftRuleServiceInterface" type="Smile\GiftSalesRule\Model\GiftRuleService" />
+    <type name="Magento\Framework\Model\Entity\RepositoryFactory">
+        <arguments>
+            <argument name="entities" xsi:type="array">
+                <item name="Smile\GiftSalesRule\Api\Data\GiftRuleRepository" xsi:type="string">Smile\GiftSalesRule\Api\GiftRuleRepositoryInterface</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\EntityManager\MetadataPool">
+        <arguments>
+            <argument name="metadata" xsi:type="array">
+                <item name="Smile\GiftSalesRule\Api\Data\GiftRuleInterface" xsi:type="array">
+                    <item name="entityTableName" xsi:type="string">smile_gift_salesrule</item>
+                    <item name="identifierField" xsi:type="string">rule_id</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\EntityManager\HydratorPool">
+        <arguments>
+            <argument name="hydrators" xsi:type="array">
+                <item name="Smile\GiftSalesRule\Api\Data\GiftRuleInterface" xsi:type="string">Magento\Framework\EntityManager\AbstractModelHydrator</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

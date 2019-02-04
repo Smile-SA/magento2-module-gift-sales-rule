@@ -1,0 +1,14 @@
+{
+    "smile_gift_salesrule": {
+        "column": {
+            "rule_id": true,
+            "maximum_number_product": true,
+            "price_range": true
+        },
+        "constraint": {
+            "SMILE_GIFT_SALESRULE_RULE_ID_SALESRULE_RULE_ID": true,
+            "SMILE_GIFT_SALESRULE_RULE_ID": true,
+            "PRIMARY": true
+        }
+    }
+}
