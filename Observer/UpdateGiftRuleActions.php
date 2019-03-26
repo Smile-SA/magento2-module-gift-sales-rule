@@ -67,19 +67,14 @@ class UpdateGiftRuleActions implements ObserverInterface
             if ($rule->getActions()) {
                 $actions = $rule->getActions()->asArray();
                 if (isset($actions['conditions'])) {
-                    $hasChanged = false;
                     foreach ($actions['conditions'] as $index => $condition) {
                         if (strpos($condition['attribute'], self::QUOTE_ATTRIBUTE) !== false) {
                             // Remove quote condition for gift rule
                             unset($actions['conditions'][$index]);
-                            $hasChanged = true;
                         }
                     }
 
-                    if ($hasChanged) {
-                        // Update actions only if conditions are removed
-                        $rule->setActionsSerialized($this->serializer->serialize($actions));
-                    }
+                    $rule->setActionsSerialized($this->serializer->serialize($actions));
                 }
             }
         }
