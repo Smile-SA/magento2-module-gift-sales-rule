@@ -65,13 +65,11 @@ class ValueProviderPlugin
      *
      * @return mixed
      */
-    public function aroundGetMetadataValues(
+    public function afterGetMetadataValues(
         ValueProvider $subject,
-        callable $proceed,
+        $result,
         Rule $rule
     ) {
-        $result = $proceed($rule);
-        
         $extensionAttributes = $rule->getExtensionAttributes();
 
         $result['actions']['children']['simple_action']['arguments']['data']['config']['options'][] = [

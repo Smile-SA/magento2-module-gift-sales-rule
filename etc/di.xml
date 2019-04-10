@@ -21,9 +21,6 @@
     <type name="Magento\SalesRule\Api\RuleRepositoryInterface">
         <plugin name="gift_sales_rules_repository" type="Smile\GiftSalesRule\Plugin\Model\RuleRepositoryPlugin"/>
     </type>
-    <type name="Magento\SalesRule\Model\Rule\Action\Discount\CalculatorFactory">
-        <plugin name="gift_sales_rules_calculator_factory" type="Smile\GiftSalesRule\Plugin\Model\Rule\Action\Discount\CalculatorFactoryPlugin" />
-    </type>
     <type name="Magento\SalesRule\Model\Rule\Condition\Product\Combine">
         <plugin name="gift_sales_rules_condition_product_combine" type="Smile\GiftSalesRule\Plugin\Model\Rule\Condition\Product\CombinePlugin" />
     </type>
@@ -55,6 +52,14 @@
             <argument name="giftRule" xsi:type="array">
                 <item name="1" xsi:type="const">Smile\GiftSalesRule\Api\Data\GiftRuleInterface::OFFER_PRODUCT</item>
                 <item name="2" xsi:type="const">Smile\GiftSalesRule\Api\Data\GiftRuleInterface::OFFER_PRODUCT_PER_PRICE_RANGE</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\SalesRule\Model\Rule\Action\Discount\CalculatorFactory">
+        <arguments>
+            <argument name="discountRules" xsi:type="array">
+                <item name="offer_product" xsi:type="string">Smile\GiftSalesRule\Model\Rule\Action\Discount\OfferProduct</item>
+                <item name="offer_product_per_price_range" xsi:type="string">Smile\GiftSalesRule\Model\Rule\Action\Discount\OfferProductPerPriceRange</item>
             </argument>
         </arguments>
     </type>
