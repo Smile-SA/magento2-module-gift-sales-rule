@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this module to newer
+ * versions in the future.
+ *
+ * @category  Smile
+ * @package   Smile\GiftSalesRule
+ * @author    Maxime Queneau <maxime.queneau@smile.fr>
+ * @copyright 2019 Smile
+ * @license   Open Software License ("OSL") v. 3.0
+ */
+ -->
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <fieldset name="actions" component="Smile_GiftSalesRule/js/form/element/actions-fieldset">
+        <field name="simple_action" component="Smile_GiftSalesRule/js/form/element/action-type">
+            <settings>
+                <switcherConfig>
+                    <rules>
+                        <rule name="0">
+                            <value>offer_product</value>
+                            <actions>
+                                <action name="0">
+                                    <target>sales_rule_form.sales_rule_form.actions.maximum_number_product</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="1">
+                                    <target>sales_rule_form.sales_rule_form.actions.price_range</target>
+                                    <callback>hide</callback>
+                                </action>
+                                <action name="2">
+                                    <target>sales_rule_form.sales_rule_form.actions.discount_amount</target>
+                                    <callback>hide</callback>
+                                </action>
+                                <action name="3">
+                                    <target>sales_rule_form.sales_rule_form.actions.discount_qty</target>
+                                    <callback>hide</callback>
+                                </action>
+                                <action name="4">
+                                    <target>sales_rule_form.sales_rule_form.actions.discount_step</target>
+                                    <callback>hide</callback>
+                                </action>
+                                <action name="5">
+                                    <target>sales_rule_form.sales_rule_form.actions.apply_to_shipping</target>
+                                    <callback>hide</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="1">
+                            <value>offer_product_per_price_range</value>
+                            <actions>
+                                <action name="0">
+                                    <target>sales_rule_form.sales_rule_form.actions.maximum_number_product</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="1">
+                                    <target>sales_rule_form.sales_rule_form.actions.price_range</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="2">
+                                    <target>sales_rule_form.sales_rule_form.actions.discount_amount</target>
+                                    <callback>hide</callback>
+                                </action>
+                                <action name="3">
+                                    <target>sales_rule_form.sales_rule_form.actions.discount_qty</target>
+                                    <callback>hide</callback>
+                                </action>
+                                <action name="4">
+                                    <target>sales_rule_form.sales_rule_form.actions.discount_step</target>
+                                    <callback>hide</callback>
+                                </action>
+                                <action name="5">
+                                    <target>sales_rule_form.sales_rule_form.actions.apply_to_shipping</target>
+                                    <callback>hide</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                    </rules>
+                    <enabled>true</enabled>
+                </switcherConfig>
+            </settings>
+        </field>
+        <field name="maximum_number_product" formElement="input" sortOrder="2">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">sales_rule</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Maximum number product offered</label>
+                <dataScope>extension_attributes.gift_rule.maximum_number_product</dataScope>
+                <visible>false</visible>
+            </settings>
+        </field>
+        <field name="price_range" formElement="input" sortOrder="4">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">sales_rule</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Price range</label>
+                <dataScope>extension_attributes.gift_rule.price_range</dataScope>
+                <visible>false</visible>
+            </settings>
+        </field>
+    </fieldset>
+</form>
