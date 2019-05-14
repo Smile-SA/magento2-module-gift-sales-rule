@@ -1,3 +1,4 @@
+"Edit my choices","Modifier mes choix"
 "Maximum number of products offered","Nombre maximum de produit offert"
 "Price range","Tranche de prix"
 "Select gift product:","Sélecteur des produits offerts:"
@@ -6,4 +7,6 @@
 "We can't add this gift item to your shopping cart.","Impossible d'ajouter ce produit cadeau"
 "We found an invalid request for adding gift product.","Requête d’ajout produit offer au panier invalide."
 "You added gift product to your shopping cart.","Vous avez ajouté un produit cadeau dans le panier"
+"You entered too many gifts. You can only select %1 gifts.","Vous avez demandé trop de cadeaux. Vous ne pouvez en sélectionner que %1."
 "Your session has expired","Votre session a expiré"
+"%1: choose your %2 gifts","%1 : sélectionnez vos %2 cadeaux"

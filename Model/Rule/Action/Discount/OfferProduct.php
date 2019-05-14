@@ -95,7 +95,7 @@ class OfferProduct extends AbstractDiscount
             /** @var array $giftRuleData */
             $giftRuleData = $this->giftRuleCacheHelper->saveCachedGiftRule(
                 $rule->getRuleId(),
-                $rule->getActions(),
+                $rule,
                 (int)$rule->getRuleId()
             );
         }

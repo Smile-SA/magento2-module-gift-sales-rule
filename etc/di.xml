@@ -87,6 +87,7 @@
     <preference for="Smile\GiftSalesRule\Api\Data\GiftRuleInterface" type="Smile\GiftSalesRule\Model\GiftRule" />
     <preference for="Smile\GiftSalesRule\Api\GiftRuleRepositoryInterface" type="Smile\GiftSalesRule\Model\GiftRuleRepository" />
     <preference for="Smile\GiftSalesRule\Api\GiftRuleServiceInterface" type="Smile\GiftSalesRule\Model\GiftRuleService" />
+    <preference for="Smile\GiftSalesRule\Api\Data\GiftRuleDataInterface" type="Smile\GiftSalesRule\Model\GiftRuleData" />
     <type name="Magento\Framework\Model\Entity\RepositoryFactory">
         <arguments>
             <argument name="entities" xsi:type="array">

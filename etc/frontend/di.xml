@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this module to newer
+ * versions in the future.
+ *
+ * @category  Smile
+ * @package   Smile\GiftSalesRule
+ * @author    Pierre Le Maguer <pilem@smile.fr>
+ * @copyright 2019 Smile
+ * @license   Open Software License ("OSL") v. 3.0
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- plugins -->
+    <type name="Magento\Checkout\Block\Cart\Item\Renderer">
+        <plugin name="gift_sales_rule_renderer_item_plugin" type="Smile\GiftSalesRule\Plugin\Checkout\Block\Cart\Item\RendererPlugin" />
+    </type>
+</config>

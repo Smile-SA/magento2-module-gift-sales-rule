@@ -1,0 +1,37 @@
+<?php
+/**
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Smile ElasticSuite to newer
+ * versions in the future.
+ *
+ *
+ * @category  Smile
+ * @package   Smile\GiftSalesRule
+ * @author    Pierre Le Maguer <pilem@smile.fr>
+ * @copyright 2019 Smile
+ * @license   Open Software License ("OSL") v. 3.0
+ */
+
+/** @var $block \Smile\GiftSalesRule\Block\Cart\GiftRules */
+$giftRules = $block->getGiftRules();
+?>
+
+<?php if ($giftRules) : ?>
+    <?php
+    /** @var \Smile\GiftSalesRule\Block\Cart\GiftRules\Rule $childBlock */
+    $childBlock = $block->getChildBlock('checkout.cart.gift-rules.rule');
+    ?>
+    <div class="block free-gift" id="block-free-gift"
+         data-mage-init='{"collapsible":{"openedState": "active", "saveState": false}}'>
+        <div class="title" data-role="title">
+            <strong id="block-free-gift-heading" role="heading" aria-level="2"><?= /* @escapeNotVerified */
+                __ ('Get free gift !') ?></strong>
+        </div>
+        <div class="content" data-role="content" aria-labelledby="block-free-gift-heading">
+            <?php foreach ($giftRules as $rule) : ?>
+                <?= $childBlock->setGiftRule($rule)->toHtml(); ?>
+            <?php endforeach; ?>
+        </div>
+    </div>
+<?php endif; ?>

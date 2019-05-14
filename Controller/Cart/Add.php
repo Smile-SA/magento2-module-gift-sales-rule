@@ -98,27 +98,21 @@ class Add extends \Magento\Framework\App\Action\Action
 
         $params = $this->getRequest()->getParams();
 
-        if (!isset($params['giftrule']) || !isset($params['product'])) {
+        if (!$this->validatePostParameters($params)) {
             $this->messageManager->addErrorMessage(
                 __('We can\'t add this gift item to your shopping cart.')
             );
             return $this->resultRedirectFactory->create()->setPath('checkout/cart');
         }
 
-        $productId    = (int) $params['product'];
-        $giftRuleId   = (int) $params['giftrule'];
-        $giftRuleCode = $params['giftrulecode'];
-        $qty = 1;
-        if (isset($params['qty']) && is_int($params['qty'])) {
-            $qty = $params['qty'];
-        }
+        $productData = $this->formatProductPostParameters($params);
 
         try {
-             $this->giftRuleService->addGiftProducts(
+             $this->giftRuleService->replaceGiftProducts(
                  $this->cart->getQuote(),
-                 [['id' => $productId, 'qty' => $qty]],
-                 $giftRuleCode,
-                 $giftRuleId
+                 $productData,
+                 $params['gift_rule_code'],
+                 $params['gift_rule_id']
              );
 
             $this->quoteRepository->save($this->cart->getQuote());
@@ -135,5 +129,51 @@ class Add extends \Magento\Framework\App\Action\Action
             );
             return $this->resultRedirectFactory->create()->setPath('checkout/cart');
         }
+    }
+
+    /**
+     * Validate post parameters.
+     *
+     * @param array $params
+     * @return bool
+     */
+    protected function validatePostParameters(array $params): bool
+    {
+        if (!isset($params['gift_rule_code'])
+            || !isset($params['gift_rule_id'])
+            || !isset($params['products'])
+            || !is_array($params['products'])) {
+            return false;
+        }
+
+        foreach ($params['products'] as $productId => $productData) {
+            if (!isset($productData['qty'])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Format post parameters for the add to cart method.
+     *
+     * @param $params
+     * @return array
+     */
+    protected function formatProductPostParameters($params)
+    {
+        $filteredParams = [];
+        foreach ($params['products'] as $productId => $productData) {
+            if ($productData['qty']) {
+                $productData['uenc'] = $params['uenc'];
+                $productData['id'] = $productId;
+                $productData['product'] = $productId;
+                $productData['item'] = $productId;
+                $filteredParams[] = $productData;
+            }
+        }
+
+        return $filteredParams;
     }
 }

@@ -1,0 +1,54 @@
+<?php
+/**
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Smile ElasticSuite to newer
+ * versions in the future.
+ *
+ *
+ * @category  Smile
+ * @package   Smile\GiftSalesRule
+ * @author    Pierre Le Maguer <pilem@smile.fr>
+ * @copyright 2019 Smile
+ * @license   Open Software License ("OSL") v. 3.0
+ */
+
+/** @var $block \Magento\ConfigurableProduct\Block\Product\View\Type\Configurable*/
+$_product    = $block->getProduct();
+$_attributes = $block->decorateArray($block->getAllowAttributes());
+?>
+<?php if ($_product->isSaleable() && count($_attributes)):?>
+    <div id="configurable-attributes-<?= $_product->getId() ?>" class="configurable-attributes">
+        <input name="products[<?= $_product->getId() ?>][selected_configurable_option]" type="hidden" value="" />
+        <?php foreach ($_attributes as $_attribute): ?>
+            <div class="field configurable required">
+                <label class="label" for="products[<?= $_product->getId() ?>]attribute<?= /* @escapeNotVerified */ $_attribute->getAttributeId() ?>">
+                    <span><?= $block->escapeHtml($_attribute->getProductAttribute()->getStoreLabel()) ?></span>
+                </label>
+                <div class="control">
+                    <select name="products[<?= $_product->getId() ?>][super_attribute][<?= /* @escapeNotVerified */ $_attribute->getAttributeId() ?>]"
+                            data-selector="products[<?= $_product->getId() ?>][super_attribute][<?= /* @escapeNotVerified */ $_attribute->getAttributeId() ?>]"
+                            data-validate="{required:true}"
+                            id="products[<?= $_product->getId() ?>]attribute<?= /* @escapeNotVerified */ $_attribute->getAttributeId() ?>"
+                            data-attribute-id="<?= $_attribute->getAttributeId() ?>"
+                            class="super-attribute-select super-attribute-select-<?= $_product->getId() ?>">
+                        <option value=""><?= /* @escapeNotVerified */ __('Choose an Option...') ?></option>
+                    </select>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <script type="text/x-magento-init">
+        {
+            "#configurable-attributes-<?= $_product->getId() ?>": {
+                "Smile_GiftSalesRule/js/configurable": {
+                    "superSelector": ".super-attribute-select-<?= $_product->getId() ?>",
+                    "selectSimpleProduct": "[name='products[<?= $_product->getId() ?>][selected_configurable_option]']",
+                    "spConfig": <?= /* @escapeNotVerified */ $block->getJsonConfig() ?>,
+                    "gallerySwitchStrategy": "<?php /* @escapeNotVerified */ echo $block->getVar('gallery_switch_strategy',
+            'Magento_ConfigurableProduct') ?: 'replace'; ?>"
+                }
+            }
+        }
+    </script>
+<?php endif;?>

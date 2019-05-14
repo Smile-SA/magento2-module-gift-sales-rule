@@ -1,0 +1,40 @@
+<?php
+/**
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Smile ElasticSuite to newer
+ * versions in the future.
+ *
+ *
+ * @category  Smile
+ * @package   Smile\GiftSalesRule
+ * @author    Pierre Le Maguer <pilem@smile.fr>
+ * @copyright 2019 Smile
+ * @license   Open Software License ("OSL") v. 3.0
+ */
+
+/** @var $block \Smile\GiftSalesRule\Block\Cart\GiftRules\ProductItem */
+$product = $block->getProduct();
+$selectedQty = $block->getProductQty();
+?>
+<li class="item product product-item">
+    <div class="product-item-info freegift-product-item<?php if ($selectedQty) : ?> active<?php endif; ?>">
+        <span class="product photo product-item-photo"><?= $block->getImage($product, 'category_page_grid')->toHtml() ?></span>
+        <div class="product details product-item-details" data-product-id="<?= (int) $product->getId() ?>">
+            <strong class="product name product-item-name"><?= $block->escapeHtml($product->getName()) ?></strong>
+            <?= $block->getProductDetailsHtml($product) ?>
+            <div class="field qty">
+                <label class="label" for="qty-<?= (int) $product->getId() ?>"><span><?= /* @escapeNotVerified */ __('Qty') ?></span></label>
+                <div class="control">
+                    <input type="number"
+                           name="products[<?= (int) $product->getId() ?>][qty]"
+                           id="qty-<?= (int) $product->getId() ?>"
+                           title="<?= /* @escapeNotVerified */ __('Qty') ?>"
+                           class="input-text qty"
+                           <?php if ($selectedQty) : ?>value="<?= (int) $selectedQty ?>"<?php endif; ?>
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
+</li>

@@ -1,3 +1,4 @@
+"Edit my choices","Edit my choices"
 "Maximum number of products offered","Maximum number of products offered"
 "Price range","Price range"
 "Select gift product:","Select gift product:"
@@ -6,4 +7,6 @@
 "We can't add this gift item to your shopping cart.","We can't add this gift item to your shopping cart."
 "We found an invalid request for adding gift product.","We found an invalid request for adding gift product."
 "You added gift product to your shopping cart.","You added gift product to your shopping cart."
+"You entered too many gifts. You can only select %1 gifts.","You entered too many gifts. You can only select %1 gifts."
 "Your session has expired","Your session has expired"
+"%1: choose your %2 gifts","%1: choose your %2 gifts"
