@@ -1,0 +1,89 @@
+// /**
+//  * DISCLAIMER
+//  *
+//  * Do not edit or add to this file if you wish to upgrade Smile ElasticSuite to newer
+//  * versions in the future.
+//  *
+//  *
+//  * @category  Smile
+//  * @package   Smile\GiftSalesRule
+//  * @author    Pierre Le Maguer <pilem@smile.fr>
+//  * @copyright 2019 Smile
+//  * @license   Open Software License ("OSL") v. 3.0
+//  */
+
+//
+//  Common
+//  _____________________________________________
+& when (@media-common = true) {
+
+    // Modal Design
+    .free-gift-modal {
+        .modal-inner-wrap {
+            max-width: 1000px;
+            .products-grid .product-item {
+                width: 25%;
+                margin-left: 0;
+                padding: 0 2%;
+                .product-item-info {
+                    width: 240px;
+                }
+                .field.qty {
+                    display: flex;
+                    align-items: center;
+                    .label {
+                        margin-right: 10px;
+                    }
+                }
+                .configurable, .configurable-attributes {
+                    margin-bottom: 10px;
+                }
+            }
+            .actions .primary-block {
+                margin: 0 auto 10px;
+                width: 200px;
+                .primary {
+                    width: 100%;
+                }
+            }
+            .message-error {
+                display: none;
+            }
+        }
+    }
+
+    // Free Gift buttons Design
+    #block-free-gift {
+        .rule-item {
+            margin-bottom: 10px;
+            .name {
+                margin-right: 15px;
+            }
+        }
+    }
+}
+
+//
+//  Common
+//  _____________________________________________
+@media all and (max-width: @screen__l), print {
+    .free-gift-modal .modal-inner-wrap .products-grid .product-item {
+        width: 33%;
+    }
+}
+
+@media all and (max-width: @screen__s), print {
+    .free-gift-modal .modal-inner-wrap .products-grid .product-item {
+        width: 50%;
+        .freegift-product-item {
+            margin-bottom: 10px;
+        }
+    }
+}
+
+@media all and (max-width: @screen__xs), print {
+    .free-gift-modal .modal-inner-wrap .products-grid .product-item {
+        width: 100%;
+    }
+}
+

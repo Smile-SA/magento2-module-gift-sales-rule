@@ -14,6 +14,7 @@
 namespace Smile\GiftSalesRule\Plugin\Model;
 
 use Magento\Framework\Api\ExtensionAttributesFactory;
+use Magento\SalesRule\Api\Data\RuleExtensionInterface;
 use Magento\SalesRule\Api\Data\RuleInterface;
 use Magento\SalesRule\Api\RuleRepositoryInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;

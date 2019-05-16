@@ -15,8 +15,30 @@
  -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceContainer name="content">
-            <block class="Smile\GiftSalesRule\Block\Cart" name="checkout.cart.giftrule" template="Smile_GiftSalesRule::cart.phtml" after="-" />
+        <referenceContainer name="cart.discount">
+            <block class="Smile\GiftSalesRule\Block\Cart\GiftRules"
+                   name="checkout.cart.gift-rules"
+                   template="Smile_GiftSalesRule::cart/gift-rules.phtml"
+                   after="-">
+                <block class="Smile\GiftSalesRule\Block\Cart\GiftRules\Rule"
+                       name="checkout.cart.gift-rules.rule"
+                       template="Smile_GiftSalesRule::cart/gift-rules/rule.phtml">
+                    <block class="Smile\GiftSalesRule\Block\Cart\GiftRules\ProductItem"
+                           name="checkout.cart.gift-rules.product-item"
+                           template="Smile_GiftSalesRule::cart/gift-rules/product-item.phtml">
+                        <block class="Magento\Swatches\Block\Product\Renderer\Listing\Configurable"
+                               name="swatch-details" as="swatch-details"
+                               template="Smile_GiftSalesRule::cart/gift-rules/product/swatch-renderer.phtml"
+                               ifconfig="catalog/frontend/show_swatches_in_product_list" />
+                        <block class="Magento\ConfigurableProduct\Block\Product\View\Type\Configurable"
+                               name="configurable-details" as="configurable-details"
+                               template="Smile_GiftSalesRule::cart/gift-rules/product/configurable-renderer.phtml"/>
+                        <block class="Magento\Framework\View\Element\RendererList" name="category.product.type.details.renderers" as="details.renderers">
+                            <block class="Magento\Framework\View\Element\Template" name="category.product.type.details.renderers.default" as="default"/>
+                        </block>
+                    </block>
+                </block>
+            </block>
         </referenceContainer>
     </body>
 </page>

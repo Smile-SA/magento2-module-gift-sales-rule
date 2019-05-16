@@ -60,18 +60,18 @@ class GiftRule extends AbstractHelper
     /**
      * Is gift sales rule
      *
-     * @param RuleInterface $rule
+     * @param Rule $rule
      *
      * @return bool
      */
     public function isGiftRule(Rule $rule)
     {
-        $isgiftRule = false;
+        $isGiftRule = false;
         if (in_array($rule->getSimpleAction(), $this->giftRule)) {
-            $isgiftRule = true;
+            $isGiftRule = true;
         }
 
-        return $isgiftRule;
+        return $isGiftRule;
     }
 
     /**
@@ -92,7 +92,6 @@ class GiftRule extends AbstractHelper
          */
         $hasProduct = false;
         foreach ($quote->getAllItems() as $item) {
-            $option = $item->getOptionByCode('option_gift_rule');
             if (!$item->getOptionByCode('option_gift_rule')) {
                 $hasProduct = true;
                 break;
@@ -120,20 +119,17 @@ class GiftRule extends AbstractHelper
     /**
      * Retrieve url for add gift product to cart
      *
-     * @param       $giftRuleId
-     * @param       $giftRuleCode
-     * @param       $productId
-     * @param array $additional
+     * @param int    $giftRuleId
+     * @param string $giftRuleCode
      *
      * @return string
      */
-    public function getAddUrl($giftRuleId, $giftRuleCode, $productId)
+    public function getAddUrl($giftRuleId, $giftRuleCode)
     {
         $routeParams = [
             ActionInterface::PARAM_NAME_URL_ENCODED => $this->urlEncoder->encode($this->_urlBuilder->getCurrentUrl()),
-            'giftrule'     => $giftRuleId,
-            'giftrulecode' => $giftRuleCode,
-            'product'      => $productId
+            'gift_rule_id'   => $giftRuleId,
+            'gift_rule_code' => $giftRuleCode
         ];
 
         return $this->_getUrl('giftsalesrule/cart/add', $routeParams);

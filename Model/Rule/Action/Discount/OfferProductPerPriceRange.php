@@ -118,8 +118,8 @@ class OfferProductPerPriceRange extends AbstractDiscount
 
                 $this->giftRuleCacheHelper->saveCachedGiftRule(
                     $rule->getRuleId() . '_' . $range,
-                    $rule->getActions(),
-                    $giftRule
+                    $rule,
+                    (int)$rule->getRuleId()
                 );
             } else {
                 // Save active gift rule in session

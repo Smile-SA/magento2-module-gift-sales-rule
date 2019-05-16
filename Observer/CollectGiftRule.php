@@ -50,6 +50,11 @@ class CollectGiftRule implements ObserverInterface
     protected $quoteRepository;
 
     /**
+     * @var \Magento\Framework\App\Request\Http
+     */
+    protected $request;
+
+    /**
      * CollectTotalsAfterObserver constructor.
      *
      * @param CheckoutSession                            $checkoutSession
@@ -123,11 +128,11 @@ class CollectGiftRule implements ObserverInterface
 
                     // If maximum number product = 1 and only 1 gift product available => add automatic gift product
                     if ($giftRuleData[GiftRuleCacheHelper::DATA_MAXIMUM_NUMBER_PRODUCT] == 1
-                        && count($giftRuleData[GiftRuleCacheHelper::DATA_ITEMS]) == 1
+                        && count($giftRuleData[GiftRuleCacheHelper::DATA_PRODUCT_ITEMS]) == 1
                         && count($giftItem) == 0) {
                         $this->giftRuleService->addGiftProducts(
                             $quote,
-                            [['id' => key($giftRuleData[GiftRuleCacheHelper::DATA_ITEMS]), 'qty' => 1]],
+                            [['id' => key($giftRuleData[GiftRuleCacheHelper::DATA_PRODUCT_ITEMS]), 'qty' => 1]],
                             $giftRuleCode,
                             $giftRuleId
                         );
