@@ -29,7 +29,8 @@ class AddGiftRuleOption implements ObserverInterface
      * Add option for gift item
      *
      * @event checkout_cart_save_after
-     * @param Observer $observer
+     *
+     * @param Observer $observer Observer
      */
     public function execute(Observer $observer)
     {

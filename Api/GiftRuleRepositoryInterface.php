@@ -29,7 +29,7 @@ interface GiftRuleRepositoryInterface
     /**
      * Get a giftrule by ID.
      *
-     * @param int $entityId
+     * @param int $entityId Entity id
      * @return GiftRuleInterface
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
@@ -38,7 +38,7 @@ interface GiftRuleRepositoryInterface
     /**
      * Get the giftrules matching the specified criteria.
      *
-     * @param SearchCriteriaInterface $searchCriteria
+     * @param SearchCriteriaInterface $searchCriteria Search criteria
      * @return GiftRuleSearchResultsInterface
      */
     public function getList(SearchCriteriaInterface $searchCriteria = null);
@@ -46,7 +46,7 @@ interface GiftRuleRepositoryInterface
     /**
      * Save the GiftRule.
      *
-     * @param GiftRuleInterface $giftRule
+     * @param GiftRuleInterface $giftRule Gift rule
      * @return GiftRuleInterface
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      */
@@ -55,7 +55,7 @@ interface GiftRuleRepositoryInterface
     /**
      * Delete a giftrule by ID.
      *
-     * @param int $entityId
+     * @param int $entityId Entity id
      * @return bool
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      * @throws \Magento\Framework\Exception\CouldNotDeleteException

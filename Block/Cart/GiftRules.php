@@ -38,10 +38,10 @@ class GiftRules extends \Magento\Framework\View\Element\Template
     /**
      * Cart constructor.
      *
-     * @param Context                  $context
-     * @param GiftRuleServiceInterface $giftRuleService
-     * @param CheckoutCart             $cart
-     * @param array                    $data
+     * @param Context                  $context         Context
+     * @param GiftRuleServiceInterface $giftRuleService Gift rule service
+     * @param CheckoutCart             $cart            Cart
+     * @param array                    $data            Data
      */
     public function __construct(
         Context $context,

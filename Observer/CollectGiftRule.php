@@ -13,12 +13,16 @@
  */
 namespace Smile\GiftSalesRule\Observer;
 
+use Magento\Framework\App\Request\Http;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
+use Magento\Quote\Model\Quote\Item\Option;
 use Smile\GiftSalesRule\Helper\Cache as GiftRuleCacheHelper;
+use Smile\GiftSalesRule\Helper\Config as GiftRuleConfigHelper;
 use Smile\GiftSalesRule\Api\GiftRuleServiceInterface;
 
 /**
@@ -45,34 +49,42 @@ class CollectGiftRule implements ObserverInterface
     protected $giftRuleCacheHelper;
 
     /**
-     * @var \Magento\Quote\Api\CartRepositoryInterface
+     * @var GiftRuleConfigHelper
+     */
+    protected $giftRuleConfigHelper;
+
+    /**
+     * @var CartRepositoryInterface
      */
     protected $quoteRepository;
 
     /**
-     * @var \Magento\Framework\App\Request\Http
+     * @var Http
      */
     protected $request;
 
     /**
-     * CollectTotalsAfterObserver constructor.
+     * CollectGiftRule constructor.
      *
-     * @param CheckoutSession                            $checkoutSession
-     * @param GiftRuleServiceInterface                   $giftRuleService
-     * @param GiftRuleCacheHelper                        $giftRuleCacheHelper
-     * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
-     * @param \Magento\Framework\App\Request\Http        $request
+     * @param CheckoutSession          $checkoutSession      Checkout session
+     * @param GiftRuleServiceInterface $giftRuleService      Gift rule service
+     * @param GiftRuleCacheHelper      $giftRuleCacheHelper  Gift rule cache helper
+     * @param GiftRuleConfigHelper     $giftRuleConfigHelper Gift rule config helper
+     * @param CartRepositoryInterface  $quoteRepository      Quote repository
+     * @param Http                     $request              Request
      */
     public function __construct(
         CheckoutSession $checkoutSession,
         GiftRuleServiceInterface $giftRuleService,
         GiftRuleCacheHelper $giftRuleCacheHelper,
+        GiftRuleConfigHelper $giftRuleConfigHelper,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Framework\App\Request\Http $request
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->giftRuleService = $giftRuleService;
         $this->giftRuleCacheHelper = $giftRuleCacheHelper;
+        $this->giftRuleConfigHelper = $giftRuleConfigHelper;
         $this->quoteRepository = $quoteRepository;
         $this->request = $request;
     }
@@ -81,7 +93,11 @@ class CollectGiftRule implements ObserverInterface
      * Update gift item quantity
      * Add automatic gift item
      *
-     * @param Observer $observer
+     * @param Observer $observer Oberver
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function execute(Observer $observer)
     {
@@ -105,7 +121,7 @@ class CollectGiftRule implements ObserverInterface
                     foreach ($quote->getAllItems() as $item) {
                         $option = $item->getOptionByCode('option_gift_rule');
                         if ($option && $option->getValue() == $giftRuleId) {
-                            // Remove gift item
+                            // Remove gift item.
                             $quote->deleteItem($item);
                             $saveQuote = true;
                         }
@@ -117,8 +133,11 @@ class CollectGiftRule implements ObserverInterface
 
                     /** @var Item $item */
                     foreach ($quote->getAllItems() as $item) {
+                        /** @var Option $option */
                         $option = $item->getOptionByCode('option_gift_rule');
-                        if ($option && $option->getValue() == $giftRuleId) {
+                        /** @var Option $configurableOption */
+                        $configurableOption = $item->getOptionByCode('simple_product');
+                        if ($option && $option->getValue() == $giftRuleId && !$configurableOption) {
                             $giftItem[] = $item;
                             $giftItemQty += $item->getQty();
                         }
@@ -126,13 +145,17 @@ class CollectGiftRule implements ObserverInterface
 
                     $giftRuleData = $this->giftRuleCacheHelper->getCachedGiftRule($giftRuleCode);
 
-                    // If maximum number product = 1 and only 1 gift product available => add automatic gift product
-                    if ($giftRuleData[GiftRuleCacheHelper::DATA_MAXIMUM_NUMBER_PRODUCT] == 1
-                        && count($giftRuleData[GiftRuleCacheHelper::DATA_PRODUCT_ITEMS]) == 1
-                        && count($giftItem) == 0) {
+                    // If only 1 gift product available => add automatic gift product.
+                    if ($this->giftRuleConfigHelper->isAutomaticAddEnabled() && count($giftItem) == 0 &&
+                        count($giftRuleData[GiftRuleCacheHelper::DATA_PRODUCT_ITEMS]) == 1) {
                         $this->giftRuleService->addGiftProducts(
                             $quote,
-                            [['id' => key($giftRuleData[GiftRuleCacheHelper::DATA_PRODUCT_ITEMS]), 'qty' => 1]],
+                            [
+                                [
+                                    'id' => key($giftRuleData[GiftRuleCacheHelper::DATA_PRODUCT_ITEMS]),
+                                    'qty' => GiftRuleCacheHelper::DATA_MAXIMUM_NUMBER_PRODUCT,
+                                ],
+                            ],
                             $giftRuleCode,
                             $giftRuleId
                         );
@@ -140,7 +163,7 @@ class CollectGiftRule implements ObserverInterface
                     }
 
                     if ($giftItemQty > $giftRuleData[GiftRuleCacheHelper::DATA_MAXIMUM_NUMBER_PRODUCT]) {
-                        // Delete gift item
+                        // Delete gift item.
                         $qtyToDelete = $giftItemQty - $giftRuleData[GiftRuleCacheHelper::DATA_MAXIMUM_NUMBER_PRODUCT];
 
                         foreach (array_reverse($giftItem) as $item) {
@@ -150,6 +173,9 @@ class CollectGiftRule implements ObserverInterface
                                 break;
                             } else {
                                 $qtyToDelete = $qtyToDelete - $item->getQty();
+                                if ($parentItemId = $item->getParentItemId()) {
+                                    $quote->removeItem($parentItemId);
+                                }
                                 $quote->deleteItem($item);
                                 $saveQuote = true;
                             }

@@ -41,8 +41,8 @@ class PrepareFormActions implements ObserverInterface
     /**
      * PrepareFormActionsObserver constructor.
      *
-     * @param Registry        $registry
-     * @param GiftSRuleHelper $giftRuleHelper
+     * @param Registry        $registry       Registry
+     * @param GiftSRuleHelper $giftRuleHelper Gift rule helper
      */
     public function __construct(
         Registry $registry,
@@ -55,7 +55,7 @@ class PrepareFormActions implements ObserverInterface
     /**
      * Change fieldset legend
      *
-     * @param Observer $observer
+     * @param Observer $observer Observer
      */
     public function execute(Observer $observer)
     {

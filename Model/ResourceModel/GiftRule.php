@@ -35,10 +35,12 @@ class GiftRule extends AbstractDb
     protected $metadataPool;
 
     /**
-     * @param Context $context
-     * @param EntityManager $entityManager
-     * @param MetadataPool $metadataPool
-     * @param string|null $connectionName
+     * GiftRule constructor.
+     *
+     * @param Context       $context        Context
+     * @param EntityManager $entityManager  Entity manage
+     * @param MetadataPool  $metadataPool   Metadata poll
+     * @param null          $connectionName Connection name
      */
     public function __construct(
         Context       $context,
@@ -50,18 +52,6 @@ class GiftRule extends AbstractDb
 
         $this->entityManager = $entityManager;
         $this->metadataPool = $metadataPool;
-    }
-
-    /**
-     * {@inheritdoc}
-     * @SuppressWarnings(PHPMD.CamelCaseMethodName)
-     */
-    protected function _construct()
-    {
-        $this->_init(
-            GiftRuleInterface::TABLE_NAME,
-            GiftRuleInterface::RULE_ID
-        );
     }
 
     /**
@@ -109,17 +99,29 @@ class GiftRule extends AbstractDb
     }
 
     /**
+     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CamelCaseMethodName)
+     */
+    protected function _construct()
+    {
+        $this->_init(
+            GiftRuleInterface::TABLE_NAME,
+            GiftRuleInterface::RULE_ID
+        );
+    }
+
+    /**
      * Get the id of an object
      *
-     * @param mixed       $value
-     * @param string|null $field
+     * @param mixed       $value Value
+     * @param string|null $field Field
      *
      * @return bool|int|string
      */
     protected function getObjectId($value, $field = null)
     {
         $entityMetadata = $this->metadataPool->getMetadata(GiftRuleInterface::class);
-        if (is_null($field)) {
+        if ($field === null) {
             $field = $entityMetadata->getIdentifierField();
         }
         $entityId = $value;
@@ -134,6 +136,7 @@ class GiftRule extends AbstractDb
             $result = $this->getConnection()->fetchCol($select);
             $entityId = count($result) ? $result[0] : false;
         }
+
         return $entityId;
     }
 }

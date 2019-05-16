@@ -48,9 +48,9 @@ class SaveHandler implements ExtensionInterface
     /**
      * ReadHandler constructor.
      *
-     * @param MetadataPool       $metadataPool
-     * @param GiftRuleRepository $giftRuleRepository
-     * @param GiftRuleFactory    $giftRuleFactory
+     * @param MetadataPool       $metadataPool       Metadata pool
+     * @param GiftRuleRepository $giftRuleRepository Gift rule repository
+     * @param GiftRuleFactory    $giftRuleFactory    Gift rule factory
      */
     public function __construct(
         MetadataPool $metadataPool,
@@ -65,14 +65,15 @@ class SaveHandler implements ExtensionInterface
     /**
      * Save gift rule value from Sales Rule extension attributes
      *
-     * @param Rule|object $entity
-     * @param array $arguments
-     * @return Rule|object
+     * @param object $entity    Entity
+     * @param array  $arguments Arguments
+     *
+     * @return bool|object
+     * @throws \Magento\Framework\Exception\CouldNotSaveException
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function execute($entity, $arguments = [])
     {
-        $attributes = $entity->getExtensionAttributes() ?: [];
         $metadata = $this->metadataPool->getMetadata(RuleInterface::class);
         if ($ruleId = $entity->getData($metadata->getLinkField())) {
             $extensionAttributes = $entity->getExtensionAttributes();
@@ -81,7 +82,7 @@ class SaveHandler implements ExtensionInterface
                     /** @var GiftRuleInterface $giftRule */
                     $giftRule = $this->giftRuleRepository->getById($ruleId);
                 } catch (NoSuchEntityException $exception) {
-                    // Create gift rule if not exist
+                    // Create gift rule if not exist.
                     $giftRule = $this->giftRuleFactory->create();
                     $giftRule->setId($ruleId);
                 }

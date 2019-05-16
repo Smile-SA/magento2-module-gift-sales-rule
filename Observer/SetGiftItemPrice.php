@@ -27,7 +27,7 @@ class SetGiftItemPrice implements ObserverInterface
     /**
      * Change price for gift product
      *
-     * @param Observer $observer
+     * @param Observer $observer Observer
      */
     public function execute(Observer $observer)
     {

@@ -24,17 +24,20 @@ use Magento\Quote\Model\Quote\Item\AbstractItem;
  */
 class RendererPlugin
 {
+    /**
+     * @var array
+     */
     protected $actionsBlockToRemove = [
         'checkout.cart.item.renderers.default.actions.edit',
         'checkout.cart.item.renderers.simple.actions.edit',
-        'checkout.cart.item.renderers.configurable.actions.edit'
+        'checkout.cart.item.renderers.configurable.actions.edit',
     ];
 
     /**
      * Remove the edit action from the item renderer for gift items.
      *
-     * @param Renderer     $subject
-     * @param AbstractItem $item
+     * @param Renderer     $subject Subject
+     * @param AbstractItem $item    Item
      *
      * @return array
      */
