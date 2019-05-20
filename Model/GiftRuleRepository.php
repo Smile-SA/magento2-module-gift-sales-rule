@@ -36,6 +36,7 @@ use Smile\GiftSalesRule\Model\ResourceModel\GiftRule\CollectionFactory as GiftRu
  *
  * @author    Maxime Queneau <maxime.queneau@smile.fr>
  * @copyright 2019 Smile
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class GiftRuleRepository implements GiftRuleRepositoryInterface
 {
@@ -69,13 +70,13 @@ class GiftRuleRepository implements GiftRuleRepositoryInterface
     /**
      * GiftRuleRepository constructor.
      *
-     * @param CollectionProcessor                   $collectionProcessor
-     * @param GiftRuleInterfaceFactory              $objectFactory
-     * @param GiftRuleResource                      $objectResource
-     * @param GiftRuleCollectionFactory             $objectCollectionFactory
-     * @param GiftRuleSearchResultsInterfaceFactory $objectSearchResultsFactory
-     * @param CacheInterface                        $cache
-     * @param null                                  $identifierFieldName
+     * @param CollectionProcessor                   $collectionProcessor        Collection processor
+     * @param GiftRuleInterfaceFactory              $objectFactory              Gift rule interface factory
+     * @param GiftRuleResource                      $objectResource             Gift rule resource
+     * @param GiftRuleCollectionFactory             $objectCollectionFactory    Gift rule collection factory
+     * @param GiftRuleSearchResultsInterfaceFactory $objectSearchResultsFactory Gift rule search results interface factory
+     * @param CacheInterface                        $cache                      Cache interface
+     * @param null                                  $identifierFieldName        Identifier field name
      */
     public function __construct(
         CollectionProcessor $collectionProcessor,
@@ -97,6 +98,7 @@ class GiftRuleRepository implements GiftRuleRepositoryInterface
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function getById($objectId)
     {
@@ -106,13 +108,13 @@ class GiftRuleRepository implements GiftRuleRepositoryInterface
             $this->objectResource->load($object, $objectId);
 
             if (!$object->getId()) {
-                // object does not exist
+                // Object does not exist.
                 throw NoSuchEntityException::singleField('objectId', $objectId);
             }
 
             $this->cacheById[$object->getId()] = $object;
 
-            if (!is_null($this->identifierFieldName)) {
+            if ($this->identifierFieldName != null) {
                 $objectIdentifier = $object->getData($this->identifierFieldName);
                 $this->cacheByIdentifier[$objectIdentifier] = $object;
             }
@@ -137,10 +139,10 @@ class GiftRuleRepository implements GiftRuleRepositoryInterface
             $this->collectionProcessor->process($searchCriteria, $collection);
         }
 
-        // load the collection
+        // Load the collection.
         $collection->load();
 
-        // build the result
+        // Build the result.
         $searchResults->setTotalCount($collection->getSize());
         $searchResults->setItems($collection->getItems());
 
@@ -150,7 +152,7 @@ class GiftRuleRepository implements GiftRuleRepositoryInterface
     /**
      * Delete entity
      *
-     * @param AbstractModel $object
+     * @param AbstractModel $object Object
      *
      * @return boolean
      * @throws CouldNotDeleteException
@@ -161,7 +163,7 @@ class GiftRuleRepository implements GiftRuleRepositoryInterface
             $this->objectResource->delete($object);
 
             unset($this->cacheById[$object->getId()]);
-            if (!is_null($this->identifierFieldName)) {
+            if ($this->identifierFieldName != null) {
                 $objectIdentifier = $object->getData($this->identifierFieldName);
                 unset($this->cacheByIdentifier[$objectIdentifier]);
             }
@@ -183,7 +185,7 @@ class GiftRuleRepository implements GiftRuleRepositoryInterface
             $this->objectResource->save($object);
 
             unset($this->cacheById[$object->getId()]);
-            if (!is_null($this->identifierFieldName)) {
+            if ($this->identifierFieldName != null) {
                 $objectIdentifier = $object->getData($this->identifierFieldName);
                 unset($this->cacheByIdentifier[$objectIdentifier]);
             }

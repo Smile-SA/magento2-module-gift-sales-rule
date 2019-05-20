@@ -42,8 +42,8 @@ class ReadHandler implements ExtensionInterface
     /**
      * ReadHandler constructor.
      *
-     * @param MetadataPool       $metadataPool
-     * @param GiftRuleRepository $giftRuleRepository
+     * @param MetadataPool       $metadataPool       Metadata pool
+     * @param GiftRuleRepository $giftRuleRepository Gift rule repository
      */
     public function __construct(
         MetadataPool $metadataPool,
@@ -56,8 +56,8 @@ class ReadHandler implements ExtensionInterface
     /**
      * Fill Sales Rule extension attributes with gift rule attributes
      *
-     * @param Rule|object $entity
-     * @param array       $arguments
+     * @param Rule|object $entity    Entity
+     * @param array       $arguments Arguments
      *
      * @return Rule
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
@@ -72,8 +72,8 @@ class ReadHandler implements ExtensionInterface
                 /** @var GiftRuleInterface $giftRule */
                 $giftRule = $this->giftRuleRepository->getById($entity->getData($metadata->getLinkField()));
 
-                $attributes['gift_rule'][GiftRuleInterface::MAXIMUM_NUMBER_PRODUCT] = 
-                    $giftRule->getMaximumNumberProduct();
+                $maximumNumber = $giftRule->getMaximumNumberProduct();
+                $attributes['gift_rule'][GiftRuleInterface::MAXIMUM_NUMBER_PRODUCT] = $maximumNumber;
                 $attributes['gift_rule'][GiftRuleInterface::PRICE_RANGE] = $giftRule->getPriceRange();
             } catch (NoSuchEntityException $exception) {
                 $attributes['gift_rule'][GiftRuleInterface::MAXIMUM_NUMBER_PRODUCT] = null;

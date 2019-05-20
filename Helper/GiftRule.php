@@ -42,9 +42,9 @@ class GiftRule extends AbstractHelper
     /**
      * GiftRule constructor.
      *
-     * @param Context                     $context
-     * @param GiftRuleRepositoryInterface $giftRuleRepository
-     * @param array                       $giftRule
+     * @param Context                     $context            Context
+     * @param GiftRuleRepositoryInterface $giftRuleRepository Gift rule repository
+     * @param array                       $giftRule           Gift rule
      */
     public function __construct(
         Context $context,
@@ -60,7 +60,7 @@ class GiftRule extends AbstractHelper
     /**
      * Is gift sales rule
      *
-     * @param Rule $rule
+     * @param Rule $rule Rule
      *
      * @return bool
      */
@@ -77,8 +77,8 @@ class GiftRule extends AbstractHelper
     /**
      * Check if is valid gift rule for quote
      *
-     * @param Rule  $rule
-     * @param Quote $quote
+     * @param Rule  $rule  Rule
+     * @param Quote $quote Quote
      *
      * @return bool
      * @throws \Magento\Framework\Exception\NoSuchEntityException
@@ -119,8 +119,8 @@ class GiftRule extends AbstractHelper
     /**
      * Retrieve url for add gift product to cart
      *
-     * @param int    $giftRuleId
-     * @param string $giftRuleCode
+     * @param int    $giftRuleId   Gift rule id
+     * @param string $giftRuleCode Gift rule code
      *
      * @return string
      */
@@ -129,7 +129,7 @@ class GiftRule extends AbstractHelper
         $routeParams = [
             ActionInterface::PARAM_NAME_URL_ENCODED => $this->urlEncoder->encode($this->_urlBuilder->getCurrentUrl()),
             'gift_rule_id'   => $giftRuleId,
-            'gift_rule_code' => $giftRuleCode
+            'gift_rule_code' => $giftRuleCode,
         ];
 
         return $this->_getUrl('giftsalesrule/cart/add', $routeParams);

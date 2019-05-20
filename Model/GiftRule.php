@@ -28,25 +28,20 @@ class GiftRule extends AbstractModel implements GiftRuleInterface, IdentityInter
 {
     const CACHE_TAG = 'smile_gift_sales_rule_gift_rule';
 
-    /** {@inheritdoc} */
+    /**
+     * @var string
+     */
     protected $_eventPrefix = 'smile_gift_sales_rule_gift_rule';
 
-    /** {@inheritdoc} */
+    /**
+     * @var string
+     */
     protected $_eventObject = 'smile_gift_sales_rule_gift_rule';
 
-    /** {@inheritdoc} */
-    protected $_cacheTag = self::CACHE_TAG;
-
     /**
-     * {@inheritdoc}
-     * @SuppressWarnings(PHPMD.CamelCaseMethodName)
+     * @var string
      */
-    protected function _construct()
-    {
-        $this->_init(
-            \Smile\GiftSalesRule\Model\ResourceModel\GiftRule::class
-        );
-    }
+    protected $_cacheTag = self::CACHE_TAG;
 
     /**
      * {@inheritdoc}
@@ -92,7 +87,7 @@ class GiftRule extends AbstractModel implements GiftRuleInterface, IdentityInter
      * Populate the object from array values
      * It is better to use setters instead of the generic setData method
      *
-     * @param array $values
+     * @param array $values values
      *
      * @return GiftRule
      */
@@ -102,5 +97,16 @@ class GiftRule extends AbstractModel implements GiftRuleInterface, IdentityInter
         $this->setPriceRange($values['price_range']);
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CamelCaseMethodName)
+     */
+    protected function _construct()
+    {
+        $this->_init(
+            \Smile\GiftSalesRule\Model\ResourceModel\GiftRule::class
+        );
     }
 }

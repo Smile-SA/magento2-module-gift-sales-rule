@@ -64,11 +64,11 @@ class Cache extends AbstractHelper
     /**
      * GiftSalesRuleCache constructor.
      *
-     * @param Context                     $context
-     * @param CacheInterface              $cache
-     * @param GiftRuleRepositoryInterface $giftRuleRepository
-     * @param CollectionFactory           $productCollectionFactory
-     * @param Builder                     $sqlBuilder
+     * @param Context                     $context                  Context
+     * @param CacheInterface              $cache                    Cache
+     * @param GiftRuleRepositoryInterface $giftRuleRepository       Gift rule repository
+     * @param CollectionFactory           $productCollectionFactory Product collection factory
+     * @param Builder                     $sqlBuilder               Sql builder
      */
     public function __construct(
         Context $context,
@@ -88,9 +88,9 @@ class Cache extends AbstractHelper
     /**
      * Save cached gift rule
      *
-     * @param string                $identifier
-     * @param Rule                  $rule
-     * @param int|GiftRuleInterface $giftRule
+     * @param string                $identifier Identifier
+     * @param Rule                  $rule       Rule
+     * @param int|GiftRuleInterface $giftRule   Gift rule
      *
      * @return array
      * @throws \Magento\Framework\Exception\NoSuchEntityException
@@ -109,8 +109,7 @@ class Cache extends AbstractHelper
             /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection $collection */
             $collection = $this->productCollectionFactory->create();
 
-            $collection
-                ->addStoreFilter();
+            $collection->addStoreFilter();
 
             $actions = $rule->getActions();
             $actions->collectValidatedAttributes($collection);
@@ -125,7 +124,7 @@ class Cache extends AbstractHelper
             $giftRuleData = [
                 self::DATA_LABEL => $rule->getStoreLabel(),
                 self::DATA_MAXIMUM_NUMBER_PRODUCT => $giftRule->getMaximumNumberProduct(),
-                self::DATA_PRODUCT_ITEMS => $items
+                self::DATA_PRODUCT_ITEMS => $items,
             ];
 
             $this->cache->save(
@@ -146,7 +145,7 @@ class Cache extends AbstractHelper
     /**
      * Get cached gift rule
      *
-     * @param int|string $giftRuleCode
+     * @param int|string $giftRuleCode Gift rule code
      *
      * @return array
      */

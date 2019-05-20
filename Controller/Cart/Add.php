@@ -59,12 +59,12 @@ class Add extends \Magento\Framework\App\Action\Action
     /**
      * Add constructor.
      *
-     * @param Context                  $context
-     * @param Validator                $formKeyValidator
-     * @param GiftRuleServiceInterface $giftRuleService
-     * @param CartRepositoryInterface  $quoteRepository
-     * @param Cart                     $cart
-     * @param LoggerInterface          $logger
+     * @param Context                  $context          Context
+     * @param Validator                $formKeyValidator Form key validator
+     * @param GiftRuleServiceInterface $giftRuleService  Gift rule service
+     * @param CartRepositoryInterface  $quoteRepository  Quote repository
+     * @param Cart                     $cart             Cart
+     * @param LoggerInterface          $logger           Logger
      */
     public function __construct(
         Context $context,
@@ -93,6 +93,7 @@ class Add extends \Magento\Framework\App\Action\Action
             $this->messageManager->addErrorMessage(
                 __('Your session has expired')
             );
+
             return $this->resultRedirectFactory->create()->setPath('checkout/cart');
         }
 
@@ -102,6 +103,7 @@ class Add extends \Magento\Framework\App\Action\Action
             $this->messageManager->addErrorMessage(
                 __('We can\'t add this gift item to your shopping cart.')
             );
+
             return $this->resultRedirectFactory->create()->setPath('checkout/cart');
         }
 
@@ -120,13 +122,14 @@ class Add extends \Magento\Framework\App\Action\Action
             $this->messageManager->addSuccessMessage(
                 __('You added gift product to your shopping cart.')
             );
-            return $this->resultRedirectFactory->create()->setPath('checkout/cart');
 
+            return $this->resultRedirectFactory->create()->setPath('checkout/cart');
         } catch (\Exception $e) {
             $this->logger->critical($e);
             $this->messageManager->addErrorMessage(
                 __('We can\'t add this gift item to your shopping cart.')
             );
+
             return $this->resultRedirectFactory->create()->setPath('checkout/cart');
         }
     }
@@ -134,31 +137,37 @@ class Add extends \Magento\Framework\App\Action\Action
     /**
      * Validate post parameters.
      *
-     * @param array $params
+     * @param array $params params
+     *
      * @return bool
      */
     protected function validatePostParameters(array $params): bool
     {
+        $return = true;
+
         if (!isset($params['gift_rule_code'])
             || !isset($params['gift_rule_id'])
             || !isset($params['products'])
             || !is_array($params['products'])) {
-            return false;
+            $return = false;
         }
 
-        foreach ($params['products'] as $productId => $productData) {
-            if (!isset($productData['qty'])) {
-                return false;
+        if ($return) {
+            foreach ($params['products'] as $productData) {
+                if (!isset($productData['qty'])) {
+                    $return = false;
+                }
             }
         }
 
-        return true;
+        return $return;
     }
 
     /**
      * Format post parameters for the add to cart method.
      *
-     * @param $params
+     * @param array $params params
+     *
      * @return array
      */
     protected function formatProductPostParameters($params)

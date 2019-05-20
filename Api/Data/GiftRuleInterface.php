@@ -43,7 +43,7 @@ interface GiftRuleInterface
     /**
      * Set the maximum number product.
      *
-     * @param int $value
+     * @param int $value Value
      * @return $this
      */
     public function setMaximumNumberProduct($value);
@@ -58,7 +58,7 @@ interface GiftRuleInterface
     /**
      * Set the price range.
      *
-     * @param decimal $value
+     * @param decimal $value Value
      * @return $this
      */
     public function setPriceRange($value);

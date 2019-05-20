@@ -34,7 +34,7 @@ class CombinePlugin
     /**
      * CombinePlugin constructor.
      *
-     * @param GiftRuleHelper $giftRuleHelper
+     * @param GiftRuleHelper $giftRuleHelper Gift rule helper
      */
     public function __construct(
         GiftRuleHelper $giftRuleHelper
@@ -45,9 +45,9 @@ class CombinePlugin
     /**
      * Return true if rule is a gift sales rule
      *
-     * @param Combine       $subject
-     * @param callable      $proceed
-     * @param AbstractModel $model
+     * @param Combine       $subject Subject
+     * @param callable      $proceed Proceed
+     * @param AbstractModel $model   Model
      *
      * @return bool
      */
@@ -60,6 +60,7 @@ class CombinePlugin
             if (!$this->giftRuleHelper->isValidGiftRule($subject->getRule(), $model->getQuote())) {
                 return false;
             }
+
             return true;
         }
 

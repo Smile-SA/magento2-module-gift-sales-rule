@@ -52,12 +52,12 @@ class OfferProductPerPriceRange extends AbstractDiscount
     /**
      * OfferProductPerPriceRange constructor.
      *
-     * @param Validator                   $validator
-     * @param DataFactory                 $discountDataFactory
-     * @param PriceCurrencyInterface      $priceCurrency
-     * @param checkoutSession             $checkoutSession
-     * @param GiftRuleCacheHelper         $giftRuleCacheHelper
-     * @param GiftRuleRepositoryInterface $giftRuleRepository
+     * @param Validator                   $validator           Validator
+     * @param DataFactory                 $discountDataFactory Discount data factory
+     * @param PriceCurrencyInterface      $priceCurrency       Price currency
+     * @param checkoutSession             $checkoutSession     Checkout session
+     * @param GiftRuleCacheHelper         $giftRuleCacheHelper Gift rule cache helper
+     * @param GiftRuleRepositoryInterface $giftRuleRepository  Gift rule repository
      */
     public function __construct(
         Validator $validator,
@@ -79,11 +79,13 @@ class OfferProductPerPriceRange extends AbstractDiscount
     }
 
     /**
-     * @param Rule         $rule
-     * @param AbstractItem $item
-     * @param float        $qty
+     * @param Rule         $rule Rule
+     * @param AbstractItem $item Item
+     * @param float        $qty  Qty
      *
      * @return DiscountData
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function calculate($rule, $item, $qty)
     {
@@ -95,7 +97,7 @@ class OfferProductPerPriceRange extends AbstractDiscount
 
         $calculateId = 'calculate_gift_rule_'.$rule->getRuleId();
         if (!$quote->getData($calculateId)) {
-            // Set only for performance (not save in DB)
+            // Set only for performance (not save in DB).
             $quote->setData($calculateId, true);
 
             /**
@@ -108,21 +110,21 @@ class OfferProductPerPriceRange extends AbstractDiscount
                 /** @var int $level */
                 $range = floor($quote->getGrandTotal() / $giftRule->getPriceRange());
 
-                // Save active gift rule in session
+                // Save active gift rule in session.
                 $giftRuleSessionData = $this->checkoutSession->getGiftRules();
                 $giftRuleSessionData[$rule->getRuleId()] = $rule->getRuleId() . '_' . $range;
                 $this->checkoutSession->setGiftRules($giftRuleSessionData);
 
-                // Increase maximum number product by range
-                $giftRule->setMaximumNumberProduct(min($giftRule->getMaximumNumberProduct(), $range));
+                // Increase maximum number product by range.
+                $giftRule->setMaximumNumberProduct($giftRule->getMaximumNumberProduct() * $range);
 
                 $this->giftRuleCacheHelper->saveCachedGiftRule(
                     $rule->getRuleId() . '_' . $range,
                     $rule,
-                    (int)$rule->getRuleId()
+                    $giftRule
                 );
             } else {
-                // Save active gift rule in session
+                // Save active gift rule in session.
                 $giftRuleSessionData = $this->checkoutSession->getGiftRules();
                 if (isset($giftRuleSessionData[$rule->getRuleId()])) {
                     unset($giftRuleSessionData[$rule->getRuleId()]);

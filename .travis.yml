@@ -1,8 +1,8 @@
 language: php
 
 php:
-- '7.1'
-- '7.2'
+  - '7.1'
+  - '7.2'
 
 install: [
   "mkdir -p app/etc var",
@@ -15,7 +15,7 @@ cache:
     - $HOME/.composer/cache
 
 script:
-    - vendor/bin/phpcs --config-set installed_paths vendor/magento/marketplace-eqp/
-    - vendor/bin/phpcs --standard=vendor/magento/marketplace-eqp/MEQP2 --ignore=vendor,pub --severity=9 ./
-    - vendor/bin/phpcs --standard=vendor/smile/magento2-smilelab-phpcs/phpcs-standards/SmileLab --ignore=vendor,pub --extensions=php ./
-    - vendor/bin/phpmd ./ text vendor/smile/magento2-smilelab-phpmd/phpmd-rulesets/rulset.xml --exclude vendor,pub
+  - vendor/bin/phpcs --config-set installed_paths vendor/magento/marketplace-eqp/
+  - vendor/bin/phpcs --standard=vendor/magento/marketplace-eqp/MEQP2 --ignore=vendor,pub --severity=9 ./
+  - vendor/bin/phpcs --standard=vendor/smile/magento2-smilelab-phpcs/phpcs-standards/SmileLab --ignore=vendor,pub --extensions=php ./
+  - vendor/bin/phpmd ./ text vendor/smile/magento2-smilelab-phpmd/phpmd-rulesets/rulset.xml --exclude vendor,pub

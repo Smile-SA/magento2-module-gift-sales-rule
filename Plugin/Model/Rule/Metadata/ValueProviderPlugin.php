@@ -45,8 +45,8 @@ class ValueProviderPlugin
     /**
      * UpdateRuleDataObserver constructor.
      *
-     * @param GiftRuleRepositoryInterface $giftRuleRepository
-     * @param GiftRuleFactory             $giftRuleFactory
+     * @param GiftRuleRepositoryInterface $giftRuleRepository Gift rule repository
+     * @param GiftRuleFactory             $giftRuleFactory    Gift rule factory
      */
     public function __construct(
         GiftRuleRepositoryInterface $giftRuleRepository,
@@ -59,11 +59,12 @@ class ValueProviderPlugin
     /**
      * Add gift sales rule label with rule type actions
      *
-     * @param ValueProvider $subject
-     * @param callable      $proceed
-     * @param Rule          $rule
+     * @param ValueProvider $subject Subject
+     * @param array         $result  Result
+     * @param Rule          $rule    Rule
      *
      * @return mixed
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function afterGetMetadataValues(
         ValueProvider $subject,
@@ -74,20 +75,20 @@ class ValueProviderPlugin
 
         $result['actions']['children']['simple_action']['arguments']['data']['config']['options'][] = [
             'label' => __('to offer product'),
-            'value' => GiftRuleInterface::OFFER_PRODUCT
+            'value' => GiftRuleInterface::OFFER_PRODUCT,
         ];
 
         $result['actions']['children']['simple_action']['arguments']['data']['config']['options'][] = [
             'label' => __('to offer product per price range'),
-            'value' => GiftRuleInterface::OFFER_PRODUCT_PER_PRICE_RANGE
+            'value' => GiftRuleInterface::OFFER_PRODUCT_PER_PRICE_RANGE,
         ];
 
         $result['actions']['children']['maximum_number_product']['arguments']['data']['config'] = [
-            'value' => $extensionAttributes['gift_rule'][GiftRuleInterface::MAXIMUM_NUMBER_PRODUCT]
+            'value' => $extensionAttributes['gift_rule'][GiftRuleInterface::MAXIMUM_NUMBER_PRODUCT],
         ];
 
         $result['actions']['children']['price_range']['arguments']['data']['config'] = [
-            'value' => $extensionAttributes['gift_rule'][GiftRuleInterface::PRICE_RANGE]
+            'value' => $extensionAttributes['gift_rule'][GiftRuleInterface::PRICE_RANGE],
         ];
 
         return $result;

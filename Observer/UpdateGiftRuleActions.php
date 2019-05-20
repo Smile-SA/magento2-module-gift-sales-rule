@@ -41,9 +41,10 @@ class UpdateGiftRuleActions implements ObserverInterface
     protected $serializer;
 
     /**
-     * SaveGiftSalesRule constructor.
+     * UpdateGiftRuleActions constructor.
      *
-     * @param serializer $serializer
+     * @param GiftRuleHelper $giftRuleHelper Gift rule helper
+     * @param serializer     $serializer     Serializer
      */
     public function __construct(
         GiftRuleHelper $giftRuleHelper,
@@ -56,7 +57,7 @@ class UpdateGiftRuleActions implements ObserverInterface
     /**
      * Remove quote condition if it's gift rule type
      *
-     * @param Observer $observer
+     * @param Observer $observer Observer
      */
     public function execute(Observer $observer)
     {
@@ -69,7 +70,7 @@ class UpdateGiftRuleActions implements ObserverInterface
                 if (isset($actions['conditions'])) {
                     foreach ($actions['conditions'] as $index => $condition) {
                         if (strpos($condition['attribute'], self::QUOTE_ATTRIBUTE) !== false) {
-                            // Remove quote condition for gift rule
+                            // Remove quote condition for gift rule.
                             unset($actions['conditions'][$index]);
                         }
                     }

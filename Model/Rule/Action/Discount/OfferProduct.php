@@ -44,11 +44,11 @@ class OfferProduct extends AbstractDiscount
     /**
      * OfferProduct constructor.
      *
-     * @param Validator              $validator
-     * @param DataFactory            $discountDataFactory
-     * @param PriceCurrencyInterface $priceCurrency
-     * @param checkoutSession        $checkoutSession
-     * @param GiftRuleCacheHelper    $giftRuleCacheHelper
+     * @param Validator              $validator           Validator
+     * @param DataFactory            $discountDataFactory Discount data factory
+     * @param PriceCurrencyInterface $priceCurrency       Price currency
+     * @param checkoutSession        $checkoutSession     Checkout session
+     * @param GiftRuleCacheHelper    $giftRuleCacheHelper Gift rule cache helper
      */
     public function __construct(
         Validator $validator,
@@ -68,11 +68,13 @@ class OfferProduct extends AbstractDiscount
     }
 
     /**
-     * @param Rule         $rule
-     * @param AbstractItem $item
-     * @param float        $qty
+     * @param Rule         $rule Rule
+     * @param AbstractItem $item Item
+     * @param float        $qty  Qty
      *
      * @return DiscountData
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function calculate($rule, $item, $qty)
     {
@@ -84,19 +86,18 @@ class OfferProduct extends AbstractDiscount
 
         $calculateId = 'calculate_gift_rule_'.$rule->getRuleId();
         if (!$quote->getData($calculateId)) {
-            // Set only for performance (not save in DB)
+            // Set only for performance (not save in DB).
             $quote->setData($calculateId, true);
 
-            // Save active gift rule in session
+            // Save active gift rule in session.
             $giftRuleSessionData = $this->checkoutSession->getGiftRules();
             $giftRuleSessionData[$rule->getRuleId()] = $rule->getRuleId();
             $this->checkoutSession->setGiftRules($giftRuleSessionData);
 
-            /** @var array $giftRuleData */
-            $giftRuleData = $this->giftRuleCacheHelper->saveCachedGiftRule(
+            $this->giftRuleCacheHelper->saveCachedGiftRule(
                 $rule->getRuleId(),
                 $rule,
-                (int)$rule->getRuleId()
+                (int) $rule->getRuleId()
             );
         }
 

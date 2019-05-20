@@ -46,11 +46,11 @@ class Rule extends \Magento\Framework\View\Element\Template
     /**
      * Cart constructor.
      *
-     * @param Context                  $context
-     * @param GiftRuleServiceInterface $giftRuleService
-     * @param GiftRuleHelper           $giftRuleHelper
-     * @param CollectionFactory        $collectionFactory
-     * @param array                    $data
+     * @param Context                  $context           Context
+     * @param GiftRuleServiceInterface $giftRuleService   Gift rule service
+     * @param GiftRuleHelper           $giftRuleHelper    Gift rule helper
+     * @param CollectionFactory        $collectionFactory Collection factory
+     * @param array                    $data              Data
      */
     public function __construct(
         Context $context,
@@ -78,7 +78,8 @@ class Rule extends \Magento\Framework\View\Element\Template
     /**
      * Set gift rule
      *
-     * @param GiftRuleDataInterface $giftRule
+     * @param GiftRuleDataInterface $giftRule Gift rule
+     *
      * @return $this
      */
     public function setGiftRule(GiftRuleDataInterface $giftRule)
@@ -89,7 +90,8 @@ class Rule extends \Magento\Framework\View\Element\Template
     /**
      * Get product collection.
      *
-     * @param array $productItems
+     * @param array $productItems Product items
+     *
      * @return Collection
      */
     public function getProductCollection(array $productItems)
@@ -100,14 +102,15 @@ class Rule extends \Magento\Framework\View\Element\Template
             ->addIdFilter(array_keys($productItems))
             ->addFinalPrice()
         ;
+
         return $productCollection;
     }
 
     /**
      * Get add to cart url.
      *
-     * @param int    $giftRuleId
-     * @param string $giftRuleCode
+     * @param int    $giftRuleId   Gift rule id
+     * @param string $giftRuleCode Gift rule code
      *
      * @return string
      */

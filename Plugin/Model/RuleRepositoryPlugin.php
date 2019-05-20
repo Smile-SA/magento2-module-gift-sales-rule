@@ -63,10 +63,10 @@ class RuleRepositoryPlugin
     /**
      * RuleRepositoryPlugin constructor.
      *
-     * @param ExtensionAttributesFactory  $extensionFactory
-     * @param SearchCriteriaBuilder       $searchCriteriaBuilder
-     * @param GiftRuleRepositoryInterface $giftRuleRepository
-     * @param GiftRuleFactory             $giftRuleFactory
+     * @param ExtensionAttributesFactory  $extensionFactory      Extension factoryuuuuuuuuu
+     * @param SearchCriteriaBuilder       $searchCriteriaBuilder Search criteria builder
+     * @param GiftRuleRepositoryInterface $giftRuleRepository    Gift rule repository
+     * @param GiftRuleFactory             $giftRuleFactory       Gift rule factory
      */
     public function __construct(
         ExtensionAttributesFactory $extensionFactory,
@@ -83,11 +83,12 @@ class RuleRepositoryPlugin
     /**
      * After save
      *
-     * @param RuleRepositoryInterface $subject
-     * @param RuleInterface           $rule
+     * @param RuleRepositoryInterface $subject Subject
+     * @param RuleInterface           $rule    Rule
      *
      * @return mixed
      * @throws \Magento\Framework\Exception\CouldNotSaveException
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function afterSave(RuleRepositoryInterface $subject, RuleInterface $rule)
     {
@@ -95,16 +96,17 @@ class RuleRepositoryPlugin
         $giftRule = $extensionAttributes->getGiftRule();
         $this->giftRuleRepository->save($giftRule);
 
-        return $entity;
+        return $rule;
     }
 
     /**
      * After get by id
      *
-     * @param RuleRepositoryInterface $subject
-     * @param RuleInterface           $rule
+     * @param RuleRepositoryInterface $subject Subject
+     * @param RuleInterface           $rule    Rule
      *
      * @return RuleInterface
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function afterGetById(RuleRepositoryInterface $subject, RuleInterface $rule)
     {
@@ -120,7 +122,7 @@ class RuleRepositoryPlugin
             /** @var GiftRuleInterface $giftRule */
             $giftRule = $this->giftRuleRepository->getById($rule->getRuleId());
         } catch (NoSuchEntityException $exception) {
-            // Create gift rule if not exist
+            // Create gift rule if not exist.
             $giftRule = $this->giftRuleFactory->create();
             $giftRule->setId($rule->getRuleId());
         }
@@ -133,8 +135,8 @@ class RuleRepositoryPlugin
     /**
      * After get list
      *
-     * @param RuleRepositoryInterface $subject
-     * @param SearchResults           $searchResults
+     * @param RuleRepositoryInterface $subject       Subject
+     * @param SearchResults           $searchResults Search results
      *
      * @return SearchResults
      */

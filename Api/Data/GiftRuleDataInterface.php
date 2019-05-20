@@ -40,7 +40,8 @@ interface GiftRuleDataInterface
     /**
      * Set the maximum number product.
      *
-     * @param int $value
+     * @param int $value Value
+     *
      * @return $this
      */
     public function setMaximumNumberProduct($value);
@@ -55,7 +56,8 @@ interface GiftRuleDataInterface
     /**
      * Set the code.
      *
-     * @param string $value
+     * @param string $value Value
+     *
      * @return $this
      */
     public function setCode($value);
@@ -70,7 +72,8 @@ interface GiftRuleDataInterface
     /**
      * Set the rule id.
      *
-     * @param int $value
+     * @param int $value Value
+     *
      * @return $this
      */
     public function setRuleId($value);
@@ -85,7 +88,8 @@ interface GiftRuleDataInterface
     /**
      * Set the label.
      *
-     * @param string $value
+     * @param string $value Value
+     *
      * @return $this
      */
     public function setLabel($value);
@@ -104,7 +108,8 @@ interface GiftRuleDataInterface
     /**
      * Set the code.
      *
-     * @param array $items
+     * @param array $items Items
+     *
      * @return $this
      */
     public function setQuoteItems($items);
@@ -123,7 +128,8 @@ interface GiftRuleDataInterface
     /**
      * Set the code.
      *
-     * @param array $items
+     * @param array $items Items
+     *
      * @return $this
      */
     public function setProductItems($items);
@@ -138,7 +144,8 @@ interface GiftRuleDataInterface
     /**
      * Set the rest number.
      *
-     * @param int $value
+     * @param int $value Value
+     *
      * @return $this
      */
     public function setRestNumber($value);
@@ -146,7 +153,8 @@ interface GiftRuleDataInterface
     /**
      * Populate the object from array values. It is better to use setters instead of the generic setData method.
      *
-     * @param array $values
+     * @param array $values Value
+     *
      * @return $this
      */
     public function populateFromArray(array $values);

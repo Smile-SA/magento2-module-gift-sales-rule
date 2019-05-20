@@ -27,7 +27,7 @@ interface GiftRuleServiceInterface
     /**
      * Get available gifts
      *
-     * @param Quote $quote
+     * @param Quote $quote Quote
      *
      * @return array
      *     {gift_rule_id} => [
@@ -48,10 +48,10 @@ interface GiftRuleServiceInterface
     /**
      * Add gift products
      *
-     * @param Quote    $quote
-     * @param array    $products
-     * @param string   $identifier
-     * @param int|null $giftRuleId
+     * @param Quote    $quote      Quote
+     * @param array    $products   Products
+     * @param string   $identifier Identifier
+     * @param int|null $giftRuleId Gift rule id
      *
      * @return mixed
      */
@@ -60,10 +60,10 @@ interface GiftRuleServiceInterface
     /**
      * Replace gift products
      *
-     * @param Quote    $quote
-     * @param array    $products
-     * @param string   $identifier
-     * @param int|null $giftRuleId
+     * @param Quote    $quote      Quote
+     * @param array    $products   Products
+     * @param string   $identifier Identifier
+     * @param int|null $giftRuleId Gift rule id
      *
      * @return mixed
      */

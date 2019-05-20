@@ -42,9 +42,9 @@ class ProductItem extends AbstractProduct
     /**
      * Cart constructor.
      *
-     * @param Context $context
-     * @param Data    $swatchHelper
-     * @param array   $data
+     * @param Context $context      Context
+     * @param Data    $swatchHelper Swatch helper
+     * @param array   $data         Data
      */
     public function __construct(
         Context $context,
@@ -68,7 +68,8 @@ class ProductItem extends AbstractProduct
     /**
      * Set product.
      *
-     * @param Product $product
+     * @param Product $product Product
+     *
      * @return $this
      */
     public function setProduct($product)
@@ -89,7 +90,8 @@ class ProductItem extends AbstractProduct
     /**
      * Set gift rule.
      *
-     * @param GiftRuleDataInterface $giftRule
+     * @param GiftRuleDataInterface $giftRule Gift rule
+     *
      * @return $this
      */
     public function setGiftRule(GiftRuleDataInterface $giftRule)
@@ -100,8 +102,10 @@ class ProductItem extends AbstractProduct
     /**
      * Get details renderer. Either render swatch or select attributes for configurable products.
      *
-     * @param string $type
+     * @param string $type Type
+     *
      * @return bool|\Magento\Framework\View\Element\AbstractBlock
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function getDetailsRenderer($type = null)
     {
@@ -122,16 +126,6 @@ class ProductItem extends AbstractProduct
     }
 
     /**
-     * Get swatch attributes data.
-     *
-     * @return array
-     */
-    protected function getSwatchAttributesData()
-    {
-        return $this->swatchHelper->getSwatchAttributesAsArray($this->getProduct());
-    }
-
-    /**
      * Get selected product quantity.
      *
      * @return int
@@ -146,5 +140,15 @@ class ProductItem extends AbstractProduct
         }
 
         return $qty;
+    }
+
+    /**
+     * Get swatch attributes data.
+     *
+     * @return array
+     */
+    protected function getSwatchAttributesData()
+    {
+        return $this->swatchHelper->getSwatchAttributesAsArray($this->getProduct());
     }
 }

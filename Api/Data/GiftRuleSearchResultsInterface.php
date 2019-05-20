@@ -34,7 +34,7 @@ interface GiftRuleSearchResultsInterface extends SearchResultsInterface
     /**
      * Set giftrule items.
      *
-     * @param GiftRuleInterface[] $items
+     * @param GiftRuleInterface[] $items Gift rule interface
      * @return $this
      */
     public function setItems(array $items);

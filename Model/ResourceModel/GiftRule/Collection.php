@@ -26,6 +26,14 @@ class Collection extends AbstractCollection
 {
     /**
      * {@inheritdoc}
+     */
+    public function toOptionArray()
+    {
+        return $this->_toOptionArray(GiftRuleInterface::RULE_ID, GiftRuleInterface::RULE_ID);
+    }
+
+    /**
+     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CamelCaseMethodName)
      */
     protected function _construct()
@@ -34,13 +42,5 @@ class Collection extends AbstractCollection
             \Smile\GiftSalesRule\Model\GiftRule::class,
             \Smile\GiftSalesRule\Model\ResourceModel\GiftRule::class
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function toOptionArray()
-    {
-        return $this->_toOptionArray(GiftRuleInterface::RULE_ID, GiftRuleInterface::RULE_ID);
     }
 }
