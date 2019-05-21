@@ -3,13 +3,14 @@ Gift Sales Rule [![Build Status](https://travis-ci.org/Smile-SA/magento2-module-
 
 ## What is magento2-module-gift-sales-rule Magento 2 Module?
 
-This module allow possibility to create cart price rules for:
-* add gifts products
-* add gifts products by price range
+This module provides 2 new actions to Magento cart price rule feature to :
+* offer gift product(s) to customer based on native conditions
+* offer gift product(s) to customer each time a threshold is reached (every 30$ in cart for example)
 
-For each cart price rules, we can define the number of gift product and the criteria to define the gift product list
+For each cart price rule, administrator can define the number of gift products authorized and use a set of conditions to define the gift product list. 
+On the frontend side, when the rule is applied, the customer can choose between a list of products the one(s) he prefers and add them to his cart. 
 
-Gift product type can be:
+Gift products type can be:
 * simple product
 * configurable product
 
@@ -27,16 +28,16 @@ Together we explore, invent, and test technologies of the future, to better serv
 
 ## Main Features
 
-* **Parameter cart price rules for add gifts product**
+* **Configure cart price rules to select gift products**
 ![To offer product](doc/static/to_offer_product.png)
 
-* **Parameter cart price rules for add gifts product per price range**
+* **Configure cart price rules to select gift products and the price range**
 ![To offer product per price range](doc/static/to_offer_product_per_price_range.png)
 
-* **Show gift product popin**
+* **Display gift product popin**
 ![Gift popin](doc/static/gift_popin.png)
 
-* **Show added gift product in cart**
+* **Display added gift product in cart**
 ![Gift cart](doc/static/gift_cart.png)
 
 ## Documentation
