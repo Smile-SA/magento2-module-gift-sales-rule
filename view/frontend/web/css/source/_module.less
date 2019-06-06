@@ -21,6 +21,9 @@
     .free-gift-modal {
         .modal-inner-wrap {
             max-width: 1000px;
+            .modal-content {
+                margin-bottom: 20px;
+            }
             .products-grid .product-item {
                 width: 25%;
                 margin-left: 0;
@@ -39,11 +42,21 @@
                     margin-bottom: 10px;
                 }
             }
-            .actions .primary-block {
-                margin: 0 auto 10px;
-                width: 200px;
-                .primary {
-                    width: 100%;
+            .actions {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                border-top: 1px @color-gray-light5 solid;
+                z-index: 100;
+                background-color: white;
+                margin: 0 3rem;
+                .primary-block {
+                    margin: 10px auto;
+                    width: 200px;
+                    .primary {
+                        width: 100%;
+                    }
                 }
             }
             .message-error {
@@ -67,8 +80,19 @@
 //  Common
 //  _____________________________________________
 @media all and (max-width: @screen__l), print {
-    .free-gift-modal .modal-inner-wrap .products-grid .product-item {
-        width: 33%;
+    .modal-popup.modal-slide.free-gift-modal .modal-inner-wrap {
+        max-height: 100%;
+    }
+    .free-gift-modal .modal-inner-wrap {
+        .products-grid .product-item {
+            width: 33%;
+        }
+        .actions {
+            .lib-css(background-color, @modal-slide-mobile__background-color);
+            .primary-block {
+                width: 100%;
+            }
+        }
     }
 }
 
