@@ -15,6 +15,6 @@
  -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Api/etc/extension_attributes.xsd">
     <extension_attributes for="Magento\SalesRule\Api\Data\RuleInterface">
-        <attribute code="gift_rule" type="Smile\GiftSalesRule\Api\Data\GiftRuleInterface[]" />
+        <attribute code="gift_rule" type="Smile\GiftSalesRule\Api\Data\GiftRuleInterface" />
     </extension_attributes>
 </config>
