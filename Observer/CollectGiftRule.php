@@ -153,7 +153,7 @@ class CollectGiftRule implements ObserverInterface
                             [
                                 [
                                     'id' => key($giftRuleData[GiftRuleCacheHelper::DATA_PRODUCT_ITEMS]),
-                                    'qty' => GiftRuleCacheHelper::DATA_MAXIMUM_NUMBER_PRODUCT,
+                                    'qty' => $giftRuleData[GiftRuleCacheHelper::DATA_MAXIMUM_NUMBER_PRODUCT],
                                 ],
                             ],
                             $giftRuleCode,
