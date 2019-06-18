@@ -70,13 +70,13 @@
             <argument name="extensionActions" xsi:type="array">
                 <item name="Magento\SalesRule\Api\Data\RuleInterface" xsi:type="array">
                     <item name="create" xsi:type="array">
-                        <item name="create_reward" xsi:type="string">Smile\GiftSalesRule\Model\SalesRule\SaveHandler</item>
+                        <item name="create_gift_rule" xsi:type="string">Smile\GiftSalesRule\Model\SalesRule\SaveHandler</item>
                     </item>
                     <item name="update" xsi:type="array">
-                        <item name="update_reward" xsi:type="string">Smile\GiftSalesRule\Model\SalesRule\SaveHandler</item>
+                        <item name="update_gift_rule" xsi:type="string">Smile\GiftSalesRule\Model\SalesRule\SaveHandler</item>
                     </item>
                     <item name="read" xsi:type="array">
-                        <item name="read_reward" xsi:type="string">Smile\GiftSalesRule\Model\SalesRule\ReadHandler</item>
+                        <item name="read_gift_rule" xsi:type="string">Smile\GiftSalesRule\Model\SalesRule\ReadHandler</item>
                     </item>
                 </item>
             </argument>
