@@ -34,7 +34,7 @@ interface GiftRuleServiceInterface
      *         maximum_number_product => {number}
      *         code => {gift_rule_code}
      *         items => [
-     *             {product_id} => [ {product_data} ]
+     *             {product_id} => [ {product_sku} ]
      *             ...
      *         ]
      *         quote_items => [
