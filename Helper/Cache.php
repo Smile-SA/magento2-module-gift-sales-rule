@@ -118,7 +118,7 @@ class Cache extends AbstractHelper
             $items = [];
             $productCacheTags = [];
             foreach ($collection->getItems() as $item) {
-                $items[$item->getId()] = $item->getData();
+                $items[$item->getId()] = $item->getSku();
                 $productCacheTags[] = Product::CACHE_TAG . '_' . $item->getEntityId();
             }
             $giftRuleData = [
