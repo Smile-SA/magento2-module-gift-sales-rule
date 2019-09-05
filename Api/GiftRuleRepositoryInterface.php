@@ -30,7 +30,7 @@ interface GiftRuleRepositoryInterface
      * Get a giftrule by ID.
      *
      * @param int $entityId Entity id
-     * @return GiftRuleInterface
+     * @return \Smile\GiftSalesRule\Api\Data\GiftRuleInterface
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getById($entityId);
@@ -39,7 +39,7 @@ interface GiftRuleRepositoryInterface
      * Get the giftrules matching the specified criteria.
      *
      * @param SearchCriteriaInterface $searchCriteria Search criteria
-     * @return GiftRuleSearchResultsInterface
+     * @return \Smile\GiftSalesRule\Api\Data\GiftRuleSearchResultsInterface
      */
     public function getList(SearchCriteriaInterface $searchCriteria = null);
 
@@ -47,7 +47,7 @@ interface GiftRuleRepositoryInterface
      * Save the GiftRule.
      *
      * @param GiftRuleInterface $giftRule Gift rule
-     * @return GiftRuleInterface
+     * @return \Smile\GiftSalesRule\Api\Data\GiftRuleInterface
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      */
     public function save(GiftRuleInterface $giftRule);

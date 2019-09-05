@@ -51,7 +51,7 @@ interface GiftRuleInterface
     /**
      * Get the price range.
      *
-     * @return decimal
+     * @return float
      */
     public function getPriceRange();
 

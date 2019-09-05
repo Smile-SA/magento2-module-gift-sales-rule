@@ -97,7 +97,7 @@ interface GiftRuleDataInterface
     /**
      * Get the code.
      *
-     * @return array
+     * @return mixed[]
      * [
      *     {product_id} => {qty}
      *     ...
@@ -117,7 +117,7 @@ interface GiftRuleDataInterface
     /**
      * Get the code.
      *
-     * @return array
+     * @return mixed[]
      * [
      *     {product_id} => [ {product_data} ]
      *     ...
