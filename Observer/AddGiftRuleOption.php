@@ -37,7 +37,8 @@ class AddGiftRuleOption implements ObserverInterface
         /** @var \Magento\Framework\DataObject $buyRequest */
         $buyRequest = $observer->getEvent()->getBuyRequest();
 
-        if ($giftRuleId = $buyRequest->getData('gift_rule')) {
+        $giftRuleId = $buyRequest->getData('gift_rule');
+        if ($giftRuleId) {
             $transport = $observer->getEvent()->getTransport();
             $transport->options['gift_rule'] = $giftRuleId;
         }
