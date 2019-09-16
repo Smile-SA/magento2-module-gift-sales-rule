@@ -97,7 +97,8 @@ class Cache extends AbstractHelper
      */
     public function saveCachedGiftRule($identifier, $rule, $giftRule)
     {
-        if (!$giftRuleData = $this->cache->load(self::CACHE_IDENTIFIER . $identifier)) {
+        $giftRuleData = $this->cache->load(self::CACHE_IDENTIFIER . $identifier);
+        if (!$giftRuleData) {
             if (is_int($giftRule)) {
                 /**
                  * Rules load by collection => extension attributes not present in rule entity

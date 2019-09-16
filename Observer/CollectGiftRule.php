@@ -173,7 +173,8 @@ class CollectGiftRule implements ObserverInterface
                                 break;
                             } else {
                                 $qtyToDelete = $qtyToDelete - $item->getQty();
-                                if ($parentItemId = $item->getParentItemId()) {
+                                $parentItemId = $item->getParentItemId();
+                                if ($parentItemId) {
                                     $quote->removeItem($parentItemId);
                                 }
                                 $quote->deleteItem($item);

@@ -75,7 +75,8 @@ class SaveHandler implements ExtensionInterface
     public function execute($entity, $arguments = [])
     {
         $metadata = $this->metadataPool->getMetadata(RuleInterface::class);
-        if ($ruleId = $entity->getData($metadata->getLinkField())) {
+        $ruleId = $entity->getData($metadata->getLinkField());
+        if ($ruleId) {
             $extensionAttributes = $entity->getExtensionAttributes();
             if (isset($extensionAttributes['gift_rule'])) {
                 try {

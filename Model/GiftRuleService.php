@@ -13,6 +13,7 @@
  */
 namespace Smile\GiftSalesRule\Model;
 
+use Exception;
 use Magento\Checkout\Model\Cart;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\CacheInterface;
@@ -153,14 +154,14 @@ class GiftRuleService implements GiftRuleServiceInterface
 
         foreach ($products as $product) {
             if (!(isset($product['id']) && isset($product['qty']))) {
-                throw new \Exception(__('We found an invalid request for adding gift product.'));
+                throw new Exception(__('We found an invalid request for adding gift product.'));
             }
 
             if ($this->isAuthorizedGiftProduct($product['id'], $giftRuleData, $product['qty'])) {
                 $product['gift_rule'] = $giftRuleId;
                 $this->cart->addProduct($product['id'], $product);
             } else {
-                throw new \Exception(__('We can\'t add this gift item to your shopping cart.'));
+                throw new Exception(__('We can\'t add this gift item to your shopping cart.'));
             }
         }
     }
@@ -188,7 +189,7 @@ class GiftRuleService implements GiftRuleServiceInterface
 
         foreach ($products as $product) {
             if (!(isset($product['id']) && isset($product['qty']))) {
-                throw new \Exception(__('We found an invalid request for adding gift product.'));
+                throw new Exception(__('We found an invalid request for adding gift product.'));
             }
             if ($this->isAuthorizedGiftProduct($product['id'], $giftRuleData, $product['qty'])) {
                 $quoteItem = false;
@@ -211,7 +212,7 @@ class GiftRuleService implements GiftRuleServiceInterface
                     $this->cart->addProduct($product['id'], $product);
                 }
             } else {
-                throw new \Exception(__('We can\'t add this gift item to your shopping cart.'));
+                throw new Exception(__('We can\'t add this gift item to your shopping cart.'));
             }
         }
 
@@ -263,7 +264,8 @@ class GiftRuleService implements GiftRuleServiceInterface
             if ($option && $option->getValue() == $giftRuleId) {
                 $attributesOptionValue = '';
                 /** @var Option $attributesOption */
-                if ($attributesOption = $item->getOptionByCode('attributes')) {
+                $attributesOption = $item->getOptionByCode('attributes');
+                if ($attributesOption) {
                     $attributesOptionValue = $attributesOption->getValue();
                 }
                 $quoteItem[$item->getProductId()  . $attributesOptionValue] = $item;
