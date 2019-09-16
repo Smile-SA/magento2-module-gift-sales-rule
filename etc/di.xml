@@ -24,6 +24,9 @@
     <type name="Magento\SalesRule\Model\Rule\Condition\Product\Combine">
         <plugin name="gift_sales_rules_condition_product_combine" type="Smile\GiftSalesRule\Plugin\Model\Rule\Condition\Product\CombinePlugin" />
     </type>
+    <type name="Magento\Checkout\Model\Cart">
+        <plugin name="gift_sales_rules_avoid_reorder" type="Smile\GiftSalesRule\Plugin\Checkout\Model\Cart" />
+    </type>
 
     <!-- Proxy -->
     <type name="Smile\GiftSalesRule\Model\GiftRuleService">
