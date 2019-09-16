@@ -29,7 +29,7 @@ interface GiftRuleServiceInterface
      *
      * @param Quote $quote Quote
      *
-     * @return array
+     * @return mixed[]
      *     {gift_rule_id} => [
      *         maximum_number_product => {number}
      *         code => {gift_rule_code}

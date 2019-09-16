@@ -27,7 +27,7 @@ interface GiftRuleSearchResultsInterface extends SearchResultsInterface
     /**
      * Get giftrule items.
      *
-     * @return GiftRuleInterface
+     * @return \Smile\GiftSalesRule\Api\Data\GiftRuleInterface
      */
     public function getItems();
 
