@@ -27,12 +27,12 @@ $rule = $block->getGiftRule();
                 "responsive": true,
                 "modalClass": "free-gift-modal",
                 "innerScroll": true,
-                "title": "<?= $block->escapeJs(__('%1: choose your %2 gifts', $rule->getLabel(), $rule->getMaximumNumberProduct())) ?>",
+                "title": "<?= $block->escapeJs(__('%1: choose your %2 gifts', $rule->getLabel(), $rule->getNumberOfferedProduct())) ?>",
                 "buttons": []
             }
         }'  style="display: none;">
             <div id="choose-gifts" data-mage-init='{"smileChooseGifts":{
-                "nbProductToOffer": "<?= (int) $rule->getMaximumNumberProduct() ?>",
+                "nbProductToOffer": "<?= (int) $rule->getNumberOfferedProduct() ?>",
                 "formId": "#choose-gifts-form-<?= (int) $rule->getCode() ?>"
             }}'>
                 <form id="choose-gifts-form-<?= (int) $rule->getCode() ?>" method="post" action="<?= $block->getAddToCartUrl($rule->getRuleId(), $rule->getCode()) ?>">

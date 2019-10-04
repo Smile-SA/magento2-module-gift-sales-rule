@@ -30,17 +30,17 @@ class GiftRuleData extends DataObject implements GiftRuleDataInterface
      *
      * @return int
      */
-    public function getMaximumNumberProduct()
+    public function getNumberOfferedProduct()
     {
-        return $this->getData(self::MAXIMUM_NUMBER_PRODUCT);
+        return $this->getData(self::NUMBER_OFFERED_PRODUCT);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setMaximumNumberProduct($maximumNumberProduct)
+    public function setNumberOfferedProduct($numberOfferedProduct)
     {
-        return $this->setData(self::MAXIMUM_NUMBER_PRODUCT, $maximumNumberProduct);
+        return $this->setData(self::NUMBER_OFFERED_PRODUCT, $numberOfferedProduct);
     }
 
     /**
@@ -145,7 +145,7 @@ class GiftRuleData extends DataObject implements GiftRuleDataInterface
     public function populateFromArray(array $values)
     {
         $this->setLabel($values['label']);
-        $this->setMaximumNumberProduct($values['maximum_number_product']);
+        $this->setNumberOfferedProduct($values['number_offered_product']);
         $this->setRestNumber($values['rest_number']);
         $this->setQuoteItems($values['quote_items']);
         $this->setProductItems($values['product_items']);

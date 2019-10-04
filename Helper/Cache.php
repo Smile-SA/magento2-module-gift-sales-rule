@@ -37,7 +37,7 @@ class Cache extends AbstractHelper
     const CACHE_DATA_TAG   = "gift_rule_cache";
     const CACHE_IDENTIFIER = "gift_rule_product_";
 
-    const DATA_MAXIMUM_NUMBER_PRODUCT = "maximum_number_product";
+    const DATA_NUMBER_OFFERED_PRODUCT = "number_offered_product";
     const DATA_PRODUCT_ITEMS          = "product_items";
     const DATA_LABEL                  = "label";
 
@@ -123,7 +123,7 @@ class Cache extends AbstractHelper
             }
             $giftRuleData = [
                 self::DATA_LABEL => $rule->getStoreLabel(),
-                self::DATA_MAXIMUM_NUMBER_PRODUCT => $giftRule->getMaximumNumberProduct(),
+                self::DATA_NUMBER_OFFERED_PRODUCT => $giftRule->getNumberOfferedProduct(),
                 self::DATA_PRODUCT_ITEMS => $items,
             ];
 

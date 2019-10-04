@@ -153,7 +153,7 @@ class CollectGiftRule implements ObserverInterface
                             [
                                 [
                                     'id' => key($giftRuleData[GiftRuleCacheHelper::DATA_PRODUCT_ITEMS]),
-                                    'qty' => $giftRuleData[GiftRuleCacheHelper::DATA_MAXIMUM_NUMBER_PRODUCT],
+                                    'qty' => $giftRuleData[GiftRuleCacheHelper::DATA_NUMBER_OFFERED_PRODUCT],
                                 ],
                             ],
                             $giftRuleCode,
@@ -162,9 +162,9 @@ class CollectGiftRule implements ObserverInterface
                         $saveQuote = true;
                     }
 
-                    if ($giftItemQty > $giftRuleData[GiftRuleCacheHelper::DATA_MAXIMUM_NUMBER_PRODUCT]) {
+                    if ($giftItemQty > $giftRuleData[GiftRuleCacheHelper::DATA_NUMBER_OFFERED_PRODUCT]) {
                         // Delete gift item.
-                        $qtyToDelete = $giftItemQty - $giftRuleData[GiftRuleCacheHelper::DATA_MAXIMUM_NUMBER_PRODUCT];
+                        $qtyToDelete = $giftItemQty - $giftRuleData[GiftRuleCacheHelper::DATA_NUMBER_OFFERED_PRODUCT];
 
                         foreach (array_reverse($giftItem) as $item) {
                             if ($item->getQty() > $qtyToDelete) {
