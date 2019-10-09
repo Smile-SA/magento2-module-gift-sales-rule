@@ -128,7 +128,7 @@ class Rule extends \Magento\Framework\View\Element\Template
     {
         $rule = $this->getGiftRule();
         $buttonLabel = __('Choose my gift(s)');
-        if ($rule->getRestNumber() !== $rule->getMaximumNumberProduct()) {
+        if ($rule->getRestNumber() !== $rule->getNumberOfferedProduct()) {
             $buttonLabel = __('Edit my choices');
         }
 

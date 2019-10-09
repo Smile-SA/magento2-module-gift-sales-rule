@@ -25,6 +25,7 @@ use Magento\SalesRule\Api\Data\RuleInterface;
 use Smile\GiftSalesRule\Api\Data\GiftRuleInterface;
 use Smile\GiftSalesRule\Api\GiftRuleRepositoryInterface;
 use Smile\GiftSalesRule\Helper\Cache as GiftRuleCacheHelper;
+use Smile\GiftSalesRule\Model\GiftRule;
 
 /**
  * Class Offer Product Per Price Range
@@ -103,7 +104,7 @@ class OfferProductPerPriceRange extends AbstractDiscount
             /**
              * Rules load by collection => extension attributes not present in rule entity
              */
-            /** @var GiftRuleInterface $giftRule */
+            /** @var GiftRule $giftRule */
             $giftRule = $this->giftRuleRepository->getById($rule->getRuleId());
 
             if ($quote->getGrandTotal() >= $giftRule->getPriceRange()) {
@@ -115,8 +116,8 @@ class OfferProductPerPriceRange extends AbstractDiscount
                 $giftRuleSessionData[$rule->getRuleId()] = $rule->getRuleId() . '_' . $range;
                 $this->checkoutSession->setGiftRules($giftRuleSessionData);
 
-                // Increase maximum number product by range.
-                $giftRule->setMaximumNumberProduct($giftRule->getMaximumNumberProduct() * $range);
+                // Set number offered product.
+                $giftRule->setNumberOfferedProduct($giftRule->getMaximumNumberProduct() * $range);
 
                 $this->giftRuleCacheHelper->saveCachedGiftRule(
                     $rule->getRuleId() . '_' . $range,

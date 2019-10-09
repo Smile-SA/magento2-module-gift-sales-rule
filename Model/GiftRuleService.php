@@ -116,7 +116,7 @@ class GiftRuleService implements GiftRuleServiceInterface
                 $gifts[$giftRuleId][GiftRuleDataInterface::RULE_ID] = $giftRuleId;
                 $gifts[$giftRuleId][GiftRuleDataInterface::CODE] = $giftRuleCode;
                 $gifts[$giftRuleId][GiftRuleDataInterface::REST_NUMBER]
-                    = $gifts[$giftRuleId][GiftRuleDataInterface::MAXIMUM_NUMBER_PRODUCT];
+                    = $gifts[$giftRuleId][GiftRuleDataInterface::NUMBER_OFFERED_PRODUCT];
                 $gifts[$giftRuleId][GiftRuleDataInterface::QUOTE_ITEMS] = [];
                 if (isset($quoteItems[$giftRuleId])) {
                     $gifts[$giftRuleId][GiftRuleDataInterface::QUOTE_ITEMS] = $quoteItems[$giftRuleId];
@@ -238,7 +238,7 @@ class GiftRuleService implements GiftRuleServiceInterface
     {
         $isAuthorizedGiftProduct = false;
         if (array_key_exists($productId, $giftRuleData[GiftRuleCacheHelper::DATA_PRODUCT_ITEMS])
-            && $qty <= $giftRuleData[GiftRuleCacheHelper::DATA_MAXIMUM_NUMBER_PRODUCT]) {
+            && $qty <= $giftRuleData[GiftRuleCacheHelper::DATA_NUMBER_OFFERED_PRODUCT]) {
             $isAuthorizedGiftProduct = true;
         }
 

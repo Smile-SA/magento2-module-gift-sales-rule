@@ -26,25 +26,25 @@ interface GiftRuleDataInterface
     const CODE                   = 'code';
     const LABEL                  = 'label';
     const QUOTE_ITEMS            = 'quote_items';
-    const MAXIMUM_NUMBER_PRODUCT = 'maximum_number_product';
+    const NUMBER_OFFERED_PRODUCT = 'number_offered_product';
     const PRODUCT_ITEMS          = 'product_items';
     const REST_NUMBER            = 'rest_number';
 
     /**
-     * Get the maximum number product.
+     * Get the number offered product.
      *
      * @return int
      */
-    public function getMaximumNumberProduct();
+    public function getNumberOfferedProduct();
 
     /**
-     * Set the maximum number product.
+     * Set the number offered product.
      *
      * @param int $value Value
      *
      * @return $this
      */
-    public function setMaximumNumberProduct($value);
+    public function setNumberOfferedProduct($value);
 
     /**
      * Get the code.

@@ -21,7 +21,9 @@ use Magento\SalesRule\Model\Rule\Action\Discount\AbstractDiscount;
 use Magento\SalesRule\Model\Rule\Action\Discount\Data as DiscountData;
 use Magento\SalesRule\Model\Rule\Action\Discount\DataFactory;
 use Magento\SalesRule\Model\Validator;
+use Smile\GiftSalesRule\Api\GiftRuleRepositoryInterface;
 use Smile\GiftSalesRule\Helper\Cache as GiftRuleCacheHelper;
+use Smile\GiftSalesRule\Model\GiftRule;
 
 /**
  * Class OfferProduct
@@ -42,23 +44,31 @@ class OfferProduct extends AbstractDiscount
     protected $giftRuleCacheHelper;
 
     /**
+     * @var GiftRuleRepositoryInterface
+     */
+    protected $giftRuleRepository;
+
+    /**
      * OfferProduct constructor.
      *
-     * @param Validator              $validator           Validator
-     * @param DataFactory            $discountDataFactory Discount data factory
-     * @param PriceCurrencyInterface $priceCurrency       Price currency
-     * @param checkoutSession        $checkoutSession     Checkout session
-     * @param GiftRuleCacheHelper    $giftRuleCacheHelper Gift rule cache helper
+     * @param Validator                   $validator           Validator
+     * @param DataFactory                 $discountDataFactory Discount data factory
+     * @param PriceCurrencyInterface      $priceCurrency       Price currency
+     * @param checkoutSession             $checkoutSession     Checkout session
+     * @param GiftRuleCacheHelper         $giftRuleCacheHelper Gift rule cache helper
+     * @param GiftRuleRepositoryInterface $giftRuleRepository  Gift rule repository
      */
     public function __construct(
         Validator $validator,
         DataFactory $discountDataFactory,
         PriceCurrencyInterface $priceCurrency,
         checkoutSession $checkoutSession,
-        GiftRuleCacheHelper $giftRuleCacheHelper
+        GiftRuleCacheHelper $giftRuleCacheHelper,
+        GiftRuleRepositoryInterface $giftRuleRepository
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->giftRuleCacheHelper = $giftRuleCacheHelper;
+        $this->giftRuleRepository = $giftRuleRepository;
 
         parent::__construct(
             $validator,
@@ -89,6 +99,12 @@ class OfferProduct extends AbstractDiscount
             // Set only for performance (not save in DB).
             $quote->setData($calculateId, true);
 
+            /** @var GiftRule $giftRule */
+            $giftRule = $this->giftRuleRepository->getById($rule->getRuleId());
+
+            // Set number offered product.
+            $giftRule->setNumberOfferedProduct($giftRule->getMaximumNumberProduct());
+
             // Save active gift rule in session.
             $giftRuleSessionData = $this->checkoutSession->getGiftRules();
             $giftRuleSessionData[$rule->getRuleId()] = $rule->getRuleId();
@@ -97,7 +113,7 @@ class OfferProduct extends AbstractDiscount
             $this->giftRuleCacheHelper->saveCachedGiftRule(
                 $rule->getRuleId(),
                 $rule,
-                (int) $rule->getRuleId()
+                $giftRule
             );
         }
 
