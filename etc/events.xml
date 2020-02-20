@@ -26,4 +26,7 @@
     <event name="sales_quote_collect_totals_after">
         <observer name="smile_gift_salesrule_collect_totals_after" instance="Smile\GiftSalesRule\Observer\CollectGiftRule"/>
     </event>
+    <event name="smile_gift_sales_rule_gift_rule_load_after">
+        <observer name="smile_gift_salesrule_set_number_offered_product_after_load" instance="Smile\GiftSalesRule\Observer\SetNumberOfferedProduct"/>
+    </event>
 </config>

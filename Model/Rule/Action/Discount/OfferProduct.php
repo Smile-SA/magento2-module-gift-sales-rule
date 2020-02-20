@@ -102,9 +102,6 @@ class OfferProduct extends AbstractDiscount
             /** @var GiftRule $giftRule */
             $giftRule = $this->giftRuleRepository->getById($rule->getRuleId());
 
-            // Set number offered product.
-            $giftRule->setNumberOfferedProduct($giftRule->getMaximumNumberProduct());
-
             // Save active gift rule in session.
             $giftRuleSessionData = $this->checkoutSession->getGiftRules();
             $giftRuleSessionData[$rule->getRuleId()] = $rule->getRuleId();

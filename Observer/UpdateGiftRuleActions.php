@@ -15,7 +15,6 @@ namespace Smile\GiftSalesRule\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\Serializer\Json as serializer;
 use Magento\SalesRule\Api\Data\RuleInterface;
 use Smile\GiftSalesRule\Helper\GiftRule as GiftRuleHelper;

@@ -134,4 +134,17 @@ class GiftRule extends AbstractHelper
 
         return $this->_getUrl('giftsalesrule/cart/add', $routeParams);
     }
+
+    /**
+     * Get range of a gift rule for a quote.
+     *
+     * @param Quote             $quote    Quote
+     * @param GiftRuleInterface $giftRule Gift rule
+     *
+     * @return float
+     */
+    public function getRange($quote, $giftRule)
+    {
+        return floor($quote->getGrandTotal() / $giftRule->getPriceRange());
+    }
 }

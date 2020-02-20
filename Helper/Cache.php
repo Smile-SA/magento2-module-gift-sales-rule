@@ -13,13 +13,15 @@
  */
 namespace Smile\GiftSalesRule\Helper;
 
-use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Framework\App\CacheInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Rule\Model\Condition\Sql\Builder;
 use Magento\SalesRule\Model\Rule;
+use Magento\SalesRule\Model\RuleFactory;
 use Smile\GiftSalesRule\Api\Data\GiftRuleInterface;
 use Smile\GiftSalesRule\Api\GiftRuleRepositoryInterface;
 
@@ -52,6 +54,11 @@ class Cache extends AbstractHelper
     protected $giftRuleRepository;
 
     /**
+     * @var RuleFactory
+     */
+    protected $ruleFactory;
+
+    /**
      * @var CollectionFactory
      */
     protected $productCollectionFactory;
@@ -69,18 +76,21 @@ class Cache extends AbstractHelper
      * @param GiftRuleRepositoryInterface $giftRuleRepository       Gift rule repository
      * @param CollectionFactory           $productCollectionFactory Product collection factory
      * @param Builder                     $sqlBuilder               Sql builder
+     * @param RuleFactory                 $ruleFactory              Rule factory
      */
     public function __construct(
         Context $context,
         CacheInterface $cache,
         GiftRuleRepositoryInterface $giftRuleRepository,
         CollectionFactory $productCollectionFactory,
-        Builder $sqlBuilder
+        Builder $sqlBuilder,
+        RuleFactory $ruleFactory
     ) {
         $this->cache = $cache;
         $this->giftRuleRepository = $giftRuleRepository;
         $this->productCollectionFactory = $productCollectionFactory;
         $this->sqlBuilder = $sqlBuilder;
+        $this->ruleFactory = $ruleFactory;
 
         parent::__construct($context);
     }
@@ -93,7 +103,7 @@ class Cache extends AbstractHelper
      * @param int|GiftRuleInterface $giftRule   Gift rule
      *
      * @return array
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function saveCachedGiftRule($identifier, $rule, $giftRule)
     {
@@ -122,6 +132,7 @@ class Cache extends AbstractHelper
                 $items[$item->getId()] = $item->getSku();
                 $productCacheTags[] = Product::CACHE_TAG . '_' . $item->getEntityId();
             }
+
             $giftRuleData = [
                 self::DATA_LABEL => $rule->getStoreLabel(),
                 self::DATA_NUMBER_OFFERED_PRODUCT => $giftRule->getNumberOfferedProduct(),
@@ -144,7 +155,7 @@ class Cache extends AbstractHelper
     }
 
     /**
-     * Get cached gift rule
+     * Get cached gift rule.
      *
      * @param int|string $giftRuleCode Gift rule code
      *
@@ -152,14 +163,42 @@ class Cache extends AbstractHelper
      */
     public function getCachedGiftRule($giftRuleCode)
     {
-        return unserialize($this->cache->load(self::CACHE_IDENTIFIER . $giftRuleCode));
+        $cachedData = unserialize($this->cache->load(self::CACHE_IDENTIFIER . $giftRuleCode));
+        if (!$cachedData) {
+            $rule = $this->extractRuleFromCode($giftRuleCode);
+            if ($rule && $rule->getId()) {
+                try {
+                    $giftRule = $this->giftRuleRepository->getById($rule->getId());
+                    $cachedData = $this->saveCachedGiftRule($giftRuleCode, $rule, $giftRule);
+                } catch (LocalizedException $localizedException) {
+                    $cachedData = null;
+                }
+            }
+        }
+
+        return $cachedData;
     }
 
     /**
-     * Flush cached gift rule
+     * Flush cached gift rule.
      */
     public function flushCachedGiftRule()
     {
         $this->cache->clean(self::CACHE_DATA_TAG);
+    }
+
+    /**
+     * Extract rule from gift rule code.
+     *
+     * @param string $giftRuleCode Gift rule code
+     *
+     * @return \Magento\SalesRule\Api\Data\RuleInterface|null
+     */
+    protected function extractRuleFromCode($giftRuleCode)
+    {
+        $explodedCode = explode('_', $giftRuleCode);
+        $ruleId = array_shift($explodedCode);
+
+        return $this->ruleFactory->create()->load($ruleId);
     }
 }
