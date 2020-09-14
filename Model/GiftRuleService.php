@@ -121,7 +121,7 @@ class GiftRuleService implements GiftRuleServiceInterface
                 if (isset($quoteItems[$giftRuleId])) {
                     $gifts[$giftRuleId][GiftRuleDataInterface::QUOTE_ITEMS] = $quoteItems[$giftRuleId];
                     $gifts[$giftRuleId][GiftRuleDataInterface::REST_NUMBER]
-                        -= count($gifts[$giftRuleId][GiftRuleDataInterface::QUOTE_ITEMS]);
+                        -= array_sum($gifts[$giftRuleId][GiftRuleDataInterface::QUOTE_ITEMS]);
                 }
                 /** @var GiftRuleDataInterface $giftRuleData */
                 $giftRuleData = $this->giftRuleDataFactory->create();
