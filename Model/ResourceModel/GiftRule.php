@@ -72,7 +72,9 @@ class GiftRule extends AbstractDb
         $objectId = $this->getObjectId($value, $field);
 
         if ($objectId) {
+            $object->beforeLoad($value, $field);
             $this->entityManager->load($object, $objectId);
+            $object->afterLoad();
         }
 
         return $this;

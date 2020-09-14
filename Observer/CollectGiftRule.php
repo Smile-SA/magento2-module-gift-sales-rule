@@ -127,6 +127,11 @@ class CollectGiftRule implements ObserverInterface
                         }
                     }
                 } else {
+                    $giftRuleData = $this->giftRuleCacheHelper->getCachedGiftRule($giftRuleCode);
+                    if (!$giftRuleData) {
+                        continue;
+                    }
+
                     $newGiftRulesList[$giftRuleId] = $giftRuleCode;
                     $giftItem    = [];
                     $giftItemQty = 0;
@@ -142,8 +147,6 @@ class CollectGiftRule implements ObserverInterface
                             $giftItemQty += $item->getQty();
                         }
                     }
-
-                    $giftRuleData = $this->giftRuleCacheHelper->getCachedGiftRule($giftRuleCode);
 
                     // If only 1 gift product available => add automatic gift product.
                     if ($this->giftRuleConfigHelper->isAutomaticAddEnabled() && count($giftItem) == 0 &&
