@@ -49,6 +49,11 @@
             <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
         </arguments>
     </type>
+    <type name="Smile\GiftSalesRule\Observer\SetNumberOfferedProduct">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
 
     <type name="Smile\GiftSalesRule\Helper\GiftRule">
         <arguments>
