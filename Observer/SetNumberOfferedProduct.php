@@ -17,6 +17,7 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Quote\Api\CartRepositoryInterface;
 use Smile\GiftSalesRule\Helper\GiftRule as GiftRuleHelper;
 use Smile\GiftSalesRule\Model\GiftRule;
 
@@ -39,17 +40,25 @@ class SetNumberOfferedProduct implements ObserverInterface
     protected $giftRuleHelper;
 
     /**
+     * @var CartRepositoryInterface
+     */
+    protected $quoteRepository;
+
+    /**
      * SetNumberOfferedProduct constructor.
      *
-     * @param CheckoutSession $checkoutSession Checkout session
-     * @param GiftRuleHelper  $giftRuleHelper  Gift rule config helper
+     * @param CheckoutSession         $checkoutSession Checkout session
+     * @param GiftRuleHelper          $giftRuleHelper  Gift rule config helper
+     * @param CartRepositoryInterface $quoteRepository Quote repository
      */
     public function __construct(
         CheckoutSession $checkoutSession,
-        GiftRuleHelper $giftRuleHelper
+        GiftRuleHelper $giftRuleHelper,
+        CartRepositoryInterface $quoteRepository
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->giftRuleHelper = $giftRuleHelper;
+        $this->quoteRepository = $quoteRepository;
     }
 
     /**
@@ -63,7 +72,7 @@ class SetNumberOfferedProduct implements ObserverInterface
         $giftRule = $observer->getEvent()->getData('data_object');
         $giftRule->setNumberOfferedProduct($giftRule->getMaximumNumberProduct());
         try {
-            $quote = $this->checkoutSession->getQuote();
+            $quote = $this->quoteRepository->get($this->checkoutSession->getQuoteId());
             if (floatval($giftRule->getPriceRange()) > 0) {
                 $range = $this->giftRuleHelper->getRange($quote, $giftRule);
                 $giftRule->setNumberOfferedProduct($giftRule->getMaximumNumberProduct() * $range);
