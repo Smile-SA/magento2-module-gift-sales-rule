@@ -16,6 +16,8 @@ namespace Smile\GiftSalesRule\Plugin\Model\Rule\Metadata;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\SalesRule\Model\Rule;
 use Magento\SalesRule\Model\Rule\Metadata\ValueProvider;
+use Magento\Ui\Component\Form\Element\Input;
+use Magento\Ui\Component\Form\Field;
 use Smile\GiftSalesRule\Api\Data\GiftRuleInterface;
 use Smile\GiftSalesRule\Api\GiftRuleRepositoryInterface;
 use Smile\GiftSalesRule\Model\GiftRuleFactory;
@@ -84,11 +86,15 @@ class ValueProviderPlugin
         ];
 
         $result['actions']['children']['maximum_number_product']['arguments']['data']['config'] = [
-            'value' => $extensionAttributes['gift_rule'][GiftRuleInterface::MAXIMUM_NUMBER_PRODUCT],
+            'value'         => $extensionAttributes['gift_rule'][GiftRuleInterface::MAXIMUM_NUMBER_PRODUCT],
+            'componentType' => Field::NAME,
+            'formElement'   => Input::NAME,
         ];
 
         $result['actions']['children']['price_range']['arguments']['data']['config'] = [
-            'value' => $extensionAttributes['gift_rule'][GiftRuleInterface::PRICE_RANGE],
+            'value'         => $extensionAttributes['gift_rule'][GiftRuleInterface::PRICE_RANGE],
+            'componentType' => Field::NAME,
+            'formElement'   => Input::NAME,
         ];
 
         return $result;
