@@ -59,7 +59,7 @@ class PrepareFormActions implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        if ($this->giftRuleHelper->isGiftRule($this->getCurrentSalesRule())) {
+        if ($this->getCurrentSalesRule() && $this->giftRuleHelper->isGiftRule($this->getCurrentSalesRule())) {
             /** @var \Magento\Framework\Data\Form $form */
             $form = $observer->getData('form');
             /** @var \Magento\Framework\Data\Form\Element\Fieldset $element */
