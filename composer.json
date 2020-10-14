@@ -5,7 +5,7 @@
     "keywords": ["magento2", "salesrule", "gift", "cart", "free"],
     "license": "OSL-3.0",
     "require": {
-        "magento/framework": "^102.0.0",
+        "magento/framework": "^102.0.0 || ^103.0.0",
         "magento/module-sales-rule": "^101.1.0"
     },
     "require-dev": {
