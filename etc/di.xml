@@ -21,8 +21,11 @@
     <type name="Magento\SalesRule\Api\RuleRepositoryInterface">
         <plugin name="gift_sales_rules_repository" type="Smile\GiftSalesRule\Plugin\Model\RuleRepositoryPlugin"/>
     </type>
-    <type name="Magento\SalesRule\Model\Rule\Condition\Product\Combine">
-        <plugin name="gift_sales_rules_condition_product_combine" type="Smile\GiftSalesRule\Plugin\Model\Rule\Condition\Product\CombinePlugin" />
+    <type name="Magento\SalesRule\Model\Rule\Condition\Product">
+        <plugin name="gift_sales_rules_condition_product" type="Smile\GiftSalesRule\Plugin\Model\Rule\Condition\ProductPlugin" />
+    </type>
+    <type name="Magento\SalesRule\Model\Utility">
+        <plugin name="gift_sales_rules_utility" type="Smile\GiftSalesRule\Plugin\Model\UtilityPlugin" />
     </type>
     <type name="Magento\Checkout\Model\Cart">
         <plugin name="gift_sales_rules_avoid_reorder" type="Smile\GiftSalesRule\Plugin\Checkout\Model\Cart" />
@@ -118,6 +121,13 @@
             <argument name="hydrators" xsi:type="array">
                 <item name="Smile\GiftSalesRule\Api\Data\GiftRuleInterface" xsi:type="string">Magento\Framework\EntityManager\AbstractModelHydrator</item>
             </argument>
+        </arguments>
+    </type>
+
+    <!-- Use the Gift Sales Rules Applier -->
+    <type name="Magento\SalesRule\Model\Validator">
+        <arguments>
+            <argument name="rulesApplier" xsi:type="object">Smile\GiftSalesRule\Model\RulesApplier</argument>
         </arguments>
     </type>
 </config>

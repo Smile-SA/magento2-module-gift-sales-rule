@@ -17,6 +17,7 @@ use Magento\Framework\App\ActionInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\SalesRule\Model\Rule;
 use Smile\GiftSalesRule\Api\Data\GiftRuleInterface;
 use Smile\GiftSalesRule\Api\GiftRuleRepositoryInterface;
@@ -92,7 +93,7 @@ class GiftRule extends AbstractHelper
          */
         $hasProduct = false;
         foreach ($quote->getAllItems() as $item) {
-            if (!$item->getOptionByCode('option_gift_rule')) {
+            if (!$this->isGiftItem($item)) {
                 $hasProduct = true;
                 break;
             }
@@ -146,5 +147,16 @@ class GiftRule extends AbstractHelper
     public function getRange($quote, $giftRule)
     {
         return floor($quote->getGrandTotal() / $giftRule->getPriceRange());
+    }
+
+    /**
+     * Is gift item ?
+     *
+     * @param AbstractItem $item
+     * @return bool
+     */
+    public function isGiftItem(AbstractItem $item): bool
+    {
+        return (bool) $item->getOptionByCode('option_gift_rule');
     }
 }
