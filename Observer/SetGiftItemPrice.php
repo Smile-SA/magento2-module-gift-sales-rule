@@ -15,6 +15,7 @@ namespace Smile\GiftSalesRule\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Smile\GiftSalesRule\Helper\GiftRule;
 
 /**
  * Class SetGiftItemPrice
@@ -25,6 +26,19 @@ use Magento\Framework\Event\ObserverInterface;
 class SetGiftItemPrice implements ObserverInterface
 {
     /**
+     * @var GiftRule
+     */
+    protected $giftRuleHelper;
+
+    /**
+     * @param GiftRule $giftRuleHelper gift rule helper
+     */
+    public function __construct(GiftRule $giftRuleHelper)
+    {
+        $this->giftRuleHelper = $giftRuleHelper;
+    }
+
+    /**
      * Change price for gift product
      *
      * @param Observer $observer Observer
@@ -33,7 +47,7 @@ class SetGiftItemPrice implements ObserverInterface
     {
         /** @var \Magento\Quote\Model\Quote\Item $item */
         $item = $observer->getEvent()->getData('quote_item');
-        if ($item->getOptionByCode('option_gift_rule') !== null) {
+        if ($this->giftRuleHelper->isGiftItem($item)) {
             $item->setCustomPrice(0);
             $item->setOriginalCustomPrice(0);
         }
