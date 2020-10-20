@@ -73,6 +73,10 @@ class ValueProviderPlugin
     ) {
         $extensionAttributes = $rule->getExtensionAttributes();
 
+        if  (empty($extensionAttributes)) {
+            return $result;
+        }
+
         $result['actions']['children']['simple_action']['arguments']['data']['config']['options'][] = [
             'label' => __('to offer product'),
             'value' => GiftRuleInterface::OFFER_PRODUCT,
