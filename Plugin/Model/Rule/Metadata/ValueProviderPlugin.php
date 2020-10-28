@@ -86,13 +86,17 @@ class ValueProviderPlugin
         ];
 
         $result['actions']['children']['maximum_number_product']['arguments']['data']['config'] = [
-            'value'         => $extensionAttributes['gift_rule'][GiftRuleInterface::MAXIMUM_NUMBER_PRODUCT],
+            'value'         => $extensionAttributes
+                ? $extensionAttributes['gift_rule'][GiftRuleInterface::MAXIMUM_NUMBER_PRODUCT]
+                : '',
             'componentType' => Field::NAME,
             'formElement'   => Input::NAME,
         ];
 
         $result['actions']['children']['price_range']['arguments']['data']['config'] = [
-            'value'         => $extensionAttributes['gift_rule'][GiftRuleInterface::PRICE_RANGE],
+            'value'         => $extensionAttributes
+                ? $extensionAttributes['gift_rule'][GiftRuleInterface::PRICE_RANGE]
+                : '',
             'componentType' => Field::NAME,
             'formElement'   => Input::NAME,
         ];
