@@ -114,8 +114,11 @@ class OfferProductPerPriceRange extends AbstractDiscount
             /** @var GiftRule $giftRule */
             $giftRule = $this->giftRuleRepository->getById($rule->getRuleId());
 
-            if ($quote->getGrandTotal() >= $giftRule->getPriceRange()) {
-                $range = $this->giftRuleHelper->getRange($quote, $giftRule);
+            if ($quote->getShippingAddress()->getBaseSubtotalTotalInclTax() >= $giftRule->getPriceRange()) {
+                $range = $this->giftRuleHelper->getRange(
+                    $quote->getShippingAddress()->getBaseSubtotalTotalInclTax(),
+                    $giftRule->getPriceRange()
+                );
 
                 // Save active gift rule in session.
                 $giftRuleSessionData = $this->checkoutSession->getGiftRules();

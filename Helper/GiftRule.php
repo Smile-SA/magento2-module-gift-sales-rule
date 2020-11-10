@@ -109,7 +109,7 @@ class GiftRule extends AbstractHelper
             /** @var GiftRuleInterface $giftRule */
             $giftRule = $this->giftRuleRepository->getById($rule->getRuleId());
 
-            if ($quote->getGrandTotal() < $giftRule->getPriceRange()) {
+            if ($quote->getShippingAddress()->getBaseSubtotalTotalInclTax() < $giftRule->getPriceRange()) {
                 $valid = false;
             }
         }
@@ -139,14 +139,36 @@ class GiftRule extends AbstractHelper
     /**
      * Get range of a gift rule for a quote.
      *
-     * @param Quote             $quote    Quote
-     * @param GiftRuleInterface $giftRule Gift rule
+     * @param float $total      Total
+     * @param float $priceRange Price range
      *
      * @return float
      */
-    public function getRange($quote, $giftRule)
+    public function getRange($total, $priceRange)
     {
-        return floor($quote->getGrandTotal() / $giftRule->getPriceRange());
+        return floor($total / $priceRange);
+    }
+
+    /**
+     * Get number offered product for a quote.
+     *
+     * @param Quote $quote                Quote
+     * @param float $maximumNumberProduct Maximum number product
+     * @param float $priceRange           Price range
+     * @return int
+     */
+    public function getNumberOfferedProduct($quote, $maximumNumberProduct, $priceRange)
+    {
+        $numberOfferedProduct = $maximumNumberProduct;
+        if (floatval($priceRange) > 0) {
+            $range = $this->getRange(
+                $quote->getShippingAddress()->getBaseSubtotalTotalInclTax(),
+                $priceRange
+            );
+            $numberOfferedProduct = $maximumNumberProduct * $range;
+        }
+
+        return (int) $numberOfferedProduct;
     }
 
     /**

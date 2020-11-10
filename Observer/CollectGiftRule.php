@@ -23,6 +23,7 @@ use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Item\Option;
 use Smile\GiftSalesRule\Helper\Cache as GiftRuleCacheHelper;
 use Smile\GiftSalesRule\Helper\Config as GiftRuleConfigHelper;
+use Smile\GiftSalesRule\Helper\GiftRule as GiftRuleHelper;
 use Smile\GiftSalesRule\Api\GiftRuleServiceInterface;
 
 /**
@@ -54,6 +55,11 @@ class CollectGiftRule implements ObserverInterface
     protected $giftRuleConfigHelper;
 
     /**
+     * @var GiftRuleHelper
+     */
+    protected $giftRuleHelper;
+
+    /**
      * @var CartRepositoryInterface
      */
     protected $quoteRepository;
@@ -70,6 +76,7 @@ class CollectGiftRule implements ObserverInterface
      * @param GiftRuleServiceInterface $giftRuleService      Gift rule service
      * @param GiftRuleCacheHelper      $giftRuleCacheHelper  Gift rule cache helper
      * @param GiftRuleConfigHelper     $giftRuleConfigHelper Gift rule config helper
+     * @param GiftRuleHelper           $giftRuleHelper       Gift rule helper
      * @param CartRepositoryInterface  $quoteRepository      Quote repository
      * @param Http                     $request              Request
      */
@@ -78,6 +85,7 @@ class CollectGiftRule implements ObserverInterface
         GiftRuleServiceInterface $giftRuleService,
         GiftRuleCacheHelper $giftRuleCacheHelper,
         GiftRuleConfigHelper $giftRuleConfigHelper,
+        GiftRuleHelper $giftRuleHelper,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Framework\App\Request\Http $request
     ) {
@@ -85,6 +93,7 @@ class CollectGiftRule implements ObserverInterface
         $this->giftRuleService = $giftRuleService;
         $this->giftRuleCacheHelper = $giftRuleCacheHelper;
         $this->giftRuleConfigHelper = $giftRuleConfigHelper;
+        $this->giftRuleHelper = $giftRuleHelper;
         $this->quoteRepository = $quoteRepository;
         $this->request = $request;
     }
@@ -148,6 +157,12 @@ class CollectGiftRule implements ObserverInterface
                         }
                     }
 
+                    $numberOfferedProduct = $this->giftRuleHelper->getNumberOfferedProduct(
+                        $quote,
+                        $giftRuleData[GiftRuleCacheHelper::DATA_MAXIMUM_NUMBER_PRODUCT],
+                        $giftRuleData[GiftRuleCacheHelper::DATA_PRICE_RANGE]
+                    );
+
                     // If only 1 gift product available => add automatic gift product.
                     if ($this->giftRuleConfigHelper->isAutomaticAddEnabled() && count($giftItem) == 0 &&
                         count($giftRuleData[GiftRuleCacheHelper::DATA_PRODUCT_ITEMS]) == 1) {
@@ -156,7 +171,7 @@ class CollectGiftRule implements ObserverInterface
                             [
                                 [
                                     'id' => key($giftRuleData[GiftRuleCacheHelper::DATA_PRODUCT_ITEMS]),
-                                    'qty' => $giftRuleData[GiftRuleCacheHelper::DATA_NUMBER_OFFERED_PRODUCT],
+                                    'qty' => $numberOfferedProduct,
                                 ],
                             ],
                             $giftRuleCode,
@@ -165,9 +180,9 @@ class CollectGiftRule implements ObserverInterface
                         $saveQuote = true;
                     }
 
-                    if ($giftItemQty > $giftRuleData[GiftRuleCacheHelper::DATA_NUMBER_OFFERED_PRODUCT]) {
+                    if ($giftItemQty > $numberOfferedProduct) {
                         // Delete gift item.
-                        $qtyToDelete = $giftItemQty - $giftRuleData[GiftRuleCacheHelper::DATA_NUMBER_OFFERED_PRODUCT];
+                        $qtyToDelete = $giftItemQty - $numberOfferedProduct;
 
                         foreach (array_reverse($giftItem) as $item) {
                             if ($item->getQty() > $qtyToDelete) {

@@ -25,6 +25,7 @@ use Smile\GiftSalesRule\Api\Data\GiftRuleDataInterface;
 use Smile\GiftSalesRule\Api\Data\GiftRuleDataInterfaceFactory;
 use Smile\GiftSalesRule\Api\GiftRuleServiceInterface;
 use Smile\GiftSalesRule\Helper\Cache as GiftRuleCacheHelper;
+use Smile\GiftSalesRule\Helper\GiftRule as GiftRuleHelper;
 
 /**
  * Class GiftRuleService
@@ -55,6 +56,11 @@ class GiftRuleService implements GiftRuleServiceInterface
     protected $giftRuleCacheHelper;
 
     /**
+     * @var GiftRuleHelper
+     */
+    protected $giftRuleHelper;
+
+    /**
      * @var GiftRuleDataInterfaceFactory
      */
     protected $giftRuleDataFactory;
@@ -67,19 +73,22 @@ class GiftRuleService implements GiftRuleServiceInterface
      * @param CacheInterface               $cache               Cache
      * @param GiftRuleCacheHelper          $giftRuleCacheHelper Gift rule cache helper
      * @param GiftRuleDataInterfaceFactory $giftRuleDataFactory Gift rule data factory
+     * @param GiftRuleHelper               $giftRuleHelper      Gift rule helper
      */
     public function __construct(
         CheckoutSession $checkoutSession,
         Cart $cart,
         CacheInterface $cache,
         GiftRuleCacheHelper $giftRuleCacheHelper,
-        GiftRuleDataInterfaceFactory $giftRuleDataFactory
+        GiftRuleDataInterfaceFactory $giftRuleDataFactory,
+        GiftRuleHelper $giftRuleHelper
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->cart = $cart;
         $this->cache = $cache;
         $this->giftRuleCacheHelper = $giftRuleCacheHelper;
         $this->giftRuleDataFactory = $giftRuleDataFactory;
+        $this->giftRuleHelper = $giftRuleHelper;
     }
 
     /**
@@ -120,6 +129,12 @@ class GiftRuleService implements GiftRuleServiceInterface
                 $gifts[$giftRuleId] = $giftRuleCachedData;
                 $gifts[$giftRuleId][GiftRuleDataInterface::RULE_ID] = $giftRuleId;
                 $gifts[$giftRuleId][GiftRuleDataInterface::CODE] = $giftRuleCode;
+                $gifts[$giftRuleId][GiftRuleDataInterface::NUMBER_OFFERED_PRODUCT]
+                    = $this->giftRuleHelper->getNumberOfferedProduct(
+                        $quote,
+                        $giftRuleCachedData[GiftRuleCacheHelper::DATA_MAXIMUM_NUMBER_PRODUCT],
+                        $giftRuleCachedData[GiftRuleCacheHelper::DATA_PRICE_RANGE]
+                    );
                 $gifts[$giftRuleId][GiftRuleDataInterface::REST_NUMBER]
                     = $gifts[$giftRuleId][GiftRuleDataInterface::NUMBER_OFFERED_PRODUCT];
                 $gifts[$giftRuleId][GiftRuleDataInterface::QUOTE_ITEMS] = [];
@@ -165,7 +180,7 @@ class GiftRuleService implements GiftRuleServiceInterface
                 throw new Exception(__('We found an invalid request for adding gift product.'));
             }
 
-            if ($this->isAuthorizedGiftProduct($product['id'], $giftRuleData, $product['qty'])) {
+            if ($this->isAuthorizedGiftProduct($quote, $product['id'], $giftRuleData, $product['qty'])) {
                 $product['gift_rule'] = $giftRuleId;
                 $this->cart->addProduct($product['id'], $product);
             } else {
@@ -204,7 +219,7 @@ class GiftRuleService implements GiftRuleServiceInterface
             if (!(isset($product['id']) && isset($product['qty']))) {
                 throw new Exception(__('We found an invalid request for adding gift product.'));
             }
-            if ($this->isAuthorizedGiftProduct($product['id'], $giftRuleData, $product['qty'])) {
+            if ($this->isAuthorizedGiftProduct($quote, $product['id'], $giftRuleData, $product['qty'])) {
                 $quoteItem = false;
 
                 $productId = $product['id'];
@@ -239,19 +254,24 @@ class GiftRuleService implements GiftRuleServiceInterface
     }
 
     /**
-     * Check if is authorized gift product
+     * Check if is authorized gift product.
      *
+     * @param Quote $quote        Quote
      * @param int   $productId    Product id
      * @param array $giftRuleData Gift rule data
      * @param int   $qty          Qty
-     *
      * @return bool
      */
-    protected function isAuthorizedGiftProduct($productId, $giftRuleData, $qty)
+    protected function isAuthorizedGiftProduct($quote, $productId, $giftRuleData, $qty)
     {
         $isAuthorizedGiftProduct = false;
         if (array_key_exists($productId, $giftRuleData[GiftRuleCacheHelper::DATA_PRODUCT_ITEMS])
-            && $qty <= $giftRuleData[GiftRuleCacheHelper::DATA_NUMBER_OFFERED_PRODUCT]) {
+            && $qty <= $this->giftRuleHelper->getNumberOfferedProduct(
+                $quote,
+                $giftRuleData[GiftRuleCacheHelper::DATA_MAXIMUM_NUMBER_PRODUCT],
+                $giftRuleData[GiftRuleCacheHelper::DATA_PRICE_RANGE]
+            )
+        ) {
             $isAuthorizedGiftProduct = true;
         }
 
