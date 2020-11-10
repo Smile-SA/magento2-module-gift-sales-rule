@@ -120,7 +120,7 @@ define([
             $.each(this.element.find('.product-item-info.active'), function (index, element) {
                 // Swatch check
                 let options = $(element).find('.swatch-attribute'),
-                    selectedOptions = $(element).find('.swatch-attribute[option-selected]');
+                    selectedOptions = $(element).find('.swatch-attribute[data-option-selected]');
 
                 if (options.length > 0 && options.length !== selectedOptions.length) {
                     validate = false;
