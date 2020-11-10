@@ -22,8 +22,6 @@ use Smile\GiftSalesRule\Api\Data\GiftRuleInterface;
  *
  * @author    Maxime Queneau <maxime.queneau@smile.fr>
  * @copyright 2019 Smile
- * @method int getNumberOfferedProduct()
- * @method GiftRule setNumberOfferedProduct(int $number)
  * @SuppressWarnings(PHPMD.CamelCasePropertyName)
  */
 class GiftRule extends AbstractModel implements GiftRuleInterface, IdentityInterface

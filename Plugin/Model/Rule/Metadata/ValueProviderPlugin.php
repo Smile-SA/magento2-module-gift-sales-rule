@@ -73,7 +73,7 @@ class ValueProviderPlugin
         $result,
         Rule $rule
     ) {
-        $extensionAttributes = $rule->getExtensionAttributes();
+        $extAttributes = $rule->getExtensionAttributes();
 
         $result['actions']['children']['simple_action']['arguments']['data']['config']['options'][] = [
             'label' => __('to offer product'),
@@ -86,17 +86,13 @@ class ValueProviderPlugin
         ];
 
         $result['actions']['children']['maximum_number_product']['arguments']['data']['config'] = [
-            'value'         => $extensionAttributes
-                ? $extensionAttributes['gift_rule'][GiftRuleInterface::MAXIMUM_NUMBER_PRODUCT]
-                : '',
+            'value' => $extAttributes ? $extAttributes['gift_rule'][GiftRuleInterface::MAXIMUM_NUMBER_PRODUCT] : '',
             'componentType' => Field::NAME,
             'formElement'   => Input::NAME,
         ];
 
         $result['actions']['children']['price_range']['arguments']['data']['config'] = [
-            'value'         => $extensionAttributes
-                ? $extensionAttributes['gift_rule'][GiftRuleInterface::PRICE_RANGE]
-                : '',
+            'value'         => $extAttributes ? $extAttributes['gift_rule'][GiftRuleInterface::PRICE_RANGE] : '',
             'componentType' => Field::NAME,
             'formElement'   => Input::NAME,
         ];
