@@ -18,8 +18,7 @@ define([
     'mage/template',
     'mage/translate',
     'priceUtils',
-    'jquery/ui',
-    'jquery/jquery.parsequery',
+    'jquery-ui-modules/widget',
     'Magento_ConfigurableProduct/js/configurable'
 ], function ($, _, mageTemplate, $t, priceUtils) {
     'use strict';
