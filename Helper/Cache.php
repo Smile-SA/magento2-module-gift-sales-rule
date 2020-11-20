@@ -18,6 +18,7 @@ use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Framework\App\CacheInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
+use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Rule\Model\Condition\Sql\Builder;
 use Magento\SalesRule\Model\Rule;
@@ -140,6 +141,14 @@ class Cache extends AbstractHelper
                 self::DATA_MAXIMUM_NUMBER_PRODUCT => $giftRule->getMaximumNumberProduct(),
                 self::DATA_PRODUCT_ITEMS => $items,
             ];
+
+            // Dispatch an event to be able to add/change data in gift rule cache.
+            $dataObject = new DataObject($giftRuleData);
+            $this->_eventManager->dispatch(
+                'before_save_gift_rule_cache',
+                ['data_object' => $dataObject, 'rule' => $rule, 'gift_rule' => $giftRule, 'identifier' => $identifier]
+            );
+            $giftRuleData = $dataObject->getData();
 
             $this->cache->save(
                 serialize($giftRuleData),
