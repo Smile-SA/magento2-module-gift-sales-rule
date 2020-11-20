@@ -18,6 +18,7 @@
         <smile_gift_sales_rule>
             <configuration>
                 <automatic_add>1</automatic_add>
+                <automatic_popup_open>0</automatic_popup_open>
             </configuration>
         </smile_gift_sales_rule>
     </default>

@@ -33,6 +33,11 @@
                     <comment>Added if there are only 1 gift product parameterized</comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="automatic_popup_open" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Automatically open popup</label>
+                    <comment>If yes, the gift selection popup is opened automatically if there is at least one product to offer.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
             </group>
         </section>
     </system>
