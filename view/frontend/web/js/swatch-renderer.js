@@ -14,7 +14,7 @@
 
 define([
     'jquery',
-    'jquery/ui',
+    'jquery-ui-modules/widget',
     'Magento_Swatches/js/swatch-renderer'
 ], function ($) {
     'use strict';
