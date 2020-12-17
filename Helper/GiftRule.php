@@ -161,10 +161,12 @@ class GiftRule extends AbstractHelper
     {
         $numberOfferedProduct = $maximumNumberProduct;
         if (floatval($priceRange) > 0) {
-            $range = $this->getRange(
-                $quote->getShippingAddress()->getBaseSubtotalTotalInclTax(),
-                $priceRange
-            );
+            $shippingAddress = $quote->getShippingAddress();
+            // In some weird cases with multi-shipping feature enabled, we need to get the orig data.
+            // Example: Go to the checkout and come back to the cart page.
+            $total = $shippingAddress->getBaseSubtotalTotalInclTax()
+                ?: $shippingAddress->getOrigData('base_subtotal_total_incl_tax');
+            $range = $this->getRange($total, $priceRange);
             $numberOfferedProduct = $maximumNumberProduct * $range;
         }
 

@@ -18,4 +18,7 @@
     <type name="Magento\Checkout\Block\Cart\Item\Renderer">
         <plugin name="gift_sales_rule_renderer_item_plugin" type="Smile\GiftSalesRule\Plugin\Checkout\Block\Cart\Item\RendererPlugin" />
     </type>
+    <type name="Smile\GiftSalesRule\Controller\Cart\Add">
+        <plugin name="multishipping_disabler" type="Magento\Multishipping\Plugin\DisableMultishippingMode" />
+    </type>
 </config>
