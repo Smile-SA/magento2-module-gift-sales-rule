@@ -112,7 +112,7 @@ class OfferProductPerPriceRange extends AbstractDiscount
              * Rules load by collection => extension attributes not present in rule entity
              */
             /** @var GiftRule $giftRule */
-            $giftRule = $this->giftRuleRepository->getById($rule->getRuleId());
+            $giftRule = $this->giftRuleRepository->getByRule($rule);
 
             if ($quote->getShippingAddress()->getBaseSubtotalTotalInclTax() >= $giftRule->getPriceRange()) {
                 $range = $this->giftRuleHelper->getRange(

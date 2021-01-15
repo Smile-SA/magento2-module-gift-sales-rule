@@ -14,12 +14,14 @@
 namespace Smile\GiftSalesRule\Plugin\Model;
 
 use Magento\Framework\Api\ExtensionAttributesFactory;
+use Magento\Framework\EntityManager\MetadataPool;
 use Magento\SalesRule\Api\Data\RuleExtensionInterface;
 use Magento\SalesRule\Api\Data\RuleInterface;
 use Magento\SalesRule\Api\RuleRepositoryInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchResults;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\SalesRule\Model\RuleFactory;
 use Smile\GiftSalesRule\Api\Data\GiftRuleInterface;
 use Smile\GiftSalesRule\Api\GiftRuleRepositoryInterface;
 use Smile\GiftSalesRule\Model\GiftRuleFactory;
@@ -61,23 +63,39 @@ class RuleRepositoryPlugin
     protected $giftRuleFactory;
 
     /**
+     * @var MetadataPool
+     */
+    protected $metadataPool;
+
+    /**
+     * @var RuleFactory
+     */
+    protected $ruleFactory;
+
+    /**
      * RuleRepositoryPlugin constructor.
      *
      * @param ExtensionAttributesFactory  $extensionFactory      Extension factoryuuuuuuuuu
      * @param SearchCriteriaBuilder       $searchCriteriaBuilder Search criteria builder
      * @param GiftRuleRepositoryInterface $giftRuleRepository    Gift rule repository
      * @param GiftRuleFactory             $giftRuleFactory       Gift rule factory
+     * @param MetadataPool                $metadataPool          Metadata pool
+     * @param RuleFactory                 $ruleFactory           Rule Factory
      */
     public function __construct(
         ExtensionAttributesFactory $extensionFactory,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         GiftRuleRepositoryInterface $giftRuleRepository,
-        GiftRuleFactory $giftRuleFactory
+        GiftRuleFactory $giftRuleFactory,
+        MetadataPool $metadataPool,
+        RuleFactory $ruleFactory
     ) {
         $this->extensionFactory      = $extensionFactory;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->giftRuleRepository    = $giftRuleRepository;
         $this->giftRuleFactory       = $giftRuleFactory;
+        $this->metadataPool          = $metadataPool;
+        $this->ruleFactory           = $ruleFactory;
     }
 
     /**
@@ -118,13 +136,16 @@ class RuleRepositoryPlugin
             $rule->setExtensionAttributes($extensionAttributes);
         }
 
+        $metadata = $this->metadataPool->getMetadata(RuleInterface::class);
+        $model = $this->ruleFactory->create()->load($rule->getRuleId());
+
         try {
             /** @var GiftRuleInterface $giftRule */
-            $giftRule = $this->giftRuleRepository->getById($rule->getRuleId());
+            $giftRule = $this->giftRuleRepository->getById($model->getData($metadata->getLinkField()));
         } catch (NoSuchEntityException $exception) {
             // Create gift rule if not exist.
             $giftRule = $this->giftRuleFactory->create();
-            $giftRule->setId($rule->getRuleId());
+            $giftRule->setId($model->getData($metadata->getLinkField()));
         }
         $extensionAttributes->setGiftRule($giftRule);
         $rule->setExtensionAttributes($extensionAttributes);

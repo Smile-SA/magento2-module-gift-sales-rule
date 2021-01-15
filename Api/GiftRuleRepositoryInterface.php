@@ -14,6 +14,7 @@
 namespace Smile\GiftSalesRule\Api;
 
 use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\SalesRule\Model\Rule;
 use Smile\GiftSalesRule\Api\Data\GiftRuleInterface;
 use Smile\GiftSalesRule\Api\Data\GiftRuleSearchResultsInterface;
 
@@ -34,6 +35,15 @@ interface GiftRuleRepositoryInterface
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getById($entityId);
+
+    /**
+     * Get a giftrule by rule.
+     *
+     * @param Rule $rule Rule entity
+     * @return \Smile\GiftSalesRule\Api\Data\GiftRuleInterface
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getByRule($rule);
 
     /**
      * Get the giftrules matching the specified criteria.
