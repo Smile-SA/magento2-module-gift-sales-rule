@@ -107,7 +107,7 @@ class GiftRule extends AbstractHelper
              * Rules load by collection => extension attributes not present in rule entity
              */
             /** @var GiftRuleInterface $giftRule */
-            $giftRule = $this->giftRuleRepository->getById($rule->getRuleId());
+            $giftRule = $this->giftRuleRepository->getByRule($rule);
 
             if ($quote->getShippingAddress()->getBaseSubtotalTotalInclTax() < $giftRule->getPriceRange()) {
                 $valid = false;

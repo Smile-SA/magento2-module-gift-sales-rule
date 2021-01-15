@@ -100,7 +100,7 @@ class OfferProduct extends AbstractDiscount
             $quote->setData($calculateId, true);
 
             /** @var GiftRule $giftRule */
-            $giftRule = $this->giftRuleRepository->getById($rule->getRuleId());
+            $giftRule = $this->giftRuleRepository->getByRule($rule);
 
             // Save active gift rule in session.
             $giftRuleSessionData = $this->checkoutSession->getGiftRules();

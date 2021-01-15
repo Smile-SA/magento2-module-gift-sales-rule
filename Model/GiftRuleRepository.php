@@ -76,7 +76,7 @@ class GiftRuleRepository implements GiftRuleRepositoryInterface
      * @param GiftRuleCollectionFactory             $objectCollectionFactory    Gift rule collection factory
      * @param GiftRuleSearchResultsInterfaceFactory $objectSearchResultsFactory Gift rule search results interface factory
      * @param CacheInterface                        $cache                      Cache interface
-     * @param null                                  $identifierFieldName        Identifier field name
+     * @param string|null                           $identifierFieldName        Identifier field name
      */
     public function __construct(
         CollectionProcessor $collectionProcessor,
@@ -121,6 +121,16 @@ class GiftRuleRepository implements GiftRuleRepositoryInterface
         }
 
         return $this->cacheById[$objectId];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getByRule($rule)
+    {
+        $ruleId = $rule->getData($this->objectResource->getLinkFieldName()) ?: $rule->getId();
+
+        return $this->getById($ruleId);
     }
 
     /**

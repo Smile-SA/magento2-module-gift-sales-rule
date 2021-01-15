@@ -179,7 +179,7 @@ class Cache extends AbstractHelper
             $rule = $this->extractRuleFromCode($giftRuleCode);
             if ($rule && $rule->getId()) {
                 try {
-                    $giftRule = $this->giftRuleRepository->getById($rule->getId());
+                    $giftRule = $this->giftRuleRepository->getByRule($rule);
                     $cachedData = $this->saveCachedGiftRule($giftRuleCode, $rule, $giftRule);
                 } catch (LocalizedException $localizedException) {
                     $cachedData = null;

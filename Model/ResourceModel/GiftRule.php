@@ -18,6 +18,7 @@ use Magento\Framework\EntityManager\MetadataPool;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 use Magento\Framework\Model\ResourceModel\Db\Context;
+use Magento\SalesRule\Api\Data\RuleInterface;
 use Smile\GiftSalesRule\Api\Data\GiftRuleInterface;
 
 /**
@@ -98,6 +99,17 @@ class GiftRule extends AbstractDb
         $this->entityManager->delete($object);
 
         return $this;
+    }
+
+    /**
+     * Get rule link field name.
+     *
+     * @return string
+     * @throws \Exception
+     */
+    public function getLinkFieldName()
+    {
+        return $this->metadataPool->getMetadata(RuleInterface::class)->getLinkField();
     }
 
     /**
