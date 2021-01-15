@@ -88,6 +88,11 @@ class SaveHandler implements ExtensionInterface
                     $giftRule->setId($ruleId);
                 }
 
+                // Reset the price range value for offer product rules.
+                if ($entity->getSimpleAction() === GiftRuleInterface::OFFER_PRODUCT) {
+                    $extensionAttributes['gift_rule'][GiftRuleInterface::PRICE_RANGE] = 0;
+                }
+
                 $giftRule->addData($extensionAttributes['gift_rule']);
 
                 $this->giftRuleRepository->save($giftRule);
