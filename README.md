@@ -14,6 +14,15 @@ Gift products type can be:
 * simple product
 * configurable product
 
+## Magento versions compatibility
+
+**Which version should I use ?**
+
+Magento Version                   | Gift Sales Rule Latest Version                                          | Actively maintained
+----------------------------------|----------------------------------------------------------------------|---
+Magento **2.3.x** Opensource (CE) | Gift Sales Rule **1.1.x** : ```composer require smile/module-gift-sales-rule ~1.1.0``` | **Yes**
+Magento **2.4.x** Opensource (CE) | Gift Sales Rule **1.2.x** : ```composer require smile/module-gift-sales-rule ~1.2.0``` | **Yes**
+
 ## Who is developing this module ? 
 
 ![Smile](doc/static/smile.png)
