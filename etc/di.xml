@@ -36,6 +36,9 @@
     <type name="Magento\Quote\Model\Quote\Address\Item">
         <plugin name="gift_sales_rules_addres_item" type="Smile\GiftSalesRule\Plugin\Quote\Model\Address\ItemPlugin" />
     </type>
+    <type name="Magento\Checkout\Model\Session">
+        <plugin name="gift_sales_rules_checkout_session" type="Smile\GiftSalesRule\Plugin\Checkout\Model\Session" />
+    </type>
 
     <!-- Proxy -->
     <type name="Smile\GiftSalesRule\Model\GiftRuleService">
