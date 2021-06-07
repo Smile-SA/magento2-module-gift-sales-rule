@@ -70,15 +70,21 @@ class CollectGiftRule implements ObserverInterface
     protected $request;
 
     /**
+     * @var array
+     */
+    protected $actionsWithoutQuoteSaving;
+
+    /**
      * CollectGiftRule constructor.
      *
-     * @param CheckoutSession          $checkoutSession      Checkout session
-     * @param GiftRuleServiceInterface $giftRuleService      Gift rule service
-     * @param GiftRuleCacheHelper      $giftRuleCacheHelper  Gift rule cache helper
-     * @param GiftRuleConfigHelper     $giftRuleConfigHelper Gift rule config helper
-     * @param GiftRuleHelper           $giftRuleHelper       Gift rule helper
-     * @param CartRepositoryInterface  $quoteRepository      Quote repository
-     * @param Http                     $request              Request
+     * @param CheckoutSession          $checkoutSession           Checkout session
+     * @param GiftRuleServiceInterface $giftRuleService           Gift rule service
+     * @param GiftRuleCacheHelper      $giftRuleCacheHelper       Gift rule cache helper
+     * @param GiftRuleConfigHelper     $giftRuleConfigHelper      Gift rule config helper
+     * @param GiftRuleHelper           $giftRuleHelper            Gift rule helper
+     * @param CartRepositoryInterface  $quoteRepository           Quote repository
+     * @param Http                     $request                   Request
+     * @param array                    $actionsWithoutQuoteSaving Actions without quote saving
      */
     public function __construct(
         CheckoutSession $checkoutSession,
@@ -86,16 +92,18 @@ class CollectGiftRule implements ObserverInterface
         GiftRuleCacheHelper $giftRuleCacheHelper,
         GiftRuleConfigHelper $giftRuleConfigHelper,
         GiftRuleHelper $giftRuleHelper,
-        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
-        \Magento\Framework\App\Request\Http $request
+        CartRepositoryInterface $quoteRepository,
+        Http $request,
+        array $actionsWithoutQuoteSaving = []
     ) {
-        $this->checkoutSession = $checkoutSession;
-        $this->giftRuleService = $giftRuleService;
-        $this->giftRuleCacheHelper = $giftRuleCacheHelper;
-        $this->giftRuleConfigHelper = $giftRuleConfigHelper;
-        $this->giftRuleHelper = $giftRuleHelper;
-        $this->quoteRepository = $quoteRepository;
-        $this->request = $request;
+        $this->checkoutSession           = $checkoutSession;
+        $this->giftRuleService           = $giftRuleService;
+        $this->giftRuleCacheHelper       = $giftRuleCacheHelper;
+        $this->giftRuleConfigHelper      = $giftRuleConfigHelper;
+        $this->giftRuleHelper            = $giftRuleHelper;
+        $this->quoteRepository           = $quoteRepository;
+        $this->request                   = $request;
+        $this->actionsWithoutQuoteSaving = $actionsWithoutQuoteSaving;
     }
 
     /**
@@ -208,14 +216,32 @@ class CollectGiftRule implements ObserverInterface
             }
 
             /**
-             * Save quote if it is not cart add controller and item changed
+             * Save quote depending on the controller controller and item changed
              */
-            if ($saveQuote
-                && !($this->request->getControllerName() == 'cart' && $this->request->getActionName() == 'add')) {
+            if ($saveQuote && !($this->isActionWithoutQuoteSaving())) {
                 $this->quoteRepository->save($quote);
             }
 
             $this->checkoutSession->setGiftRules($newGiftRulesList);
         }
+    }
+
+    /**
+     * Is action without quote saving ?
+     *
+     * @return bool
+     */
+    protected function isActionWithoutQuoteSaving(): bool
+    {
+        $result = false;
+        foreach ($this->actionsWithoutQuoteSaving as $action) {
+            if ($action['controller_name'] === $this->request->getControllerName()
+                && $action['action_name'] === $this->request->getActionName()) {
+                $result = true;
+                break;
+            }
+        }
+
+        return $result;
     }
 }
