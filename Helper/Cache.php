@@ -35,6 +35,7 @@ use Smile\GiftSalesRule\Api\GiftRuleRepositoryInterface;
  *
  * @author    Maxime Queneau <maxime.queneau@smile.fr>
  * @copyright 2019 Smile
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class Cache extends AbstractHelper
 {
@@ -99,12 +100,12 @@ class Cache extends AbstractHelper
         RuleFactory $ruleFactory,
         StoreManagerInterface $storeManager
     ) {
-        $this->cache                    = $cache;
-        $this->giftRuleRepository       = $giftRuleRepository;
+        $this->cache = $cache;
+        $this->giftRuleRepository = $giftRuleRepository;
         $this->productCollectionFactory = $productCollectionFactory;
-        $this->sqlBuilder               = $sqlBuilder;
-        $this->ruleFactory              = $ruleFactory;
-        $this->storeManager             = $storeManager;
+        $this->sqlBuilder = $sqlBuilder;
+        $this->ruleFactory = $ruleFactory;
+        $this->storeManager = $storeManager;
 
         parent::__construct($context);
     }
@@ -239,7 +240,7 @@ class Cache extends AbstractHelper
     /**
      * Get cache key.
      *
-     * @param int|string $ruleIdentifier
+     * @param int|string $ruleIdentifier Rule identifier
      *
      * @return string
      * @throws NoSuchEntityException

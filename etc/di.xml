@@ -36,9 +36,6 @@
     <type name="Magento\Quote\Model\Quote\Address\Item">
         <plugin name="gift_sales_rules_addres_item" type="Smile\GiftSalesRule\Plugin\Quote\Model\Address\ItemPlugin" />
     </type>
-    <type name="Magento\Checkout\Model\Session">
-        <plugin name="gift_sales_rules_checkout_session" type="Smile\GiftSalesRule\Plugin\Checkout\Model\Session" />
-    </type>
 
     <!-- Proxy -->
     <type name="Smile\GiftSalesRule\Model\GiftRuleService">
@@ -137,6 +134,26 @@
     <type name="Magento\SalesRule\Model\Validator">
         <arguments>
             <argument name="rulesApplier" xsi:type="object">Smile\GiftSalesRule\Model\RulesApplier</argument>
+        </arguments>
+    </type>
+
+    <!-- Observer Collect Gift Rule -->
+    <type name="Smile\GiftSalesRule\Observer\CollectGiftRule">
+        <arguments>
+            <argument name="actionsWithoutQuoteSaving" xsi:type="array">
+                <item name="add-cart" xsi:type="array">
+                    <item name="action_name" xsi:type="string">add</item>
+                    <item name="controller_name" xsi:type="string">cart</item>
+                </item>
+                <item name="update-cart" xsi:type="array">
+                    <item name="action_name" xsi:type="string">updatePost</item>
+                    <item name="controller_name" xsi:type="string">cart</item>
+                </item>
+                <item name="switch-store" xsi:type="array">
+                    <item name="action_name" xsi:type="string">switch</item>
+                    <item name="controller_name" xsi:type="string">store</item>
+                </item>
+            </argument>
         </arguments>
     </type>
 </config>
