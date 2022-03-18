@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this module to newer
+ * versions in the future.
+ *
+ * @category  Smile
+ * @package   Smile\GiftSalesRule
+ * @author    Pierre Le Maguer <pierre.lemaguer7@gmail.com>
+ * @copyright 2022 SmileFriend
+ * @license   Open Software License ("OSL") v. 3.0
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Quote\Model\Cart\Totals\ItemConverter">
+        <plugin name="smile-gift-sales-rule-item-converter" type="Smile\GiftSalesRule\Plugin\Quote\Model\Cart\Totals\ItemConverterPlugin"/>
+    </type>
+</config>
