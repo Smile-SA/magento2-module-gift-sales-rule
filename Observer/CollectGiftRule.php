@@ -13,18 +13,19 @@
  */
 namespace Smile\GiftSalesRule\Observer;
 
+use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Item\Option;
+use Smile\GiftSalesRule\Api\GiftRuleServiceInterface;
 use Smile\GiftSalesRule\Helper\Cache as GiftRuleCacheHelper;
 use Smile\GiftSalesRule\Helper\Config as GiftRuleConfigHelper;
 use Smile\GiftSalesRule\Helper\GiftRule as GiftRuleHelper;
-use Smile\GiftSalesRule\Api\GiftRuleServiceInterface;
+use Smile\GiftSalesRule\Model\Context\GiftRule as GiftRuleContext;
 
 /**
  * Class CollectGiftRule
@@ -70,6 +71,11 @@ class CollectGiftRule implements ObserverInterface
     protected $request;
 
     /**
+     * @var GiftRuleContext
+     */
+    protected $giftRuleContext;
+
+    /**
      * CollectGiftRule constructor.
      *
      * @param CheckoutSession          $checkoutSession      Checkout session
@@ -79,6 +85,7 @@ class CollectGiftRule implements ObserverInterface
      * @param GiftRuleHelper           $giftRuleHelper       Gift rule helper
      * @param CartRepositoryInterface  $quoteRepository      Quote repository
      * @param Http                     $request              Request
+     * @param GiftRuleContext          $giftRuleContext      Gift rule context
      */
     public function __construct(
         CheckoutSession $checkoutSession,
@@ -87,7 +94,8 @@ class CollectGiftRule implements ObserverInterface
         GiftRuleConfigHelper $giftRuleConfigHelper,
         GiftRuleHelper $giftRuleHelper,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
-        \Magento\Framework\App\Request\Http $request
+        \Magento\Framework\App\Request\Http $request,
+        GiftRuleContext $giftRuleContext
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->giftRuleService = $giftRuleService;
@@ -96,6 +104,7 @@ class CollectGiftRule implements ObserverInterface
         $this->giftRuleHelper = $giftRuleHelper;
         $this->quoteRepository = $quoteRepository;
         $this->request = $request;
+        $this->giftRuleContext = $giftRuleContext;
     }
 
     /**
@@ -177,6 +186,13 @@ class CollectGiftRule implements ObserverInterface
                             $giftRuleCode,
                             $giftRuleId
                         );
+                        $this->giftRuleContext->setGiftAddedAutomaticallyCount($numberOfferedProduct);
+                        // In case we don't recollect totals,
+                        // we need to set manually quote quantity summaries to update them.
+                        // In case we recollect totals,
+                        // these sets are not necessary, but they won't affect the native behavior.
+                        $quote->setItemsCount($quote->getItemsCount() + 1);
+                        $quote->setItemsQty((float)$quote->getItemsQty() + $numberOfferedProduct);
                         $saveQuote = true;
                     }
 
