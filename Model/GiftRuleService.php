@@ -208,9 +208,14 @@ class GiftRuleService implements GiftRuleServiceInterface
             $giftRuleId = $identifier;
         }
 
-        $giftRuleData   = $this->giftRuleCacheHelper->getCachedGiftRule($identifier);
+        $giftRuleData = $this->giftRuleCacheHelper->getCachedGiftRule($identifier);
         if (!$giftRuleData) {
             throw new Exception(__('The gift rule is not valid.'));
+        }
+
+        // If rule id isn't applied to quote, don't allow to add gifts for it.
+        if (!in_array($giftRuleId, explode(',', (string) $quote->getAppliedRuleIds()))) {
+            throw new LocalizedException(__('We can\'t add this gift item to your shopping cart.'));
         }
 
         $quoteGiftItems = $this->getQuoteGiftItems($quote, $giftRuleId);

@@ -14,15 +14,19 @@
 namespace Smile\GiftSalesRule\Helper;
 
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\Product\Attribute\Source\Status;
+use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Framework\App\CacheInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Rule\Model\Condition\Sql\Builder;
 use Magento\SalesRule\Model\Rule;
 use Magento\SalesRule\Model\RuleFactory;
+use Magento\Store\Model\StoreManagerInterface;
 use Smile\GiftSalesRule\Api\Data\GiftRuleInterface;
 use Smile\GiftSalesRule\Api\GiftRuleRepositoryInterface;
 
@@ -31,6 +35,7 @@ use Smile\GiftSalesRule\Api\GiftRuleRepositoryInterface;
  *
  * @author    Maxime Queneau <maxime.queneau@smile.fr>
  * @copyright 2019 Smile
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class Cache extends AbstractHelper
 {
@@ -71,6 +76,11 @@ class Cache extends AbstractHelper
     protected $sqlBuilder;
 
     /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
      * GiftSalesRuleCache constructor.
      *
      * @param Context                     $context                  Context
@@ -79,6 +89,7 @@ class Cache extends AbstractHelper
      * @param CollectionFactory           $productCollectionFactory Product collection factory
      * @param Builder                     $sqlBuilder               Sql builder
      * @param RuleFactory                 $ruleFactory              Rule factory
+     * @param StoreManagerInterface       $storeManager             Store Manager
      */
     public function __construct(
         Context $context,
@@ -86,13 +97,15 @@ class Cache extends AbstractHelper
         GiftRuleRepositoryInterface $giftRuleRepository,
         CollectionFactory $productCollectionFactory,
         Builder $sqlBuilder,
-        RuleFactory $ruleFactory
+        RuleFactory $ruleFactory,
+        StoreManagerInterface $storeManager
     ) {
         $this->cache = $cache;
         $this->giftRuleRepository = $giftRuleRepository;
         $this->productCollectionFactory = $productCollectionFactory;
         $this->sqlBuilder = $sqlBuilder;
         $this->ruleFactory = $ruleFactory;
+        $this->storeManager = $storeManager;
 
         parent::__construct($context);
     }
@@ -109,7 +122,7 @@ class Cache extends AbstractHelper
      */
     public function saveCachedGiftRule($identifier, $rule, $giftRule)
     {
-        $giftRuleData = $this->cache->load(self::CACHE_IDENTIFIER . $identifier);
+        $giftRuleData = $this->cache->load($this->getCacheKey($identifier));
         if (!$giftRuleData) {
             if (is_int($giftRule)) {
                 /**
@@ -119,11 +132,7 @@ class Cache extends AbstractHelper
                 $giftRule = $this->giftRuleRepository->getById($giftRule);
             }
 
-            /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection $collection */
-            $collection = $this->productCollectionFactory->create();
-
-            $collection->addStoreFilter();
-
+            $collection = $this->getProductCollection();
             $actions = $rule->getActions();
             $actions->collectValidatedAttributes($collection);
             $this->sqlBuilder->attachConditionToCollection($collection, $actions);
@@ -152,7 +161,7 @@ class Cache extends AbstractHelper
 
             $this->cache->save(
                 serialize($giftRuleData),
-                self::CACHE_IDENTIFIER . $identifier,
+                $this->getCacheKey($identifier),
                 array_merge([self::CACHE_DATA_TAG], $productCacheTags),
                 3600
             );
@@ -174,7 +183,7 @@ class Cache extends AbstractHelper
      */
     public function getCachedGiftRule($giftRuleCode)
     {
-        $cachedData = unserialize($this->cache->load(self::CACHE_IDENTIFIER . $giftRuleCode));
+        $cachedData = unserialize($this->cache->load($this->getCacheKey($giftRuleCode)));
         if (!$cachedData) {
             $rule = $this->extractRuleFromCode($giftRuleCode);
             if ($rule && $rule->getId()) {
@@ -199,6 +208,21 @@ class Cache extends AbstractHelper
     }
 
     /**
+     * Get product collection.
+     *
+     * @return Collection
+     */
+    protected function getProductCollection(): Collection
+    {
+        /** @var Collection $collection */
+        $collection = $this->productCollectionFactory->create();
+        $collection->addAttributeToFilter('status', Status::STATUS_ENABLED);
+        $collection->addStoreFilter();
+
+        return $collection;
+    }
+
+    /**
      * Extract rule from gift rule code.
      *
      * @param string $giftRuleCode Gift rule code
@@ -211,5 +235,18 @@ class Cache extends AbstractHelper
         $ruleId = array_shift($explodedCode);
 
         return $this->ruleFactory->create()->load($ruleId);
+    }
+
+    /**
+     * Get cache key.
+     *
+     * @param int|string $ruleIdentifier Rule identifier
+     *
+     * @return string
+     * @throws NoSuchEntityException
+     */
+    protected function getCacheKey($ruleIdentifier): string
+    {
+        return self::CACHE_IDENTIFIER . $ruleIdentifier . '_' . $this->storeManager->getStore()->getCode();
     }
 }
