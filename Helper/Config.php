@@ -27,6 +27,7 @@ class Config extends AbstractHelper
      * Config paths.
      */
     const KEY_CONFIG_AUTOMATIC_ADD = 'smile_gift_sales_rule/configuration/automatic_add';
+    const KEY_CONFIG_AUTOMATIC_POPUP_OPEN = 'smile_gift_sales_rule/configuration/automatic_popup_open';
     /**#@-*/
 
     /**
@@ -39,5 +40,15 @@ class Config extends AbstractHelper
         $value = (int) $this->scopeConfig->getValue(self::KEY_CONFIG_AUTOMATIC_ADD);
 
         return ($value == 1);
+    }
+
+    /**
+     * Get the config value for automatic_popup_open.
+     *
+     * @return bool
+     */
+    public function isAutomaticPopupOpenEnabled(): bool
+    {
+        return (bool) $this->scopeConfig->getValue(self::KEY_CONFIG_AUTOMATIC_POPUP_OPEN);
     }
 }

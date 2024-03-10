@@ -21,10 +21,9 @@ use Magento\SalesRule\Model\Rule\Action\Discount\AbstractDiscount;
 use Magento\SalesRule\Model\Rule\Action\Discount\Data as DiscountData;
 use Magento\SalesRule\Model\Rule\Action\Discount\DataFactory;
 use Magento\SalesRule\Model\Validator;
-use Magento\SalesRule\Api\Data\RuleInterface;
-use Smile\GiftSalesRule\Api\Data\GiftRuleInterface;
 use Smile\GiftSalesRule\Api\GiftRuleRepositoryInterface;
 use Smile\GiftSalesRule\Helper\Cache as GiftRuleCacheHelper;
+use Smile\GiftSalesRule\Helper\GiftRule as GiftRuleHelper;
 use Smile\GiftSalesRule\Model\GiftRule;
 
 /**
@@ -46,6 +45,11 @@ class OfferProductPerPriceRange extends AbstractDiscount
     protected $giftRuleCacheHelper;
 
     /**
+     * @var GiftRuleHelper
+     */
+    protected $giftRuleHelper;
+
+    /**
      * @var GiftRuleRepositoryInterface
      */
     protected $giftRuleRepository;
@@ -58,6 +62,7 @@ class OfferProductPerPriceRange extends AbstractDiscount
      * @param PriceCurrencyInterface      $priceCurrency       Price currency
      * @param checkoutSession             $checkoutSession     Checkout session
      * @param GiftRuleCacheHelper         $giftRuleCacheHelper Gift rule cache helper
+     * @param GiftRuleHelper              $giftRuleHelper      Gift rule helper
      * @param GiftRuleRepositoryInterface $giftRuleRepository  Gift rule repository
      */
     public function __construct(
@@ -66,10 +71,12 @@ class OfferProductPerPriceRange extends AbstractDiscount
         PriceCurrencyInterface $priceCurrency,
         checkoutSession $checkoutSession,
         GiftRuleCacheHelper $giftRuleCacheHelper,
+        GiftRuleHelper $giftRuleHelper,
         GiftRuleRepositoryInterface $giftRuleRepository
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->giftRuleCacheHelper = $giftRuleCacheHelper;
+        $this->giftRuleHelper = $giftRuleHelper;
         $this->giftRuleRepository = $giftRuleRepository;
 
         parent::__construct(
@@ -105,19 +112,18 @@ class OfferProductPerPriceRange extends AbstractDiscount
              * Rules load by collection => extension attributes not present in rule entity
              */
             /** @var GiftRule $giftRule */
-            $giftRule = $this->giftRuleRepository->getById($rule->getRuleId());
+            $giftRule = $this->giftRuleRepository->getByRule($rule);
 
-            if ($quote->getGrandTotal() >= $giftRule->getPriceRange()) {
-                /** @var int $level */
-                $range = floor($quote->getGrandTotal() / $giftRule->getPriceRange());
+            if ($quote->getShippingAddress()->getBaseSubtotalTotalInclTax() >= $giftRule->getPriceRange()) {
+                $range = $this->giftRuleHelper->getRange(
+                    $quote->getShippingAddress()->getBaseSubtotalTotalInclTax(),
+                    $giftRule->getPriceRange()
+                );
 
                 // Save active gift rule in session.
                 $giftRuleSessionData = $this->checkoutSession->getGiftRules();
                 $giftRuleSessionData[$rule->getRuleId()] = $rule->getRuleId() . '_' . $range;
                 $this->checkoutSession->setGiftRules($giftRuleSessionData);
-
-                // Set number offered product.
-                $giftRule->setNumberOfferedProduct($giftRule->getMaximumNumberProduct() * $range);
 
                 $this->giftRuleCacheHelper->saveCachedGiftRule(
                     $rule->getRuleId() . '_' . $range,

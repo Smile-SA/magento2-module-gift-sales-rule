@@ -10,5 +10,11 @@
             "SMILE_GIFT_SALESRULE_RULE_ID": true,
             "PRIMARY": true
         }
+    },
+    "quote_address_item": {
+        "column": {
+            "custom_price": true,
+            "original_custom_price": true
+        }
     }
 }

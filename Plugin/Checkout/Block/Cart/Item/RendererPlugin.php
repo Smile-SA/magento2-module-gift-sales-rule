@@ -15,15 +15,21 @@ namespace Smile\GiftSalesRule\Plugin\Checkout\Block\Cart\Item;
 
 use Magento\Checkout\Block\Cart\Item\Renderer;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
+use Smile\GiftSalesRule\Helper\GiftRule;
 
 /**
- * Class CombinePlugin
+ * Class RendererPlugin
  *
  * @author    Pierre Le Maguer <pilem@smile.fr>
  * @copyright 2019 Smile
  */
 class RendererPlugin
 {
+    /**
+     * @var GiftRule
+     */
+    protected $giftRuleHelper;
+
     /**
      * @var array
      */
@@ -32,6 +38,14 @@ class RendererPlugin
         'checkout.cart.item.renderers.simple.actions.edit',
         'checkout.cart.item.renderers.configurable.actions.edit',
     ];
+
+    /**
+     * @param GiftRule $giftRuleHelper gift rule helper
+     */
+    public function __construct(GiftRule $giftRuleHelper)
+    {
+        $this->giftRuleHelper = $giftRuleHelper;
+    }
 
     /**
      * Remove the edit action from the item renderer for gift items.
@@ -44,9 +58,8 @@ class RendererPlugin
     public function beforeGetActions(
         Renderer $subject,
         AbstractItem $item
-    ) {
-        $option = $item->getOptionByCode('option_gift_rule');
-        if ($option) {
+    ): array {
+        if ($this->giftRuleHelper->isGiftItem($item)) {
             $actionsBlock = $subject->getChildBlock('actions');
             if ($actionsBlock) {
                 foreach ($this->actionsBlockToRemove as $blockName) {

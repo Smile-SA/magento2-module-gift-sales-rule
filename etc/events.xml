@@ -26,4 +26,7 @@
     <event name="sales_quote_collect_totals_after">
         <observer name="smile_gift_salesrule_collect_totals_after" instance="Smile\GiftSalesRule\Observer\CollectGiftRule"/>
     </event>
+    <event name="sales_rules_skip_actions_validation">
+        <observer name="smile_gift_salesrule_set_skip_actions_validation" instance="Smile\GiftSalesRule\Observer\ValidateGiftRuleActions"/>
+    </event>
 </config>

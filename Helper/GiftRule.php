@@ -17,6 +17,7 @@ use Magento\Framework\App\ActionInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\SalesRule\Model\Rule;
 use Smile\GiftSalesRule\Api\Data\GiftRuleInterface;
 use Smile\GiftSalesRule\Api\GiftRuleRepositoryInterface;
@@ -92,7 +93,7 @@ class GiftRule extends AbstractHelper
          */
         $hasProduct = false;
         foreach ($quote->getAllItems() as $item) {
-            if (!$item->getOptionByCode('option_gift_rule')) {
+            if (!$this->isGiftItem($item)) {
                 $hasProduct = true;
                 break;
             }
@@ -106,9 +107,9 @@ class GiftRule extends AbstractHelper
              * Rules load by collection => extension attributes not present in rule entity
              */
             /** @var GiftRuleInterface $giftRule */
-            $giftRule = $this->giftRuleRepository->getById($rule->getRuleId());
+            $giftRule = $this->giftRuleRepository->getByRule($rule);
 
-            if ($quote->getGrandTotal() < $giftRule->getPriceRange()) {
+            if ($quote->getShippingAddress()->getBaseSubtotalTotalInclTax() < $giftRule->getPriceRange()) {
                 $valid = false;
             }
         }
@@ -133,5 +134,53 @@ class GiftRule extends AbstractHelper
         ];
 
         return $this->_getUrl('giftsalesrule/cart/add', $routeParams);
+    }
+
+    /**
+     * Get range of a gift rule for a quote.
+     *
+     * @param float $total      Total
+     * @param float $priceRange Price range
+     *
+     * @return float
+     */
+    public function getRange($total, $priceRange)
+    {
+        return floor($total / $priceRange);
+    }
+
+    /**
+     * Get number offered product for a quote.
+     *
+     * @param Quote $quote                Quote
+     * @param float $maximumNumberProduct Maximum number product
+     * @param float $priceRange           Price range
+     * @return int
+     */
+    public function getNumberOfferedProduct($quote, $maximumNumberProduct, $priceRange)
+    {
+        $numberOfferedProduct = $maximumNumberProduct;
+        if (floatval($priceRange) > 0) {
+            $shippingAddress = $quote->getShippingAddress();
+            // In some weird cases with multi-shipping feature enabled, we need to get the orig data.
+            // Example: Go to the checkout and come back to the cart page.
+            $total = $shippingAddress->getBaseSubtotalTotalInclTax()
+                ?: $shippingAddress->getOrigData('base_subtotal_total_incl_tax');
+            $range = $this->getRange($total, $priceRange);
+            $numberOfferedProduct = $maximumNumberProduct * $range;
+        }
+
+        return (int) $numberOfferedProduct;
+    }
+
+    /**
+     * Is gift item ?
+     *
+     * @param AbstractItem $item item
+     * @return bool
+     */
+    public function isGiftItem(AbstractItem $item): bool
+    {
+        return (bool) $item->getOptionByCode('option_gift_rule');
     }
 }

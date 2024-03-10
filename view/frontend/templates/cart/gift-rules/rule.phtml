@@ -14,6 +14,8 @@
  */
 
 /** @var $block \Smile\GiftSalesRule\Block\Cart\GiftRules\Rule */
+/** @var $giftRuleViewModel \Smile\GiftSalesRule\ViewModel\GiftRule */
+$giftRuleViewModel = $block->getData('giftRuleViewModel');
 $rule = $block->getGiftRule();
 ?>
 
@@ -24,6 +26,9 @@ $rule = $block->getGiftRule();
         <div class="popin-block" id="rule-freegift-popin-<?= $rule->getCode() ?>" data-mage-init='{
             "Magento_Ui/js/modal/modal": {
                 "type": "popup",
+                <?php if ($giftRuleViewModel->isAutomaticPopupOpenEnabled()): ?>
+                "autoOpen": <?= $rule->getRestNumber() ? 'true' : 'false'; ?>,
+                <?php endif; ?>
                 "responsive": true,
                 "modalClass": "free-gift-modal",
                 "innerScroll": true,

@@ -29,4 +29,12 @@
                     column="rule_id" referenceTable="salesrule" referenceColumn="rule_id"
                     onDelete="CASCADE"/>
     </table>
+    <!-- Fix Magento Bug Start: To remove when the PR https://github.com/magento/magento2/pull/31309 is merged -->
+    <table name="quote_address_item" resource="checkout" engine="innodb" comment="Sales Flat Quote Address Item">
+        <column xsi:type="decimal" name="custom_price" scale="4" precision="12" unsigned="false" nullable="true"
+                comment="Custom Price"/>
+        <column xsi:type="decimal" name="original_custom_price" scale="4" precision="12" unsigned="false"
+                nullable="true" comment="Original Custom Price"/>
+    </table>
+    <!-- Fix Magento Bug End -->
 </schema>
