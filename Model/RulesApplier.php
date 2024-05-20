@@ -66,7 +66,7 @@ class RulesApplier extends BaseRulesApplier
      * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function applyRules($item, $rules, $skipValidation, $couponCode)
+    public function applyRules($item, $rules, $skipValidation, $couponCode = [])
     {
         $address = $item->getAddress();
         $appliedRuleIds = [];
