@@ -16,7 +16,6 @@ namespace Smile\GiftSalesRule\Api;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\SalesRule\Model\Rule;
 use Smile\GiftSalesRule\Api\Data\GiftRuleInterface;
-use Smile\GiftSalesRule\Api\Data\GiftRuleSearchResultsInterface;
 
 /**
  * GiftRule repository interface.
@@ -51,7 +50,7 @@ interface GiftRuleRepositoryInterface
      * @param SearchCriteriaInterface $searchCriteria Search criteria
      * @return \Smile\GiftSalesRule\Api\Data\GiftRuleSearchResultsInterface
      */
-    public function getList(SearchCriteriaInterface $searchCriteria = null);
+    public function getList(?SearchCriteriaInterface $searchCriteria = null);
 
     /**
      * Save the GiftRule.

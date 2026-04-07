@@ -164,7 +164,7 @@ class GiftRuleService implements GiftRuleServiceInterface
      * @throws LocalizedException
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    public function addGiftProducts(Quote $quote, array $products, string $identifier, int $giftRuleId = null)
+    public function addGiftProducts(Quote $quote, array $products, string $identifier, ?int $giftRuleId = null)
     {
         if ($giftRuleId == null) {
             $giftRuleId = $identifier;
@@ -202,7 +202,7 @@ class GiftRuleService implements GiftRuleServiceInterface
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function replaceGiftProducts(Quote $quote, array $products, string $identifier, int $giftRuleId = null)
+    public function replaceGiftProducts(Quote $quote, array $products, string $identifier, ?int $giftRuleId = null)
     {
         if ($giftRuleId == null) {
             $giftRuleId = $identifier;

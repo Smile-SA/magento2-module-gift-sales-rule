@@ -55,7 +55,7 @@ interface GiftRuleServiceInterface
      *
      * @return mixed
      */
-    public function addGiftProducts(Quote $quote, array $products, string $identifier, int $giftRuleId = null);
+    public function addGiftProducts(Quote $quote, array $products, string $identifier, ?int $giftRuleId = null);
 
     /**
      * Replace gift products
@@ -67,5 +67,5 @@ interface GiftRuleServiceInterface
      *
      * @return mixed
      */
-    public function replaceGiftProducts(Quote $quote, array $products, string $identifier, int $giftRuleId = null);
+    public function replaceGiftProducts(Quote $quote, array $products, string $identifier, ?int $giftRuleId = null);
 }

@@ -136,7 +136,7 @@ class GiftRuleRepository implements GiftRuleRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function getList(SearchCriteriaInterface $searchCriteria = null)
+    public function getList(?SearchCriteriaInterface $searchCriteria = null)
     {
         /** @var AbstractCollection $collection */
         $collection = $this->objectCollectionFactory->create();
