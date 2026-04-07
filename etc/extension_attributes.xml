@@ -17,4 +17,7 @@
     <extension_attributes for="Magento\SalesRule\Api\Data\RuleInterface">
         <attribute code="gift_rule" type="Smile\GiftSalesRule\Api\Data\GiftRuleInterface" />
     </extension_attributes>
+    <extension_attributes for="Magento\Quote\Api\Data\TotalsItemInterface">
+        <attribute code="gift_rule" type="Smile\GiftSalesRule\Api\Data\GiftRuleTotalsItemInterface" />
+    </extension_attributes>
 </config>

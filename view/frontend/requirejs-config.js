@@ -15,5 +15,15 @@ var config = {
         '*': {
             smileChooseGifts: 'Smile_GiftSalesRule/js/choose-gifts'
         }
+    },
+    config: {
+        mixins: {
+            'Magento_Checkout/js/view/summary/item/details/thumbnail': {
+                'Smile_GiftSalesRule/js/view/summary/item/details/thumbnail-mixin': true
+            },
+            'Magento_Checkout/js/view/summary/cart-items': {
+                'Smile_GiftSalesRule/js/view/summary/cart-items-mixin': true
+            },
+        }
     }
 };
