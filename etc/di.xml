@@ -136,4 +136,24 @@
             <argument name="rulesApplier" xsi:type="object">Smile\GiftSalesRule\Model\RulesApplier</argument>
         </arguments>
     </type>
+
+    <!-- Observer Collect Gift Rule -->
+    <type name="Smile\GiftSalesRule\Observer\CollectGiftRule">
+        <arguments>
+            <argument name="actionsWithoutQuoteSaving" xsi:type="array">
+                <item name="add-cart" xsi:type="array">
+                    <item name="action_name" xsi:type="string">add</item>
+                    <item name="controller_name" xsi:type="string">cart</item>
+                </item>
+                <item name="update-cart" xsi:type="array">
+                    <item name="action_name" xsi:type="string">updatePost</item>
+                    <item name="controller_name" xsi:type="string">cart</item>
+                </item>
+                <item name="switch-store" xsi:type="array">
+                    <item name="action_name" xsi:type="string">switch</item>
+                    <item name="controller_name" xsi:type="string">store</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
 </config>

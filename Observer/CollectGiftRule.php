@@ -70,15 +70,26 @@ class CollectGiftRule implements ObserverInterface
     protected $request;
 
     /**
+     * @var array
+     */
+    protected $actionsWithoutQuoteSaving;
+
+    /**
+     * @var bool
+     */
+    protected $alreadyTriggered = false;
+
+    /**
      * CollectGiftRule constructor.
      *
-     * @param CheckoutSession          $checkoutSession      Checkout session
-     * @param GiftRuleServiceInterface $giftRuleService      Gift rule service
-     * @param GiftRuleCacheHelper      $giftRuleCacheHelper  Gift rule cache helper
-     * @param GiftRuleConfigHelper     $giftRuleConfigHelper Gift rule config helper
-     * @param GiftRuleHelper           $giftRuleHelper       Gift rule helper
-     * @param CartRepositoryInterface  $quoteRepository      Quote repository
-     * @param Http                     $request              Request
+     * @param CheckoutSession          $checkoutSession           Checkout session
+     * @param GiftRuleServiceInterface $giftRuleService           Gift rule service
+     * @param GiftRuleCacheHelper      $giftRuleCacheHelper       Gift rule cache helper
+     * @param GiftRuleConfigHelper     $giftRuleConfigHelper      Gift rule config helper
+     * @param GiftRuleHelper           $giftRuleHelper            Gift rule helper
+     * @param CartRepositoryInterface  $quoteRepository           Quote repository
+     * @param Http                     $request                   Request
+     * @param array                    $actionsWithoutQuoteSaving Actions without quote saving
      */
     public function __construct(
         CheckoutSession $checkoutSession,
@@ -86,16 +97,18 @@ class CollectGiftRule implements ObserverInterface
         GiftRuleCacheHelper $giftRuleCacheHelper,
         GiftRuleConfigHelper $giftRuleConfigHelper,
         GiftRuleHelper $giftRuleHelper,
-        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
-        \Magento\Framework\App\Request\Http $request
+        CartRepositoryInterface $quoteRepository,
+        Http $request,
+        array $actionsWithoutQuoteSaving = []
     ) {
-        $this->checkoutSession = $checkoutSession;
-        $this->giftRuleService = $giftRuleService;
-        $this->giftRuleCacheHelper = $giftRuleCacheHelper;
-        $this->giftRuleConfigHelper = $giftRuleConfigHelper;
-        $this->giftRuleHelper = $giftRuleHelper;
-        $this->quoteRepository = $quoteRepository;
-        $this->request = $request;
+        $this->checkoutSession           = $checkoutSession;
+        $this->giftRuleService           = $giftRuleService;
+        $this->giftRuleCacheHelper       = $giftRuleCacheHelper;
+        $this->giftRuleConfigHelper      = $giftRuleConfigHelper;
+        $this->giftRuleHelper            = $giftRuleHelper;
+        $this->quoteRepository           = $quoteRepository;
+        $this->request                   = $request;
+        $this->actionsWithoutQuoteSaving = $actionsWithoutQuoteSaving;
     }
 
     /**
@@ -110,112 +123,145 @@ class CollectGiftRule implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
+        if ($this->alreadyTriggered) {
+            // Avoid infinite loops (saving the quote may retrigger this observer)
+            return;
+        }
+
         /** @var array $giftRules */
         $giftRules = $this->checkoutSession->getGiftRules();
 
+        /** @var Quote $quote */
+        $quote = $observer->getEvent()->getQuote();
+
+        $appliedRuleIds = explode(',', (string) $quote->getAppliedRuleIds());
+        $saveQuote = false;
+
+        // Remove gift items associated to rules that are no longer applied to the quote
+        /** @var Item $item */
+        foreach ($quote->getAllItems() as $item) {
+            $option = $item->getOptionByCode('option_gift_rule');
+
+            if ($option && !in_array((string) $option->getValue(), $appliedRuleIds, true)) {
+                $quote->deleteItem($item);
+                $saveQuote = true;
+            }
+        }
+
         if ($giftRules) {
-            /** @var Quote $quote */
-            $quote = $observer->getEvent()->getQuote();
-
-            /** @var array $ruleIds */
-            $ruleIds = explode(',', $quote->getAppliedRuleIds());
-
-            $saveQuote = false;
-
             /** @var array $newGiftRulesList */
             $newGiftRulesList = [];
             foreach ($giftRules as $giftRuleId => $giftRuleCode) {
-                if (!in_array($giftRuleId, $ruleIds)) {
-                    /** @var Item $item */
-                    foreach ($quote->getAllItems() as $item) {
-                        $option = $item->getOptionByCode('option_gift_rule');
-                        if ($option && $option->getValue() == $giftRuleId) {
-                            // Remove gift item.
-                            $quote->deleteItem($item);
-                            $saveQuote = true;
-                        }
-                    }
-                } else {
-                    $giftRuleData = $this->giftRuleCacheHelper->getCachedGiftRule($giftRuleCode);
-                    if (!$giftRuleData) {
+                if (!in_array($giftRuleId, $appliedRuleIds)) {
+                    // Already processed above
+                    continue;
+                }
+
+                $giftRuleData = $this->giftRuleCacheHelper->getCachedGiftRule($giftRuleCode);
+                if (!$giftRuleData) {
+                    continue;
+                }
+
+                $newGiftRulesList[$giftRuleId] = $giftRuleCode;
+                $giftItem = [];
+                $giftItemQty = 0;
+
+                /** @var Item $item */
+                foreach ($quote->getAllItems() as $item) {
+                    if ($item->isDeleted()) {
                         continue;
                     }
 
-                    $newGiftRulesList[$giftRuleId] = $giftRuleCode;
-                    $giftItem    = [];
-                    $giftItemQty = 0;
-
-                    /** @var Item $item */
-                    foreach ($quote->getAllItems() as $item) {
-                        /** @var Option $option */
-                        $option = $item->getOptionByCode('option_gift_rule');
-                        /** @var Option $configurableOption */
-                        $configurableOption = $item->getOptionByCode('simple_product');
-                        if ($option && $option->getValue() == $giftRuleId && !$configurableOption) {
-                            $giftItem[] = $item;
-                            $giftItemQty += $item->getQty();
-                        }
+                    /** @var Option $option */
+                    $option = $item->getOptionByCode('option_gift_rule');
+                    /** @var Option $configurableOption */
+                    $configurableOption = $item->getOptionByCode('simple_product');
+                    if ($option && $option->getValue() == $giftRuleId && !$configurableOption) {
+                        $giftItem[] = $item;
+                        $giftItemQty += $item->getQty();
                     }
+                }
 
-                    $numberOfferedProduct = $this->giftRuleHelper->getNumberOfferedProduct(
+                $numberOfferedProduct = $this->giftRuleHelper->getNumberOfferedProduct(
+                    $quote,
+                    $giftRuleData[GiftRuleCacheHelper::DATA_MAXIMUM_NUMBER_PRODUCT],
+                    $giftRuleData[GiftRuleCacheHelper::DATA_PRICE_RANGE]
+                );
+
+                // If only 1 gift product available => add automatic gift product.
+                if ($this->giftRuleConfigHelper->isAutomaticAddEnabled() && count($giftItem) == 0 &&
+                    count($giftRuleData[GiftRuleCacheHelper::DATA_PRODUCT_ITEMS]) == 1) {
+                    $this->giftRuleService->addGiftProducts(
                         $quote,
-                        $giftRuleData[GiftRuleCacheHelper::DATA_MAXIMUM_NUMBER_PRODUCT],
-                        $giftRuleData[GiftRuleCacheHelper::DATA_PRICE_RANGE]
-                    );
-
-                    // If only 1 gift product available => add automatic gift product.
-                    if ($this->giftRuleConfigHelper->isAutomaticAddEnabled() && count($giftItem) == 0 &&
-                        count($giftRuleData[GiftRuleCacheHelper::DATA_PRODUCT_ITEMS]) == 1) {
-                        $this->giftRuleService->addGiftProducts(
-                            $quote,
+                        [
                             [
-                                [
-                                    'id' => key($giftRuleData[GiftRuleCacheHelper::DATA_PRODUCT_ITEMS]),
-                                    'qty' => $numberOfferedProduct,
-                                ],
+                                'id' => key($giftRuleData[GiftRuleCacheHelper::DATA_PRODUCT_ITEMS]),
+                                'qty' => $numberOfferedProduct,
                             ],
-                            $giftRuleCode,
-                            $giftRuleId
-                        );
-                        $saveQuote = true;
-                    }
+                        ],
+                        $giftRuleCode,
+                        $giftRuleId
+                    );
+                    $saveQuote = true;
+                }
 
-                    if ($giftItemQty > $numberOfferedProduct) {
-                        // Delete gift item.
-                        $qtyToDelete = $giftItemQty - $numberOfferedProduct;
+                if ($giftItemQty > $numberOfferedProduct) {
+                    // Delete gift item.
+                    $qtyToDelete = $giftItemQty - $numberOfferedProduct;
 
-                        foreach (array_reverse($giftItem) as $item) {
-                            if ($item->getQty() > $qtyToDelete) {
-                                $item->setQty($item->getQty() - $qtyToDelete);
-                                $saveQuote = true;
-                                break;
-                            } else {
-                                $qtyToDelete = $qtyToDelete - $item->getQty();
-                                $parentItemId = $item->getParentItemId();
-                                if ($parentItemId) {
-                                    $quote->removeItem($parentItemId);
-                                }
-                                $quote->deleteItem($item);
-                                $saveQuote = true;
+                    foreach (array_reverse($giftItem) as $item) {
+                        if ($item->getQty() > $qtyToDelete) {
+                            $item->setQty($item->getQty() - $qtyToDelete);
+                            $saveQuote = true;
+                            break;
+                        } else {
+                            $qtyToDelete = $qtyToDelete - $item->getQty();
+                            $parentItemId = $item->getParentItemId();
+                            if ($parentItemId) {
+                                $quote->removeItem($parentItemId);
                             }
+                            $quote->deleteItem($item);
+                            $saveQuote = true;
+                        }
 
-                            if ($qtyToDelete == 0) {
-                                break;
-                            }
+                        if ($qtyToDelete == 0) {
+                            break;
                         }
                     }
                 }
             }
 
-            /**
-             * Save quote if it is not cart add controller and item changed
-             */
-            if ($saveQuote
-                && !($this->request->getControllerName() == 'cart' && $this->request->getActionName() == 'add')) {
-                $this->quoteRepository->save($quote);
-            }
-
             $this->checkoutSession->setGiftRules($newGiftRulesList);
         }
+
+        /**
+         * Save quote depending on the controller and item changed
+         */
+        if ($saveQuote && !$this->isActionWithoutQuoteSaving()) {
+            $this->alreadyTriggered = true;
+            $this->quoteRepository->save($quote);
+            $this->alreadyTriggered = false;
+        }
+    }
+
+    /**
+     * Is action without quote saving?
+     *
+     * @return bool
+     */
+    protected function isActionWithoutQuoteSaving(): bool
+    {
+        $result = false;
+        foreach ($this->actionsWithoutQuoteSaving as $action) {
+            if (
+                $action['controller_name'] === $this->request->getControllerName()
+                && $action['action_name'] === $this->request->getActionName()
+            ) {
+                $result = true;
+                break;
+            }
+        }
+
+        return $result;
     }
 }

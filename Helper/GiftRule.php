@@ -18,6 +18,7 @@ use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
+use Magento\SalesRule\Model\Data\Rule as DataRule;
 use Magento\SalesRule\Model\Rule;
 use Smile\GiftSalesRule\Api\Data\GiftRuleInterface;
 use Smile\GiftSalesRule\Api\GiftRuleRepositoryInterface;
@@ -61,11 +62,11 @@ class GiftRule extends AbstractHelper
     /**
      * Is gift sales rule
      *
-     * @param Rule $rule Rule
+     * @param Rule|DataRule $rule Rule
      *
      * @return bool
      */
-    public function isGiftRule(Rule $rule)
+    public function isGiftRule($rule): bool
     {
         $isGiftRule = false;
         if (in_array($rule->getSimpleAction(), $this->giftRule)) {
