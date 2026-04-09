@@ -102,7 +102,7 @@ class RulesApplier extends BaseRulesApplier
                 }
             }
 
-            $this->applyRule($item, $rule, $address, $couponCode);
+            $this->applyRule($item, $rule, $address, $couponCodes);
             $appliedRuleIds[$rule->getRuleId()] = $rule->getRuleId();
 
             if ($rule->getStopRulesProcessing()) {
