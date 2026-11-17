@@ -1,16 +1,7 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Model;
 
 use Magento\Framework\DataObject;
@@ -19,7 +10,6 @@ use Smile\GiftSalesRule\Api\Data\GiftRuleDataInterface;
 /**
  * GiftRuleData model.
  *
- * @author    Pierre Le Maguer <pilem@smile.fr>
  * @copyright 2019 Smile
  * @SuppressWarnings(PHPMD.CamelCasePropertyName)
  */
@@ -27,16 +17,14 @@ class GiftRuleData extends DataObject implements GiftRuleDataInterface
 {
     /**
      * Get the maximum number product.
-     *
-     * @return int
      */
-    public function getNumberOfferedProduct()
+    public function getNumberOfferedProduct(): int
     {
         return $this->getData(self::NUMBER_OFFERED_PRODUCT);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setNumberOfferedProduct($numberOfferedProduct)
     {
@@ -44,7 +32,7 @@ class GiftRuleData extends DataObject implements GiftRuleDataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getCode()
     {
@@ -52,7 +40,7 @@ class GiftRuleData extends DataObject implements GiftRuleDataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setCode($value)
     {
@@ -60,7 +48,7 @@ class GiftRuleData extends DataObject implements GiftRuleDataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getRuleId()
     {
@@ -68,7 +56,7 @@ class GiftRuleData extends DataObject implements GiftRuleDataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setRuleId($value)
     {
@@ -76,7 +64,7 @@ class GiftRuleData extends DataObject implements GiftRuleDataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getLabel()
     {
@@ -84,7 +72,7 @@ class GiftRuleData extends DataObject implements GiftRuleDataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setLabel($value)
     {
@@ -92,7 +80,7 @@ class GiftRuleData extends DataObject implements GiftRuleDataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getProductItems()
     {
@@ -100,7 +88,7 @@ class GiftRuleData extends DataObject implements GiftRuleDataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setProductItems($items)
     {
@@ -108,7 +96,7 @@ class GiftRuleData extends DataObject implements GiftRuleDataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getQuoteItems()
     {
@@ -116,7 +104,7 @@ class GiftRuleData extends DataObject implements GiftRuleDataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setQuoteItems($items)
     {
@@ -124,7 +112,7 @@ class GiftRuleData extends DataObject implements GiftRuleDataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getRestNumber()
     {
@@ -132,7 +120,7 @@ class GiftRuleData extends DataObject implements GiftRuleDataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setRestNumber($value)
     {
@@ -140,7 +128,7 @@ class GiftRuleData extends DataObject implements GiftRuleDataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function populateFromArray(array $values)
     {

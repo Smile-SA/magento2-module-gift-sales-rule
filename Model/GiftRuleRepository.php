@@ -1,18 +1,10 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Model;
 
+use Exception;
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface as CollectionProcessor;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\App\CacheInterface;
@@ -21,51 +13,30 @@ use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Model\AbstractModel;
-use Magento\Framework\Model\ResourceModel\Db\AbstractDb as AbstractResourceModel;
 use Magento\Framework\Phrase;
-use Smile\GiftSalesRule\Api\GiftRuleRepositoryInterface;
-use Smile\GiftSalesRule\Api\Data\GiftRuleSearchResultsInterfaceFactory;
 use Smile\GiftSalesRule\Api\Data\GiftRuleInterface;
 use Smile\GiftSalesRule\Api\Data\GiftRuleInterfaceFactory;
+use Smile\GiftSalesRule\Api\Data\GiftRuleSearchResultsInterface;
+use Smile\GiftSalesRule\Api\Data\GiftRuleSearchResultsInterfaceFactory;
+use Smile\GiftSalesRule\Api\GiftRuleRepositoryInterface;
 use Smile\GiftSalesRule\Helper\Cache as GiftRuleCacheHelper;
 use Smile\GiftSalesRule\Model\ResourceModel\GiftRule as GiftRuleResource;
 use Smile\GiftSalesRule\Model\ResourceModel\GiftRule\CollectionFactory as GiftRuleCollectionFactory;
 
 /**
- * GiftRule repository.
- *
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class GiftRuleRepository implements GiftRuleRepositoryInterface
 {
-    /** @var CollectionProcessor */
-    protected $collectionProcessor;
+    protected mixed $objectFactory;
 
-    /** @var mixed */
-    protected $objectFactory;
+    protected mixed $objectCollectionFactory;
 
-    /** @var AbstractResourceModel */
-    protected $objectResource;
+    protected mixed $objectSearchResultsFactory;
 
-    /** @var mixed */
-    protected $objectCollectionFactory;
+    protected array $cacheById = [];
 
-    /** @var mixed */
-    protected $objectSearchResultsFactory;
-
-    /** @var string|null */
-    protected $identifierFieldName = null;
-
-    /** @var array */
-    protected $cacheById = [];
-
-    /** @var CacheInterface */
-    protected $cache;
-
-    /** @var array */
-    protected $cacheByIdentifier = [];
+    protected array $cacheByIdentifier = [];
 
     /**
      * GiftRuleRepository constructor.
@@ -74,30 +45,26 @@ class GiftRuleRepository implements GiftRuleRepositoryInterface
      * @param GiftRuleInterfaceFactory              $objectFactory              Gift rule interface factory
      * @param GiftRuleResource                      $objectResource             Gift rule resource
      * @param GiftRuleCollectionFactory             $objectCollectionFactory    Gift rule collection factory
-     * @param GiftRuleSearchResultsInterfaceFactory $objectSearchResultsFactory Gift rule search results interface factory
+     * @param GiftRuleSearchResultsInterfaceFactory $objectSearchResultsFactory Search results factory
      * @param CacheInterface                        $cache                      Cache interface
      * @param string|null                           $identifierFieldName        Identifier field name
      */
     public function __construct(
-        CollectionProcessor $collectionProcessor,
+        protected CollectionProcessor $collectionProcessor,
         GiftRuleInterfaceFactory $objectFactory,
-        GiftRuleResource $objectResource,
+        protected GiftRuleResource $objectResource,
         GiftRuleCollectionFactory $objectCollectionFactory,
         GiftRuleSearchResultsInterfaceFactory $objectSearchResultsFactory,
-        CacheInterface $cache,
-        $identifierFieldName = null
+        protected CacheInterface $cache,
+        protected ?string $identifierFieldName = null
     ) {
-        $this->collectionProcessor        = $collectionProcessor;
         $this->objectFactory              = $objectFactory;
-        $this->objectResource             = $objectResource;
         $this->objectCollectionFactory    = $objectCollectionFactory;
         $this->objectSearchResultsFactory = $objectSearchResultsFactory;
-        $this->cache                      = $cache;
-        $this->identifierFieldName        = $identifierFieldName;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function getById($objectId)
@@ -124,7 +91,7 @@ class GiftRuleRepository implements GiftRuleRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getByRule($rule)
     {
@@ -134,14 +101,14 @@ class GiftRuleRepository implements GiftRuleRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getList(?SearchCriteriaInterface $searchCriteria = null)
     {
         /** @var AbstractCollection $collection */
         $collection = $this->objectCollectionFactory->create();
 
-        /** @var \Magento\Framework\Api\SearchResults $searchResults */
+        /** @var GiftRuleSearchResultsInterface $searchResults */
         $searchResults = $this->objectSearchResultsFactory->create();
 
         if ($searchCriteria) {
@@ -154,7 +121,9 @@ class GiftRuleRepository implements GiftRuleRepositoryInterface
 
         // Build the result.
         $searchResults->setTotalCount($collection->getSize());
-        $searchResults->setItems($collection->getItems());
+        /** @var GiftRuleInterface[] $items */
+        $items = $collection->getItems();
+        $searchResults->setItems($items);
 
         return $searchResults;
     }
@@ -163,11 +132,9 @@ class GiftRuleRepository implements GiftRuleRepositoryInterface
      * Delete entity
      *
      * @param AbstractModel $object Object
-     *
-     * @return boolean
      * @throws CouldNotDeleteException
      */
-    public function deleteEntity(AbstractModel $object)
+    public function deleteEntity(AbstractModel $object): bool
     {
         try {
             $this->objectResource->delete($object);
@@ -177,7 +144,7 @@ class GiftRuleRepository implements GiftRuleRepositoryInterface
                 $objectIdentifier = $object->getData($this->identifierFieldName);
                 unset($this->cacheByIdentifier[$objectIdentifier]);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $msg = new Phrase($e->getMessage());
             throw new CouldNotDeleteException($msg);
         }
@@ -186,11 +153,11 @@ class GiftRuleRepository implements GiftRuleRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function save(GiftRuleInterface $object)
     {
-        /** @var AbstractModel $object */
+        /** @var GiftRule $object */
         try {
             $this->objectResource->save($object);
 
@@ -201,8 +168,8 @@ class GiftRuleRepository implements GiftRuleRepositoryInterface
             }
 
             /** Flush gift rule data cached */
-            $this->cache->clean(GiftRuleCacheHelper::CACHE_DATA_TAG);
-        } catch (\Exception $e) {
+            $this->cache->clean([GiftRuleCacheHelper::CACHE_DATA_TAG]);
+        } catch (Exception $e) {
             $msg = new Phrase($e->getMessage());
             throw new CouldNotSaveException($msg);
         }
@@ -211,10 +178,13 @@ class GiftRuleRepository implements GiftRuleRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function deleteById($objectId)
     {
-        return $this->deleteEntity($this->getById($objectId));
+        /** @var GiftRule $object */
+        $object = $this->getById($objectId);
+
+        return $this->deleteEntity($object);
     }
 }

@@ -1,16 +1,7 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Model\Rule\Action\Discount;
 
 use Magento\Checkout\Model\Session as checkoutSession;
@@ -26,28 +17,10 @@ use Smile\GiftSalesRule\Helper\Cache as GiftRuleCacheHelper;
 use Smile\GiftSalesRule\Model\GiftRule;
 
 /**
- * Class OfferProduct
- *
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
+ * @SuppressWarnings(PHPMD.CookieAndSessionMisuse)
  */
 class OfferProduct extends AbstractDiscount
 {
-    /**
-     * @var checkoutSession
-     */
-    protected $checkoutSession;
-
-    /**
-     * @var GiftRuleCacheHelper
-     */
-    protected $giftRuleCacheHelper;
-
-    /**
-     * @var GiftRuleRepositoryInterface
-     */
-    protected $giftRuleRepository;
-
     /**
      * OfferProduct constructor.
      *
@@ -62,13 +35,10 @@ class OfferProduct extends AbstractDiscount
         Validator $validator,
         DataFactory $discountDataFactory,
         PriceCurrencyInterface $priceCurrency,
-        checkoutSession $checkoutSession,
-        GiftRuleCacheHelper $giftRuleCacheHelper,
-        GiftRuleRepositoryInterface $giftRuleRepository
+        protected checkoutSession $checkoutSession,
+        protected GiftRuleCacheHelper $giftRuleCacheHelper,
+        protected GiftRuleRepositoryInterface $giftRuleRepository
     ) {
-        $this->checkoutSession = $checkoutSession;
-        $this->giftRuleCacheHelper = $giftRuleCacheHelper;
-        $this->giftRuleRepository = $giftRuleRepository;
 
         parent::__construct(
             $validator,
@@ -78,15 +48,15 @@ class OfferProduct extends AbstractDiscount
     }
 
     /**
+     * Register the gift rule (session + cache); the returned discount data stays empty.
+     *
      * @param Rule         $rule Rule
      * @param AbstractItem $item Item
      * @param float        $qty  Qty
-     *
-     * @return DiscountData
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function calculate($rule, $item, $qty)
+    public function calculate(mixed $rule, mixed $item, mixed $qty): DiscountData
     {
         /** @var \Magento\SalesRule\Model\Rule\Action\Discount\Data $discountData */
         $discountData = $this->discountFactory->create();
@@ -94,7 +64,7 @@ class OfferProduct extends AbstractDiscount
         /** @var \Magento\Quote\Model\Quote $quote */
         $quote = $item->getQuote();
 
-        $calculateId = 'calculate_gift_rule_'.$rule->getRuleId();
+        $calculateId = 'calculate_gift_rule_' . $rule->getRuleId();
         if (!$quote->getData($calculateId)) {
             // Set only for performance (not save in DB).
             $quote->setData($calculateId, true);

@@ -1,19 +1,9 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Plugin\Model\Rule\Metadata;
 
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\SalesRule\Model\Rule;
 use Magento\SalesRule\Model\Rule\Metadata\ValueProvider;
 use Magento\Ui\Component\Form\Element\Input;
@@ -25,24 +15,19 @@ use Smile\GiftSalesRule\Model\GiftRuleFactory;
 /**
  * Add gift sales rule
  *
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
  * @copyright 2019 Smile
  */
 class ValueProviderPlugin
 {
     /**
      * Gift rule repository
-     *
-     * @var GiftRuleRepositoryInterface
      */
-    protected $giftRuleRepository;
+    protected GiftRuleRepositoryInterface $giftRuleRepository;
 
     /**
      * Gift rule factory
-     *
-     * @var GiftRuleFactory
      */
-    protected $giftRuleFactory;
+    protected GiftRuleFactory $giftRuleFactory;
 
     /**
      * UpdateRuleDataObserver constructor.
@@ -64,15 +49,13 @@ class ValueProviderPlugin
      * @param ValueProvider $subject Subject
      * @param array         $result  Result
      * @param Rule          $rule    Rule
-     *
-     * @return mixed
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function afterGetMetadataValues(
         ValueProvider $subject,
-        $result,
+        array $result,
         Rule $rule
-    ) {
+    ): array {
         $extAttributes = $rule->getExtensionAttributes();
 
         $result['actions']['children']['simple_action']['arguments']['data']['config']['options'][] = [

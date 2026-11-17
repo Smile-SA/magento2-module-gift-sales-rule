@@ -1,16 +1,7 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Model;
 
 use Exception;
@@ -28,43 +19,10 @@ use Smile\GiftSalesRule\Helper\Cache as GiftRuleCacheHelper;
 use Smile\GiftSalesRule\Helper\GiftRule as GiftRuleHelper;
 
 /**
- * Class GiftRuleService
- *
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
+ * @SuppressWarnings(PHPMD.CookieAndSessionMisuse)
  */
 class GiftRuleService implements GiftRuleServiceInterface
 {
-    /**
-     * @var CheckoutSession
-     */
-    protected $checkoutSession;
-
-    /**
-     * @var CacheInterface
-     */
-    protected $cache;
-
-    /**
-     * @var Cart
-     */
-    protected $cart;
-
-    /**
-     * @var GiftRuleCacheHelper
-     */
-    protected $giftRuleCacheHelper;
-
-    /**
-     * @var GiftRuleHelper
-     */
-    protected $giftRuleHelper;
-
-    /**
-     * @var GiftRuleDataInterfaceFactory
-     */
-    protected $giftRuleDataFactory;
-
     /**
      * GiftRuleService constructor.
      *
@@ -76,29 +34,22 @@ class GiftRuleService implements GiftRuleServiceInterface
      * @param GiftRuleHelper               $giftRuleHelper      Gift rule helper
      */
     public function __construct(
-        CheckoutSession $checkoutSession,
-        Cart $cart,
-        CacheInterface $cache,
-        GiftRuleCacheHelper $giftRuleCacheHelper,
-        GiftRuleDataInterfaceFactory $giftRuleDataFactory,
-        GiftRuleHelper $giftRuleHelper
+        protected CheckoutSession $checkoutSession,
+        protected Cart $cart,
+        protected CacheInterface $cache,
+        protected GiftRuleCacheHelper $giftRuleCacheHelper,
+        protected GiftRuleDataInterfaceFactory $giftRuleDataFactory,
+        protected GiftRuleHelper $giftRuleHelper
     ) {
-        $this->checkoutSession = $checkoutSession;
-        $this->cart = $cart;
-        $this->cache = $cache;
-        $this->giftRuleCacheHelper = $giftRuleCacheHelper;
-        $this->giftRuleDataFactory = $giftRuleDataFactory;
-        $this->giftRuleHelper = $giftRuleHelper;
     }
 
     /**
      * Get available gifts
      *
      * @param Quote $quote Quote
-     *
      * @return GiftRuleDataInterface[]
      */
-    public function getAvailableGifts(Quote $quote)
+    public function getAvailableGifts(Quote $quote): array
     {
         /** @var array $gifts */
         $gifts = [];
@@ -106,12 +57,12 @@ class GiftRuleService implements GiftRuleServiceInterface
         /** @var array $quoteItems */
         $quoteItems = [];
 
-        /** @var array $giftRules */
+        /** @var array|null $giftRules */
         $giftRules = $this->checkoutSession->getGiftRules();
 
         /** @var Item $item */
         foreach ($quote->getAllItems() as $item) {
-            /** @var Option $option */
+            /** @var Option|null $option */
             $option = $item->getOptionByCode('option_gift_rule');
 
             if ($option) {
@@ -159,12 +110,10 @@ class GiftRuleService implements GiftRuleServiceInterface
      * @param array    $products   Products
      * @param string   $identifier Identifier
      * @param int|null $giftRuleId Gift rule id
-     *
-     * @return mixed|void
      * @throws LocalizedException
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    public function addGiftProducts(Quote $quote, array $products, string $identifier, ?int $giftRuleId = null)
+    public function addGiftProducts(Quote $quote, array $products, string $identifier, ?int $giftRuleId = null): void
     {
         if ($giftRuleId == null) {
             $giftRuleId = $identifier;
@@ -196,14 +145,17 @@ class GiftRuleService implements GiftRuleServiceInterface
      * @param array    $products   Product
      * @param string   $identifier Identifier
      * @param int|null $giftRuleId Gift rule id
-     *
      * @throws LocalizedException
      * @SuppressWarnings(PHPMD.ElseExpression)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function replaceGiftProducts(Quote $quote, array $products, string $identifier, ?int $giftRuleId = null)
-    {
+    public function replaceGiftProducts(
+        Quote $quote,
+        array $products,
+        string $identifier,
+        ?int $giftRuleId = null
+    ): void {
         if ($giftRuleId == null) {
             $giftRuleId = $identifier;
         }
@@ -224,7 +176,7 @@ class GiftRuleService implements GiftRuleServiceInterface
 
                 $productId = $product['id'];
                 if (isset($product['super_attribute'])) {
-                    $productId = $product['id'].json_encode($product['super_attribute']);
+                    $productId = $product['id'] . json_encode($product['super_attribute']);
                 }
 
                 if (isset($quoteGiftItems[$productId])) {
@@ -256,16 +208,20 @@ class GiftRuleService implements GiftRuleServiceInterface
     /**
      * Check if is authorized gift product.
      *
-     * @param Quote $quote        Quote
-     * @param int   $productId    Product id
-     * @param array $giftRuleData Gift rule data
-     * @param int   $qty          Qty
-     * @return bool
+     * @param Quote            $quote        Quote
+     * @param int|string       $productId    Product id (request param / array key)
+     * @param array            $giftRuleData Gift rule data
+     * @param float|int|string $qty          Qty (request param)
      */
-    protected function isAuthorizedGiftProduct($quote, $productId, $giftRuleData, $qty)
-    {
+    protected function isAuthorizedGiftProduct(
+        Quote $quote,
+        int|string $productId,
+        array $giftRuleData,
+        float|int|string $qty
+    ): bool {
         $isAuthorizedGiftProduct = false;
-        if (array_key_exists($productId, $giftRuleData[GiftRuleCacheHelper::DATA_PRODUCT_ITEMS])
+        if (
+            array_key_exists($productId, $giftRuleData[GiftRuleCacheHelper::DATA_PRODUCT_ITEMS])
             && $qty <= $this->giftRuleHelper->getNumberOfferedProduct(
                 $quote,
                 $giftRuleData[GiftRuleCacheHelper::DATA_MAXIMUM_NUMBER_PRODUCT],
@@ -281,22 +237,20 @@ class GiftRuleService implements GiftRuleServiceInterface
     /**
      * Get quote gift item
      *
-     * @param Quote $quote      Quote
-     * @param int   $giftRuleId Gift rule id
-     *
-     * @return array
+     * @param Quote      $quote      Quote
+     * @param int|string $giftRuleId Gift rule id (falls back to the string identifier)
      */
-    protected function getQuoteGiftItems(Quote $quote, int $giftRuleId)
+    protected function getQuoteGiftItems(Quote $quote, int|string $giftRuleId): array
     {
         $quoteItem = [];
 
         /** @var Item $item */
         foreach ($quote->getAllItems() as $item) {
-            /** @var Option $option */
+            /** @var Option|null $option */
             $option = $item->getOptionByCode('option_gift_rule');
             if ($option && $option->getValue() == $giftRuleId) {
                 $attributesOptionValue = '';
-                /** @var Option $attributesOption */
+                /** @var Option|null $attributesOption */
                 $attributesOption = $item->getOptionByCode('attributes');
                 if ($attributesOption) {
                     $attributesOptionValue = $attributesOption->getValue();

@@ -1,37 +1,21 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Api\Data;
 
-/**
- * GiftRule interface.
- *
- * @api
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- */
 interface GiftRuleInterface
 {
-    const TABLE_NAME             = 'smile_gift_salesrule';
-    const RULE_ID                = 'rule_id';
-    const MAXIMUM_NUMBER_PRODUCT = 'maximum_number_product';
-    const PRICE_RANGE            = 'price_range';
+    public const TABLE_NAME             = 'smile_gift_salesrule';
+    public const RULE_ID                = 'rule_id';
+    public const MAXIMUM_NUMBER_PRODUCT = 'maximum_number_product';
+    public const PRICE_RANGE            = 'price_range';
 
     /**
      * Rule type actions
      */
-    const OFFER_PRODUCT                 = 'offer_product';
-    const OFFER_PRODUCT_PER_PRICE_RANGE = 'offer_product_per_price_range';
+    public const OFFER_PRODUCT                 = 'offer_product';
+    public const OFFER_PRODUCT_PER_PRICE_RANGE = 'offer_product_per_price_range';
 
     /**
      * Get the maximum number product.
@@ -58,7 +42,7 @@ interface GiftRuleInterface
     /**
      * Set the price range.
      *
-     * @param decimal $value Value
+     * @param float   $value Value
      * @return $this
      */
     public function setPriceRange($value);

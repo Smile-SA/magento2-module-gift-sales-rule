@@ -1,0 +1,19 @@
+parameters:
+    level: 6
+    phpVersion: 80100
+    ignoreErrors:
+        -
+            # phpstan 2.3 no longer parses PHPMD suppressions such as @SuppressWarnings(PHPMD.Xxx)
+            message: '#PHPDoc tag @SuppressWarnings has invalid value#'
+            identifier: phpDoc.parseError
+            reportUnmatched: false
+        -
+            identifier: missingType.iterableValue
+            reportUnmatched: false
+    paths:
+        - .
+    excludePaths:
+        - 'vendor/*'
+
+includes:
+    - %currentWorkingDirectory%/vendor/smile/magento2-smilelab-phpstan/extension.neon

@@ -1,34 +1,24 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Pierre Le Maguer <pierre.lemaguer@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Api\Data;
 
 /**
  * GiftRule interface.
  *
  * @api
- * @author    Pierre Le Maguer <pierre.lemaguer@smile.fr>
  * @copyright 2019 Smile
  */
 interface GiftRuleDataInterface
 {
-    const RULE_ID                = 'rule_id';
-    const CODE                   = 'code';
-    const LABEL                  = 'label';
-    const QUOTE_ITEMS            = 'quote_items';
-    const NUMBER_OFFERED_PRODUCT = 'number_offered_product';
-    const PRODUCT_ITEMS          = 'product_items';
-    const REST_NUMBER            = 'rest_number';
+    public const RULE_ID                = 'rule_id';
+    public const CODE                   = 'code';
+    public const LABEL                  = 'label';
+    public const QUOTE_ITEMS            = 'quote_items';
+    public const NUMBER_OFFERED_PRODUCT = 'number_offered_product';
+    public const PRODUCT_ITEMS          = 'product_items';
+    public const REST_NUMBER            = 'rest_number';
 
     /**
      * Get the number offered product.
@@ -41,7 +31,6 @@ interface GiftRuleDataInterface
      * Set the number offered product.
      *
      * @param int $value Value
-     *
      * @return $this
      */
     public function setNumberOfferedProduct($value);
@@ -57,7 +46,6 @@ interface GiftRuleDataInterface
      * Set the code.
      *
      * @param string $value Value
-     *
      * @return $this
      */
     public function setCode($value);
@@ -73,7 +61,6 @@ interface GiftRuleDataInterface
      * Set the rule id.
      *
      * @param int $value Value
-     *
      * @return $this
      */
     public function setRuleId($value);
@@ -89,7 +76,6 @@ interface GiftRuleDataInterface
      * Set the label.
      *
      * @param string $value Value
-     *
      * @return $this
      */
     public function setLabel($value);
@@ -109,7 +95,6 @@ interface GiftRuleDataInterface
      * Set the code.
      *
      * @param array $items Items
-     *
      * @return $this
      */
     public function setQuoteItems($items);
@@ -129,7 +114,6 @@ interface GiftRuleDataInterface
      * Set the code.
      *
      * @param array $items Items
-     *
      * @return $this
      */
     public function setProductItems($items);
@@ -145,7 +129,6 @@ interface GiftRuleDataInterface
      * Set the rest number.
      *
      * @param int $value Value
-     *
      * @return $this
      */
     public function setRestNumber($value);
@@ -154,7 +137,6 @@ interface GiftRuleDataInterface
      * Populate the object from array values. It is better to use setters instead of the generic setData method.
      *
      * @param array $values Value
-     *
      * @return $this
      */
     public function populateFromArray(array $values);
