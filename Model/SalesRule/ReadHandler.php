@@ -1,16 +1,7 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Model\SalesRule;
 
 use Magento\Framework\EntityManager\MetadataPool;
@@ -21,24 +12,8 @@ use Magento\SalesRule\Model\Rule;
 use Smile\GiftSalesRule\Api\Data\GiftRuleInterface;
 use Smile\GiftSalesRule\Model\GiftRuleRepository;
 
-/**
- * Class ReadHandler
- *
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- */
 class ReadHandler implements ExtensionInterface
 {
-    /**
-     * @var MetadataPool
-     */
-    protected $metadataPool;
-
-    /**
-     * @var GiftRuleRepository
-     */
-    protected $giftRuleRepository;
-
     /**
      * ReadHandler constructor.
      *
@@ -46,24 +21,21 @@ class ReadHandler implements ExtensionInterface
      * @param GiftRuleRepository $giftRuleRepository Gift rule repository
      */
     public function __construct(
-        MetadataPool $metadataPool,
-        GiftRuleRepository $giftRuleRepository
+        protected MetadataPool $metadataPool,
+        protected GiftRuleRepository $giftRuleRepository
     ) {
-        $this->metadataPool = $metadataPool;
-        $this->giftRuleRepository = $giftRuleRepository;
     }
 
     /**
      * Fill Sales Rule extension attributes with gift rule attributes
      *
-     * @param Rule|object $entity    Entity
-     * @param array       $arguments Arguments
-     *
+     * @param Rule  $entity    Entity
+     * @param array $arguments Arguments
      * @return Rule
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @throws \Exception
      */
-    public function execute($entity, $arguments = [])
+    public function execute(mixed $entity, mixed $arguments = []): object
     {
         $attributes = $entity->getExtensionAttributes() ?: [];
         $metadata = $this->metadataPool->getMetadata(RuleInterface::class);

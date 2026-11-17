@@ -6,10 +6,13 @@
     "license": "OSL-3.0",
     "require": {
         "magento/framework": "^103.0.7",
-        "magento/module-sales-rule": "^101.2.7"
+        "magento/module-configurable-product": "^100.4.0",
+        "magento/module-sales-rule": "^101.2.7",
+        "magento/module-swatches": "^100.4.0",
+        "magento/module-weee": "^100.4.0"
     },
     "require-dev": {
-        "smile/magento2-smilelab-quality-suite": "^1.1.0"
+        "smile/magento2-smilelab-quality-suite": "^4.0"
     },
     "authors":[
         {
@@ -32,5 +35,15 @@
             "type": "composer",
             "url": "https://repo.magento.com/"
         }
-    ]
+    ],
+    "config": {
+        "allow-plugins": {
+            "magento/composer-dependency-version-audit-plugin": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        },
+        "audit": {
+            "abandoned": "report"
+        },
+        "sort-packages": true
+    }
 }

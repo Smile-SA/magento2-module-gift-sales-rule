@@ -1,16 +1,7 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Model\SalesRule;
 
 use Magento\Framework\EntityManager\MetadataPool;
@@ -22,29 +13,8 @@ use Smile\GiftSalesRule\Api\Data\GiftRuleInterface;
 use Smile\GiftSalesRule\Model\GiftRuleFactory;
 use Smile\GiftSalesRule\Model\GiftRuleRepository;
 
-/**
- * Class SaveHandler
- *
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- */
 class SaveHandler implements ExtensionInterface
 {
-    /**
-     * @var MetadataPool
-     */
-    protected $metadataPool;
-
-    /**
-     * @var GiftRuleRepository
-     */
-    protected $giftRuleRepository;
-
-    /**
-     * @var GiftRuleFactory
-     */
-    protected $giftRuleFactory;
-
     /**
      * ReadHandler constructor.
      *
@@ -53,26 +23,22 @@ class SaveHandler implements ExtensionInterface
      * @param GiftRuleFactory    $giftRuleFactory    Gift rule factory
      */
     public function __construct(
-        MetadataPool $metadataPool,
-        GiftRuleRepository $giftRuleRepository,
-        GiftRuleFactory $giftRuleFactory
+        protected MetadataPool $metadataPool,
+        protected GiftRuleRepository $giftRuleRepository,
+        protected GiftRuleFactory $giftRuleFactory
     ) {
-        $this->metadataPool = $metadataPool;
-        $this->giftRuleRepository = $giftRuleRepository;
-        $this->giftRuleFactory = $giftRuleFactory;
     }
 
     /**
      * Save gift rule value from Sales Rule extension attributes
      *
-     * @param object $entity    Entity
-     * @param array  $arguments Arguments
-     *
-     * @return bool|object
+     * @param Rule  $entity    Entity
+     * @param array $arguments Arguments
+     * @return Rule
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function execute($entity, $arguments = [])
+    public function execute(mixed $entity, mixed $arguments = []): object
     {
         $metadata = $this->metadataPool->getMetadata(RuleInterface::class);
         $ruleId = $entity->getData($metadata->getLinkField());

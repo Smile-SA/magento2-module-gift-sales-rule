@@ -1,29 +1,13 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Api;
 
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\SalesRule\Model\Rule;
 use Smile\GiftSalesRule\Api\Data\GiftRuleInterface;
 
-/**
- * GiftRule repository interface.
- *
- * @api
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- */
 interface GiftRuleRepositoryInterface
 {
     /**
