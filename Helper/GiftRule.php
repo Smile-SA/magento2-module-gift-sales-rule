@@ -41,6 +41,13 @@ class GiftRule extends AbstractHelper
     protected $giftRuleRepository;
 
     /**
+     * Gift rule id of the gift product currently added by the gift rule service.
+     *
+     * @var int|null
+     */
+    private $giftRuleIdBeingAdded = null;
+
+    /**
      * GiftRule constructor.
      *
      * @param Context                     $context            Context
@@ -182,5 +189,25 @@ class GiftRule extends AbstractHelper
     public function isGiftItem(AbstractItem $item): bool
     {
         return (bool) $item->getOptionByCode('option_gift_rule');
+    }
+
+    /**
+     * Set (or reset with null) the gift rule id of the gift product being added by the gift rule service.
+     *
+     * @param int|null $giftRuleId Gift rule id
+     */
+    public function setGiftRuleIdBeingAdded(?int $giftRuleId): void
+    {
+        $this->giftRuleIdBeingAdded = $giftRuleId;
+    }
+
+    /**
+     * Get the gift rule id of the gift product being added by the gift rule service.
+     *
+     * @return int|null
+     */
+    public function getGiftRuleIdBeingAdded(): ?int
+    {
+        return $this->giftRuleIdBeingAdded;
     }
 }

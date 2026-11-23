@@ -15,7 +15,7 @@ namespace Smile\GiftSalesRule\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Checkout\Model\Session as CheckoutSession;
+use Smile\GiftSalesRule\Helper\GiftRule as GiftRuleHelper;
 
 /**
  * Class AddGiftRuleOption
@@ -25,6 +25,19 @@ use Magento\Checkout\Model\Session as CheckoutSession;
  */
 class AddGiftRuleOption implements ObserverInterface
 {
+    /**
+     * @var GiftRuleHelper
+     */
+    protected $giftRuleHelper;
+
+    /**
+     * @param GiftRuleHelper $giftRuleHelper Gift rule helper
+     */
+    public function __construct(GiftRuleHelper $giftRuleHelper)
+    {
+        $this->giftRuleHelper = $giftRuleHelper;
+    }
+
     /**
      * Add option for gift item
      *
@@ -37,8 +50,10 @@ class AddGiftRuleOption implements ObserverInterface
         /** @var \Magento\Framework\DataObject $buyRequest */
         $buyRequest = $observer->getEvent()->getBuyRequest();
 
+        // The gift_rule value comes from the buy request, which a visitor controls (e.g. checkout/cart/add):
+        // only trust it when the gift rule service is the one adding the product.
         $giftRuleId = $buyRequest->getData('gift_rule');
-        if ($giftRuleId) {
+        if ($giftRuleId && (int) $giftRuleId === $this->giftRuleHelper->getGiftRuleIdBeingAdded()) {
             $transport = $observer->getEvent()->getTransport();
             $transport->options['gift_rule'] = $giftRuleId;
         }
