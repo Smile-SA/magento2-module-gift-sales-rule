@@ -192,6 +192,17 @@ class GiftRule extends AbstractHelper
     }
 
     /**
+     * Is the item a top-level quote item (not the child of a composite product) ?
+     *
+     * @param AbstractItem $item item
+     * @return bool
+     */
+    public function isTopLevelItem(AbstractItem $item): bool
+    {
+        return !$item->getParentItemId() && !$item->getParentItem();
+    }
+
+    /**
      * Set (or reset with null) the gift rule id of the gift product being added by the gift rule service.
      *
      * @param int|null $giftRuleId Gift rule id

@@ -10,12 +10,15 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Session\SessionManager;
 use Magento\Framework\Session\Storage;
 use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\Quote\Item;
+use Magento\Quote\Model\Quote\Item\Option;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
 use Smile\GiftSalesRule\Helper\Cache as GiftRuleCacheHelper;
 use Smile\GiftSalesRule\Helper\GiftRule as GiftRuleHelper;
+use Smile\GiftSalesRule\Model\GiftRuleData;
 use Smile\GiftSalesRule\Model\GiftRuleService;
 
 /**
@@ -123,6 +126,112 @@ class GiftRuleServiceTest extends TestCase
         );
 
         $this->assertNull($this->giftRuleHelper->getGiftRuleIdBeingAdded());
+    }
+
+    /**
+     * Only the keys the gift popup sends reach the buy request: bundle selections and custom options are dropped.
+     */
+    public function testGiftBuyRequestKeepsOnlyGiftPopupKeys(): void
+    {
+        $this->givenSessionAndAppliedRules([self::RULE_ID => self::RULE_CODE], (string) self::RULE_ID);
+
+        $this->cart->expects($this->once())
+            ->method('addProduct')
+            ->willReturnCallback(function ($productId, $request) {
+                $this->assertSame(
+                    [
+                        'id' => self::PRODUCT_ID,
+                        'product' => self::PRODUCT_ID,
+                        'qty' => 1,
+                        'super_attribute' => [93 => 5],
+                        'selected_configurable_option' => '43',
+                        'gift_rule' => self::RULE_ID,
+                    ],
+                    $request
+                );
+
+                return $this->cart;
+            });
+
+        $this->service->addGiftProducts(
+            $this->quote,
+            [[
+                'id' => self::PRODUCT_ID,
+                'product' => self::PRODUCT_ID,
+                'qty' => 1,
+                'super_attribute' => [93 => 5],
+                'selected_configurable_option' => '43',
+                'bundle_option' => [1 => 2],
+                'bundle_option_qty' => [1 => 100],
+                'options' => [7 => 'engraving'],
+                'gift_rule' => 99,
+            ]],
+            self::RULE_CODE,
+            self::RULE_ID
+        );
+    }
+
+    /**
+     * The remaining number of gifts counts a composite gift by its own qty, not its children's.
+     */
+    public function testAvailableGiftsCountTopLevelGiftItemsOnly(): void
+    {
+        $this->sessionStorage->setData('gift_rules', [self::RULE_ID => self::RULE_CODE]);
+
+        $cacheHelper = $this->createStub(GiftRuleCacheHelper::class);
+        $cacheHelper->method('getCachedGiftRule')->willReturn([
+            'label' => 'Gift',
+            'code' => self::RULE_CODE,
+            GiftRuleCacheHelper::DATA_PRODUCT_ITEMS => [self::PRODUCT_ID => 'sku'],
+            GiftRuleCacheHelper::DATA_MAXIMUM_NUMBER_PRODUCT => 3,
+            GiftRuleCacheHelper::DATA_PRICE_RANGE => null,
+        ]);
+        $reflection = new ReflectionClass(GiftRuleService::class);
+        $reflection->getProperty('giftRuleCacheHelper')->setValue($this->service, $cacheHelper);
+        $reflection->getProperty('giftRuleDataFactory')->setValue($this->service, new class {
+            public function create(): GiftRuleData
+            {
+                return (new ReflectionClass(GiftRuleData::class))->newInstanceWithoutConstructor();
+            }
+        });
+
+        $parent = $this->createGiftItem(self::PRODUCT_ID, 2);
+        $child = $this->createGiftItem(43, 1);
+        $child->setParentItem($parent);
+        $detachedChild = $this->createGiftItem(44, 1);
+        $detachedChild->setData('parent_item_id', 7);
+        $quote = $this->getMockBuilder(Quote::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getAllItems'])
+            ->getMock();
+        $quote->expects($this->once())->method('getAllItems')->willReturn([$parent, $child, $detachedChild]);
+
+        $this->cart->expects($this->never())->method('addProduct');
+
+        $gifts = $this->service->getAvailableGifts($quote);
+
+        $this->assertSame([self::PRODUCT_ID => 2.0], $gifts[self::RULE_ID]->getQuoteItems());
+        $this->assertSame(1.0, $gifts[self::RULE_ID]->getRestNumber());
+    }
+
+    /**
+     * Create a quote item flagged as a gift of the test rule.
+     */
+    private function createGiftItem(int $productId, float $qty): Item
+    {
+        $option = (new ReflectionClass(Option::class))->newInstanceWithoutConstructor();
+        $option->setData('value', (string) self::RULE_ID);
+
+        $item = $this->getMockBuilder(Item::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getOptionByCode'])
+            ->getMock();
+        $item->setData(['product_id' => $productId, 'qty' => $qty]);
+        $item->expects($this->atLeastOnce())->method('getOptionByCode')->willReturnCallback(
+            fn (string $code) => $code === 'option_gift_rule' ? $option : null
+        );
+
+        return $item;
     }
 
     /**

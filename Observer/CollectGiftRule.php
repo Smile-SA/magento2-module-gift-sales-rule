@@ -140,9 +140,12 @@ class CollectGiftRule implements ObserverInterface
                     foreach ($quote->getAllItems() as $item) {
                         /** @var Option $option */
                         $option = $item->getOptionByCode('option_gift_rule');
-                        /** @var Option $configurableOption */
-                        $configurableOption = $item->getOptionByCode('simple_product');
-                        if ($option && $option->getValue() == $giftRuleId && !$configurableOption) {
+                        // A child item of a composite gift keeps its own qty (1 for a configurable): count its parent.
+                        if (
+                            $option
+                            && $option->getValue() == $giftRuleId
+                            && $this->giftRuleHelper->isTopLevelItem($item)
+                        ) {
                             $giftItem[] = $item;
                             $giftItemQty += $item->getQty();
                         }
@@ -182,10 +185,6 @@ class CollectGiftRule implements ObserverInterface
                                 break;
                             } else {
                                 $qtyToDelete = $qtyToDelete - $item->getQty();
-                                $parentItemId = $item->getParentItemId();
-                                if ($parentItemId) {
-                                    $quote->removeItem($parentItemId);
-                                }
                                 $quote->deleteItem($item);
                                 $saveQuote = true;
                             }

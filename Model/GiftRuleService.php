@@ -36,6 +36,17 @@ use Smile\GiftSalesRule\Helper\GiftRule as GiftRuleHelper;
 class GiftRuleService implements GiftRuleServiceInterface
 {
     /**
+     * Keys of a gift product request sent by the gift popup: no other key may reach the buy request of a free item.
+     */
+    private const GIFT_PRODUCT_REQUEST_KEYS = [
+        'id',
+        'product',
+        'qty',
+        'super_attribute',
+        'selected_configurable_option',
+    ];
+
+    /**
      * @var CheckoutSession
      */
     protected $checkoutSession;
@@ -114,7 +125,7 @@ class GiftRuleService implements GiftRuleServiceInterface
             /** @var Option $option */
             $option = $item->getOptionByCode('option_gift_rule');
 
-            if ($option) {
+            if ($option && $this->giftRuleHelper->isTopLevelItem($item)) {
                 $quoteItems[$option->getValue()][$item->getProductId()] = $item->getQty();
             }
         }
@@ -285,6 +296,7 @@ class GiftRuleService implements GiftRuleServiceInterface
      */
     protected function addGiftProductToCart(array $product, int $giftRuleId): void
     {
+        $product = array_intersect_key($product, array_flip(self::GIFT_PRODUCT_REQUEST_KEYS));
         $product['gift_rule'] = $giftRuleId;
         $this->giftRuleHelper->setGiftRuleIdBeingAdded($giftRuleId);
         try {
