@@ -21,18 +21,20 @@ $rule = $block->getGiftRule();
 
 <?php if ($rule) : ?>
     <div class="rule-item">
-        <span class="name"><?= $rule->getLabel() ?></span>
-        <button class="choose action primary" onclick="jQuery('#rule-freegift-popin-<?= $rule->getCode() ?>').modal('openModal')"><?= $block->getButtonLabel() ?></button>
-        <div class="popin-block" id="rule-freegift-popin-<?= $rule->getCode() ?>" data-mage-init='{
+        <span class="name"><?= $escaper->escapeHtml($rule->getLabel()) ?></span>
+        <button class="choose action primary" type="button"
+                data-trigger="rule-freegift-popin-<?= (int) $rule->getRuleId() ?>"><?= $escaper->escapeHtml($block->getButtonLabel()) ?></button>
+        <div class="popin-block" id="rule-freegift-popin-<?= (int) $rule->getRuleId() ?>" data-mage-init='{
             "Magento_Ui/js/modal/modal": {
                 "type": "popup",
+                "trigger": "[data-trigger=rule-freegift-popin-<?= (int) $rule->getRuleId() ?>]",
                 <?php if ($giftRuleViewModel->isAutomaticPopupOpenEnabled()): ?>
                 "autoOpen": <?= $rule->getRestNumber() ? 'true' : 'false'; ?>,
                 <?php endif; ?>
                 "responsive": true,
                 "modalClass": "free-gift-modal",
                 "innerScroll": true,
-                "title": "<?= $block->escapeJs(__('%1: choose your %2 gifts', $rule->getLabel(), $rule->getNumberOfferedProduct())) ?>",
+                "title": "<?= $escaper->escapeJs(__('%1: choose your %2 gifts', $rule->getLabel(), $rule->getNumberOfferedProduct())) ?>",
                 "buttons": []
             }
         }'  style="display: none;">
@@ -40,7 +42,7 @@ $rule = $block->getGiftRule();
                 "nbProductToOffer": "<?= (int) $rule->getNumberOfferedProduct() ?>",
                 "formId": "#choose-gifts-form-<?= (int) $rule->getCode() ?>"
             }}'>
-                <form id="choose-gifts-form-<?= (int) $rule->getCode() ?>" method="post" action="<?= $block->getAddToCartUrl($rule->getRuleId(), $rule->getCode()) ?>">
+                <form id="choose-gifts-form-<?= (int) $rule->getCode() ?>" method="post" action="<?= $escaper->escapeUrl($block->getAddToCartUrl($rule->getRuleId(), $rule->getCode())) ?>">
                     <div class="messages">
                         <div class="message-error error message">
                             <div class="message-text"></div>
@@ -59,8 +61,8 @@ $rule = $block->getGiftRule();
                     </div>
                     <div class="actions">
                         <div class="primary-block">
-                            <button class="action primary validate-choose-gifts" type="submit" title="<?= __('Validate my gift(s)') ?>">
-                                <?= __('Validate my gift(s)') ?>
+                            <button class="action primary validate-choose-gifts" type="submit" title="<?= $escaper->escapeHtmlAttr(__('Validate my gift(s)')) ?>">
+                                <?= $escaper->escapeHtml(__('Validate my gift(s)')) ?>
                             </button>
                         </div>
                     </div>

@@ -166,6 +166,22 @@ class CollectGiftRuleTest extends TestCase
     }
 
     /**
+     * A gift item whose rule is not applied to the quote is removed, even with an empty session.
+     */
+    public function testGiftOfUnappliedRuleIsRemoved(): void
+    {
+        $item = $this->createGiftItem(self::RULE_ID, 1);
+        $this->sessionStorage->setData('gift_rules', []);
+        $this->quote->setData('applied_rule_ids', '3');
+        $this->quote->method('getAllItems')->willReturn([$item]);
+
+        $item->expects($this->never())->method('setQty');
+        $this->quote->expects($this->once())->method('deleteItem')->with($this->identicalTo($item));
+
+        $this->observer->execute(new Observer(['event' => new Event(['quote' => $this->quote])]));
+    }
+
+    /**
      * Run the observer on the quote items, with the gift rule applied and held in the session.
      */
     private function collect(array $items): void

@@ -158,8 +158,12 @@ class CollectGiftRule implements ObserverInterface
                     );
 
                     // If only 1 gift product available => add automatic gift product.
-                    if ($this->giftRuleConfigHelper->isAutomaticAddEnabled() && count($giftItem) == 0 &&
-                        count($giftRuleData[GiftRuleCacheHelper::DATA_PRODUCT_ITEMS]) == 1) {
+                    if (
+                        $this->giftRuleConfigHelper->isAutomaticAddEnabled()
+                        && count($giftItem) == 0
+                        && $numberOfferedProduct > 0
+                        && count($giftRuleData[GiftRuleCacheHelper::DATA_PRODUCT_ITEMS]) == 1
+                    ) {
                         $this->giftRuleService->addGiftProducts(
                             $quote,
                             [

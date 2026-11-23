@@ -182,12 +182,9 @@ class GiftRuleService implements GiftRuleServiceInterface
         }
 
         $giftRuleData = $this->getAppliedGiftRuleData($quote, $identifier, (int) $giftRuleId);
+        $products = $this->validateQuantities($quote, $products, $giftRuleData);
 
         foreach ($products as $product) {
-            if (!(isset($product['id']) && isset($product['qty']))) {
-                throw new Exception(__('We found an invalid request for adding gift product.'));
-            }
-
             if ($this->isAuthorizedGiftProduct($quote, $product['id'], $giftRuleData, $product['qty'])) {
                 $this->addGiftProductToCart($product, (int) $giftRuleId);
             } else {
@@ -217,12 +214,10 @@ class GiftRuleService implements GiftRuleServiceInterface
 
         $giftRuleData = $this->getAppliedGiftRuleData($quote, $identifier, (int) $giftRuleId);
 
+        $products = $this->validateQuantities($quote, $products, $giftRuleData);
         $quoteGiftItems = $this->getQuoteGiftItems($quote, $giftRuleId);
 
         foreach ($products as $product) {
-            if (!(isset($product['id']) && isset($product['qty']))) {
-                throw new Exception(__('We found an invalid request for adding gift product.'));
-            }
             if ($this->isAuthorizedGiftProduct($quote, $product['id'], $giftRuleData, $product['qty'])) {
                 $quoteItem = false;
 
@@ -284,6 +279,39 @@ class GiftRuleService implements GiftRuleServiceInterface
         }
 
         return $giftRuleData;
+    }
+
+    /**
+     * Check the requested quantities: positive integers, summing up to the number of offered products at most.
+     *
+     * @param Quote $quote        Quote
+     * @param array $products     Product request data
+     * @param array $giftRuleData Gift rule data
+     * @return array Product request data, with integer quantities
+     * @throws Exception
+     */
+    protected function validateQuantities(Quote $quote, array $products, array $giftRuleData): array
+    {
+        $totalQty = 0;
+        foreach ($products as $key => $product) {
+            $qty = filter_var($product['qty'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+            if (!isset($product['id']) || $qty === false) {
+                throw new Exception(__('We found an invalid request for adding gift product.'));
+            }
+            $products[$key]['qty'] = $qty;
+            $totalQty += $qty;
+        }
+
+        $numberOfferedProduct = $this->giftRuleHelper->getNumberOfferedProduct(
+            $quote,
+            $giftRuleData[GiftRuleCacheHelper::DATA_MAXIMUM_NUMBER_PRODUCT],
+            $giftRuleData[GiftRuleCacheHelper::DATA_PRICE_RANGE]
+        );
+        if ($totalQty > $numberOfferedProduct) {
+            throw new Exception(__('We can\'t add this gift item to your shopping cart.'));
+        }
+
+        return $products;
     }
 
     /**

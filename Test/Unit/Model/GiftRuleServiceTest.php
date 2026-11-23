@@ -12,6 +12,7 @@ use Magento\Framework\Session\Storage;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Item\Option;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -235,6 +236,35 @@ class GiftRuleServiceTest extends TestCase
     }
 
     /**
+     * Quantities summed over several products cannot exceed the number of products offered.
+     */
+    public function testTotalQuantityAboveRuleMaximumIsRejected(): void
+    {
+        $this->givenSessionAndAppliedRules([self::RULE_ID => self::RULE_CODE], (string) self::RULE_ID);
+
+        $this->expectAddRejected([['id' => self::PRODUCT_ID, 'qty' => 1], ['id' => self::PRODUCT_ID, 'qty' => '1']]);
+    }
+
+    /**
+     * Quantities must be positive integers.
+     */
+    #[DataProvider('invalidQtyProvider')]
+    public function testInvalidQuantityIsRejected(mixed $qty): void
+    {
+        $this->givenSessionAndAppliedRules([self::RULE_ID => self::RULE_CODE], (string) self::RULE_ID);
+
+        $this->expectAddRejected([['id' => self::PRODUCT_ID, 'qty' => $qty]]);
+    }
+
+    /**
+     * Invalid quantities.
+     */
+    public static function invalidQtyProvider(): array
+    {
+        return [['-1'], ['0'], ['0.5'], ['1e9'], [['1']]];
+    }
+
+    /**
      * Set the session gift rules and the quote applied rule ids.
      */
     private function givenSessionAndAppliedRules(array $sessionGiftRules, string $appliedRuleIds): void
@@ -246,14 +276,14 @@ class GiftRuleServiceTest extends TestCase
     /**
      * Assert that adding the gift product is rejected.
      */
-    private function expectAddRejected(): void
+    private function expectAddRejected(array $products = [['id' => self::PRODUCT_ID, 'qty' => 1]]): void
     {
         $this->cart->expects($this->never())->method('addProduct');
         $this->expectException(Exception::class);
 
         $this->service->replaceGiftProducts(
             $this->quote,
-            [['id' => self::PRODUCT_ID, 'qty' => 1]],
+            $products,
             self::RULE_CODE,
             self::RULE_ID
         );

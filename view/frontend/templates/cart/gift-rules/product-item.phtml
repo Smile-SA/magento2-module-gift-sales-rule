@@ -21,15 +21,15 @@ $selectedQty = $block->getProductQty();
     <div class="product-item-info freegift-product-item<?php if ($selectedQty) : ?> active<?php endif; ?>">
         <span class="product photo product-item-photo"><?= $block->getImage($product, 'category_page_grid')->toHtml() ?></span>
         <div class="product details product-item-details" data-product-id="<?= (int) $product->getId() ?>">
-            <strong class="product name product-item-name"><?= $block->escapeHtml($product->getName()) ?></strong>
+            <strong class="product name product-item-name"><?= $escaper->escapeHtml($product->getName()) ?></strong>
             <?= $block->getProductDetailsHtml($product) ?>
             <div class="field qty">
-                <label class="label" for="qty-<?= (int) $product->getId() ?>"><span><?= /* @escapeNotVerified */ __('Qty') ?></span></label>
+                <label class="label" for="qty-<?= (int) $product->getId() ?>"><span><?= $escaper->escapeHtml(__('Qty')) ?></span></label>
                 <div class="control">
                     <input type="number"
                            name="products[<?= (int) $product->getId() ?>][qty]"
                            id="qty-<?= (int) $product->getId() ?>"
-                           title="<?= /* @escapeNotVerified */ __('Qty') ?>"
+                           title="<?= $escaper->escapeHtmlAttr(__('Qty')) ?>"
                            class="input-text qty"
                            <?php if ($selectedQty) : ?>value="<?= (int) $selectedQty ?>"<?php endif; ?>
                     />
