@@ -21,6 +21,11 @@ use Smile\GiftSalesRule\Api\GiftRuleRepositoryInterface;
 class GiftRule extends AbstractHelper
 {
     /**
+     * Gift rule id of the gift product currently added by the gift rule service.
+     */
+    private ?int $giftRuleIdBeingAdded = null;
+
+    /**
      * GiftRule constructor.
      *
      * @param Context                     $context            Context
@@ -153,5 +158,36 @@ class GiftRule extends AbstractHelper
     public function isGiftItem(AbstractItem $item): bool
     {
         return (bool) $item->getOptionByCode('option_gift_rule');
+    }
+
+    /**
+     * Is the item a top-level quote item (not the child of a composite product) ?
+     *
+     * @param AbstractItem $item item
+     */
+    public function isTopLevelItem(AbstractItem $item): bool
+    {
+        /** @var AbstractItem|null $parentItem */
+        $parentItem = $item->getParentItem();
+
+        return !$item->getParentItemId() && !$parentItem;
+    }
+
+    /**
+     * Set (or reset with null) the gift rule id of the gift product being added by the gift rule service.
+     *
+     * @param int|null $giftRuleId Gift rule id
+     */
+    public function setGiftRuleIdBeingAdded(?int $giftRuleId): void
+    {
+        $this->giftRuleIdBeingAdded = $giftRuleId;
+    }
+
+    /**
+     * Get the gift rule id of the gift product being added by the gift rule service.
+     */
+    public function getGiftRuleIdBeingAdded(): ?int
+    {
+        return $this->giftRuleIdBeingAdded;
     }
 }

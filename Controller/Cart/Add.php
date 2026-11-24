@@ -100,26 +100,27 @@ class Add extends Action implements HttpPostActionInterface
      */
     protected function validatePostParameters(array $params): bool
     {
-        $return = true;
-
         if (
-            !isset($params['gift_rule_code'])
-            || !isset($params['gift_rule_id'])
-            || !isset($params['products'])
+            !isset($params['gift_rule_code'], $params['gift_rule_id'], $params['products'])
+            || !is_string($params['gift_rule_code'])
+            || filter_var($params['gift_rule_id'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) === false
             || !is_array($params['products'])
         ) {
-            $return = false;
+            return false;
         }
 
-        if ($return) {
-            foreach ($params['products'] as $productData) {
-                if (!isset($productData['qty'])) {
-                    $return = false;
-                }
+        foreach ($params['products'] as $productId => $productData) {
+            if (
+                !is_int($productId)
+                || !is_array($productData)
+                || !isset($productData['qty'])
+                || !is_scalar($productData['qty'])
+            ) {
+                return false;
             }
         }
 
-        return $return;
+        return true;
     }
 
     /**
@@ -132,7 +133,7 @@ class Add extends Action implements HttpPostActionInterface
         $filteredParams = [];
         foreach ($params['products'] as $productId => $productData) {
             if ($productData['qty']) {
-                $productData['uenc'] = $params['uenc'];
+                $productData['uenc'] = $params['uenc'] ?? null;
                 $productData['id'] = $productId;
                 $productData['product'] = $productId;
                 $productData['item'] = $productId;

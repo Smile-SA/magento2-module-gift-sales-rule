@@ -14,7 +14,7 @@ $productId = (int) $block->getProduct()->getId();
                 "selectorProduct": ".product-item-details",
                 "onlySwatches": false,
                 "enableControlLabel": false,
-                "numberToShow": <?= $escaper->escapeJs($block->getNumberSwatchesPerProduct()) ?>,
+                "numberToShow": <?= (int) $block->getNumberSwatchesPerProduct() ?>,
                 "jsonConfig": <?= /* @noEscape */ $block->getJsonConfig() ?>,
                 "jsonSwatchConfig": <?= /* @noEscape */ $block->getJsonSwatchConfig() ?>,
                 "mediaCallback": "<?= $escaper->escapeJs($escaper->escapeUrl($block->getMediaCallback())) ?>",

@@ -8,17 +8,17 @@ $rule = $block->getGiftRule();
 ?>
 
 <?php if ($rule): ?>
-    <?php $ruleCode = $escaper->escapeHtmlAttr($rule->getCode()); ?>
     <?php $addToCartUrl = $block->getAddToCartUrl($rule->getRuleId(), $rule->getCode()); ?>
     <div class="rule-item">
         <span class="name"><?= $escaper->escapeHtml($rule->getLabel()) ?></span>
-        <button class="choose action primary"
-                onclick="jQuery('#rule-freegift-popin-<?= /* @noEscape */ $ruleCode ?>').modal('openModal')">
+        <button class="choose action primary" type="button"
+                data-trigger="rule-freegift-popin-<?= (int) $rule->getRuleId() ?>">
             <?= $escaper->escapeHtml($block->getButtonLabel()) ?>
         </button>
-        <div class="popin-block" id="rule-freegift-popin-<?= /* @noEscape */ $ruleCode ?>" data-mage-init='{
+        <div class="popin-block" id="rule-freegift-popin-<?= (int) $rule->getRuleId() ?>" data-mage-init='{
             "Magento_Ui/js/modal/modal": {
                 "type": "popup",
+                "trigger": "[data-trigger=rule-freegift-popin-<?= (int) $rule->getRuleId() ?>]",
                 <?php if ($giftRuleViewModel->isAutomaticPopupOpenEnabled()): ?>
                 "autoOpen": <?= $rule->getRestNumber() ? 'true' : 'false'; ?>,
                 <?php endif; ?>
