@@ -29,7 +29,7 @@ use Smile\GiftSalesRule\Api\GiftRuleServiceInterface;
  * @author    Maxime Queneau <maxime.queneau@smile.fr>
  * @copyright 2019 Smile
  */
-class Add extends \Magento\Framework\App\Action\Action
+class Add extends \Magento\Framework\App\Action\Action implements HttpPostActionInterface
 {
     /**
      * @var Validator
@@ -113,8 +113,8 @@ class Add extends \Magento\Framework\App\Action\Action
              $this->giftRuleService->replaceGiftProducts(
                  $this->cart->getQuote(),
                  $productData,
-                 $params['gift_rule_code'],
-                 $params['gift_rule_id']
+                 (string) $params['gift_rule_code'],
+                 (int) $params['gift_rule_id']
              );
 
             $this->quoteRepository->save($this->cart->getQuote());
@@ -143,24 +143,27 @@ class Add extends \Magento\Framework\App\Action\Action
      */
     protected function validatePostParameters(array $params): bool
     {
-        $return = true;
-
-        if (!isset($params['gift_rule_code'])
-            || !isset($params['gift_rule_id'])
-            || !isset($params['products'])
-            || !is_array($params['products'])) {
-            $return = false;
+        if (
+            !isset($params['gift_rule_code'], $params['gift_rule_id'], $params['products'])
+            || !is_string($params['gift_rule_code'])
+            || filter_var($params['gift_rule_id'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) === false
+            || !is_array($params['products'])
+        ) {
+            return false;
         }
 
-        if ($return) {
-            foreach ($params['products'] as $productData) {
-                if (!isset($productData['qty'])) {
-                    $return = false;
-                }
+        foreach ($params['products'] as $productId => $productData) {
+            if (
+                !is_int($productId)
+                || !is_array($productData)
+                || !isset($productData['qty'])
+                || !is_scalar($productData['qty'])
+            ) {
+                return false;
             }
         }
 
-        return $return;
+        return true;
     }
 
     /**
@@ -175,7 +178,7 @@ class Add extends \Magento\Framework\App\Action\Action
         $filteredParams = [];
         foreach ($params['products'] as $productId => $productData) {
             if ($productData['qty']) {
-                $productData['uenc'] = $params['uenc'];
+                $productData['uenc'] = $params['uenc'] ?? null;
                 $productData['id'] = $productId;
                 $productData['product'] = $productId;
                 $productData['item'] = $productId;

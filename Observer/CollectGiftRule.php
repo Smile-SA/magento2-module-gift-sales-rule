@@ -110,32 +110,23 @@ class CollectGiftRule implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
+        /** @var Quote $quote */
+        $quote = $observer->getEvent()->getQuote();
+
+        /** @var array $ruleIds */
+        $ruleIds = explode(',', (string) $quote->getAppliedRuleIds());
+
+        // Remove every gift item whose rule is not applied to the quote, whatever the session holds.
+        $saveQuote = $this->removeUnappliedGiftItems($quote, $ruleIds);
+
         /** @var array $giftRules */
         $giftRules = $this->checkoutSession->getGiftRules();
 
         if ($giftRules) {
-            /** @var Quote $quote */
-            $quote = $observer->getEvent()->getQuote();
-
-            /** @var array $ruleIds */
-            $ruleIds = explode(',', $quote->getAppliedRuleIds());
-
-            $saveQuote = false;
-
             /** @var array $newGiftRulesList */
             $newGiftRulesList = [];
             foreach ($giftRules as $giftRuleId => $giftRuleCode) {
-                if (!in_array($giftRuleId, $ruleIds)) {
-                    /** @var Item $item */
-                    foreach ($quote->getAllItems() as $item) {
-                        $option = $item->getOptionByCode('option_gift_rule');
-                        if ($option && $option->getValue() == $giftRuleId) {
-                            // Remove gift item.
-                            $quote->deleteItem($item);
-                            $saveQuote = true;
-                        }
-                    }
-                } else {
+                if (in_array($giftRuleId, $ruleIds)) {
                     $giftRuleData = $this->giftRuleCacheHelper->getCachedGiftRule($giftRuleCode);
                     if (!$giftRuleData) {
                         continue;
@@ -149,9 +140,12 @@ class CollectGiftRule implements ObserverInterface
                     foreach ($quote->getAllItems() as $item) {
                         /** @var Option $option */
                         $option = $item->getOptionByCode('option_gift_rule');
-                        /** @var Option $configurableOption */
-                        $configurableOption = $item->getOptionByCode('simple_product');
-                        if ($option && $option->getValue() == $giftRuleId && !$configurableOption) {
+                        // A child item of a composite gift keeps its own qty (1 for a configurable): count its parent.
+                        if (
+                            $option
+                            && $option->getValue() == $giftRuleId
+                            && $this->giftRuleHelper->isTopLevelItem($item)
+                        ) {
                             $giftItem[] = $item;
                             $giftItemQty += $item->getQty();
                         }
@@ -164,8 +158,12 @@ class CollectGiftRule implements ObserverInterface
                     );
 
                     // If only 1 gift product available => add automatic gift product.
-                    if ($this->giftRuleConfigHelper->isAutomaticAddEnabled() && count($giftItem) == 0 &&
-                        count($giftRuleData[GiftRuleCacheHelper::DATA_PRODUCT_ITEMS]) == 1) {
+                    if (
+                        $this->giftRuleConfigHelper->isAutomaticAddEnabled()
+                        && count($giftItem) == 0
+                        && $numberOfferedProduct > 0
+                        && count($giftRuleData[GiftRuleCacheHelper::DATA_PRODUCT_ITEMS]) == 1
+                    ) {
                         $this->giftRuleService->addGiftProducts(
                             $quote,
                             [
@@ -191,10 +189,6 @@ class CollectGiftRule implements ObserverInterface
                                 break;
                             } else {
                                 $qtyToDelete = $qtyToDelete - $item->getQty();
-                                $parentItemId = $item->getParentItemId();
-                                if ($parentItemId) {
-                                    $quote->removeItem($parentItemId);
-                                }
                                 $quote->deleteItem($item);
                                 $saveQuote = true;
                             }
@@ -207,15 +201,39 @@ class CollectGiftRule implements ObserverInterface
                 }
             }
 
-            /**
-             * Save quote if it is not cart add controller and item changed
-             */
-            if ($saveQuote
-                && !($this->request->getControllerName() == 'cart' && $this->request->getActionName() == 'add')) {
-                $this->quoteRepository->save($quote);
-            }
-
             $this->checkoutSession->setGiftRules($newGiftRulesList);
         }
+
+        /**
+         * Save quote if it is not cart add controller and item changed
+         */
+        if ($saveQuote
+            && !($this->request->getControllerName() == 'cart' && $this->request->getActionName() == 'add')) {
+            $this->quoteRepository->save($quote);
+        }
+    }
+
+    /**
+     * Remove the gift items whose gift rule is not applied to the quote.
+     *
+     * @param Quote $quote   Quote
+     * @param array $ruleIds Applied rule ids
+     *
+     * @return bool True if at least one item was removed
+     */
+    protected function removeUnappliedGiftItems(Quote $quote, array $ruleIds): bool
+    {
+        $removed = false;
+
+        /** @var Item $item */
+        foreach ($quote->getAllItems() as $item) {
+            $option = $item->getOptionByCode('option_gift_rule');
+            if ($option && !in_array($option->getValue(), $ruleIds)) {
+                $quote->deleteItem($item);
+                $removed = true;
+            }
+        }
+
+        return $removed;
     }
 }

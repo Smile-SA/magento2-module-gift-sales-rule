@@ -36,6 +36,17 @@ use Smile\GiftSalesRule\Helper\GiftRule as GiftRuleHelper;
 class GiftRuleService implements GiftRuleServiceInterface
 {
     /**
+     * Keys of a gift product request sent by the gift popup: no other key may reach the buy request of a free item.
+     */
+    private const GIFT_PRODUCT_REQUEST_KEYS = [
+        'id',
+        'product',
+        'qty',
+        'super_attribute',
+        'selected_configurable_option',
+    ];
+
+    /**
      * @var CheckoutSession
      */
     protected $checkoutSession;
@@ -114,7 +125,7 @@ class GiftRuleService implements GiftRuleServiceInterface
             /** @var Option $option */
             $option = $item->getOptionByCode('option_gift_rule');
 
-            if ($option) {
+            if ($option && $this->giftRuleHelper->isTopLevelItem($item)) {
                 $quoteItems[$option->getValue()][$item->getProductId()] = $item->getQty();
             }
         }
@@ -170,19 +181,12 @@ class GiftRuleService implements GiftRuleServiceInterface
             $giftRuleId = $identifier;
         }
 
-        $giftRuleData = $this->giftRuleCacheHelper->getCachedGiftRule($identifier);
-        if (!$giftRuleData) {
-            throw new Exception(__('The gift rule is not valid.'));
-        }
+        $giftRuleData = $this->getAppliedGiftRuleData($quote, $identifier, (int) $giftRuleId);
+        $products = $this->validateQuantities($quote, $products, $giftRuleData);
 
         foreach ($products as $product) {
-            if (!(isset($product['id']) && isset($product['qty']))) {
-                throw new Exception(__('We found an invalid request for adding gift product.'));
-            }
-
             if ($this->isAuthorizedGiftProduct($quote, $product['id'], $giftRuleData, $product['qty'])) {
-                $product['gift_rule'] = $giftRuleId;
-                $this->cart->addProduct($product['id'], $product);
+                $this->addGiftProductToCart($product, (int) $giftRuleId);
             } else {
                 throw new Exception(__('We can\'t add this gift item to your shopping cart.'));
             }
@@ -208,17 +212,12 @@ class GiftRuleService implements GiftRuleServiceInterface
             $giftRuleId = $identifier;
         }
 
-        $giftRuleData   = $this->giftRuleCacheHelper->getCachedGiftRule($identifier);
-        if (!$giftRuleData) {
-            throw new Exception(__('The gift rule is not valid.'));
-        }
+        $giftRuleData = $this->getAppliedGiftRuleData($quote, $identifier, (int) $giftRuleId);
 
+        $products = $this->validateQuantities($quote, $products, $giftRuleData);
         $quoteGiftItems = $this->getQuoteGiftItems($quote, $giftRuleId);
 
         foreach ($products as $product) {
-            if (!(isset($product['id']) && isset($product['qty']))) {
-                throw new Exception(__('We found an invalid request for adding gift product.'));
-            }
             if ($this->isAuthorizedGiftProduct($quote, $product['id'], $giftRuleData, $product['qty'])) {
                 $quoteItem = false;
 
@@ -236,8 +235,7 @@ class GiftRuleService implements GiftRuleServiceInterface
                 if ($quoteItem) {
                     $quoteItem->setQty($product['qty']);
                 } else {
-                    $product['gift_rule'] = $giftRuleId;
-                    $this->cart->addProduct($product['id'], $product);
+                    $this->addGiftProductToCart($product, (int) $giftRuleId);
                 }
             } else {
                 throw new Exception(__('We can\'t add this gift item to your shopping cart.'));
@@ -250,6 +248,89 @@ class GiftRuleService implements GiftRuleServiceInterface
             foreach ($quoteGiftItems as $quoteGiftItem) {
                 $this->cart->removeItem($quoteGiftItem->getId());
             }
+        }
+    }
+
+    /**
+     * Get the data of a gift rule, only if it is currently applied to the quote.
+     *
+     * @param Quote  $quote      Quote
+     * @param string $identifier Gift rule code
+     * @param int    $giftRuleId Gift rule id
+     *
+     * @return array
+     * @throws Exception
+     */
+    protected function getAppliedGiftRuleData(Quote $quote, string $identifier, int $giftRuleId): array
+    {
+        $sessionGiftRules = (array) $this->checkoutSession->getGiftRules();
+        $appliedRuleIds = explode(',', (string) $quote->getAppliedRuleIds());
+
+        $giftRuleData = null;
+        if (isset($sessionGiftRules[$giftRuleId])
+            && (string) $sessionGiftRules[$giftRuleId] === $identifier
+            && in_array((string) $giftRuleId, $appliedRuleIds, true)
+        ) {
+            $giftRuleData = $this->giftRuleCacheHelper->getCachedGiftRule($identifier);
+        }
+
+        if (!$giftRuleData) {
+            throw new Exception(__('The gift rule is not valid.'));
+        }
+
+        return $giftRuleData;
+    }
+
+    /**
+     * Check the requested quantities: positive integers, summing up to the number of offered products at most.
+     *
+     * @param Quote $quote        Quote
+     * @param array $products     Product request data
+     * @param array $giftRuleData Gift rule data
+     * @return array Product request data, with integer quantities
+     * @throws Exception
+     */
+    protected function validateQuantities(Quote $quote, array $products, array $giftRuleData): array
+    {
+        $totalQty = 0;
+        foreach ($products as $key => $product) {
+            $qty = filter_var($product['qty'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+            if (!isset($product['id']) || $qty === false) {
+                throw new Exception(__('We found an invalid request for adding gift product.'));
+            }
+            $products[$key]['qty'] = $qty;
+            $totalQty += $qty;
+        }
+
+        $numberOfferedProduct = $this->giftRuleHelper->getNumberOfferedProduct(
+            $quote,
+            $giftRuleData[GiftRuleCacheHelper::DATA_MAXIMUM_NUMBER_PRODUCT],
+            $giftRuleData[GiftRuleCacheHelper::DATA_PRICE_RANGE]
+        );
+        if ($totalQty > $numberOfferedProduct) {
+            throw new Exception(__('We can\'t add this gift item to your shopping cart.'));
+        }
+
+        return $products;
+    }
+
+    /**
+     * Add a gift product to the cart, flagging it as a gift of the given rule.
+     *
+     * @param array $product    Product request data
+     * @param int   $giftRuleId Gift rule id
+     *
+     * @throws LocalizedException
+     */
+    protected function addGiftProductToCart(array $product, int $giftRuleId): void
+    {
+        $product = array_intersect_key($product, array_flip(self::GIFT_PRODUCT_REQUEST_KEYS));
+        $product['gift_rule'] = $giftRuleId;
+        $this->giftRuleHelper->setGiftRuleIdBeingAdded($giftRuleId);
+        try {
+            $this->cart->addProduct($product['id'], $product);
+        } finally {
+            $this->giftRuleHelper->setGiftRuleIdBeingAdded(null);
         }
     }
 
