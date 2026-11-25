@@ -20,6 +20,7 @@ use Magento\SalesRule\Model\Rule;
 use Magento\SalesRule\Model\Rule\Action\Discount\CalculatorFactory;
 use Magento\SalesRule\Model\RulesApplier as BaseRulesApplier;
 use Magento\SalesRule\Model\Utility;
+use Smile\GiftSalesRule\Api\Data\GiftRuleInterface;
 
 /**
  * Model Rules Applier
@@ -111,5 +112,36 @@ class RulesApplier extends BaseRulesApplier
         }
 
         return $appliedRuleIds;
+    }
+
+    /**
+     * Edit: run a gift rule's action on a parent whose children carry the price (dynamic bundle).
+     *
+     * For such a parent Magento's applyRule() validates the rule actions against the children
+     * and against the parent, and calls the action only for what matched. The actions of a gift
+     * rule are the gift products, so nothing matches and OfferProduct::calculate() - which
+     * registers the rule for CollectGiftRule - never runs: the rule is listed as applied, but the
+     * gift is never added. A gift rule gives no discount, so its action is called on the parent
+     * without that validation, the same as applyRules() above skips it.
+     *
+     * {@inheritdoc}
+     */
+    protected function applyRule($item, $rule, $address, array $couponCodes = [])
+    {
+        $giftActions = [GiftRuleInterface::OFFER_PRODUCT, GiftRuleInterface::OFFER_PRODUCT_PER_PRICE_RANGE];
+        if (!$item->getChildren() || !$item->isChildrenCalculated()
+            || !in_array($rule->getSimpleAction(), $giftActions, true)
+        ) {
+            return parent::applyRule($item, $rule, $address, $couponCodes);
+        }
+
+        $calculator = $this->calculatorFactory->create($rule->getSimpleAction());
+        $qty = $calculator->fixQuantity($this->validatorUtility->getItemQty($item, $rule), $rule);
+        $calculator->calculate($rule, $item, $qty);
+
+        $this->addDiscountDescription($address, $rule, $couponCodes);
+        $this->maintainAddressCouponCode($address, $rule, $address->getQuote()->getCouponCode());
+
+        return $this;
     }
 }
