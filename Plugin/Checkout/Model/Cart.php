@@ -21,8 +21,8 @@ class Cart
     public function aroundAddOrderItem(
         Subject $subject,
         Closure $proceed,
-        mixed $orderItem,
-        mixed $qtyFlag = null
+        $orderItem,
+        $qtyFlag = null
     ): Subject {
         $info = $orderItem->getProductOptionByCode('info_buyRequest');
         if (isset($info['gift_rule']) && $info['gift_rule']) {

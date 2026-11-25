@@ -38,7 +38,7 @@ class SaveHandler implements ExtensionInterface
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function execute(mixed $entity, mixed $arguments = []): object
+    public function execute($entity, $arguments = []): object
     {
         $metadata = $this->metadataPool->getMetadata(RuleInterface::class);
         $ruleId = $entity->getData($metadata->getLinkField());

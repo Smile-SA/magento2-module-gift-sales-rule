@@ -294,9 +294,9 @@ class GiftRuleService implements GiftRuleServiceInterface
      */
     protected function isAuthorizedGiftProduct(
         Quote $quote,
-        int|string $productId,
+        $productId,
         array $giftRuleData,
-        float|int|string $qty
+        $qty
     ): bool {
         $isAuthorizedGiftProduct = false;
         if (
@@ -319,7 +319,7 @@ class GiftRuleService implements GiftRuleServiceInterface
      * @param Quote      $quote      Quote
      * @param int|string $giftRuleId Gift rule id (falls back to the string identifier)
      */
-    protected function getQuoteGiftItems(Quote $quote, int|string $giftRuleId): array
+    protected function getQuoteGiftItems(Quote $quote, $giftRuleId): array
     {
         $quoteItem = [];
 

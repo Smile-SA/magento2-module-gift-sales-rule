@@ -198,7 +198,7 @@ class CollectGiftRuleTest extends TestCase
     /**
      * Create a quote item flagged as a gift of the given rule.
      */
-    private function createGiftItem(int $giftRuleId, float $qty, array $extraOptions = []): Item|MockObject
+    private function createGiftItem(int $giftRuleId, float $qty, array $extraOptions = [])
     {
         $options = ['option_gift_rule' => (string) $giftRuleId] + $extraOptions;
 

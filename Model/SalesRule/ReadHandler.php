@@ -35,7 +35,7 @@ class ReadHandler implements ExtensionInterface
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @throws \Exception
      */
-    public function execute(mixed $entity, mixed $arguments = []): object
+    public function execute($entity, $arguments = []): object
     {
         $attributes = $entity->getExtensionAttributes() ?: [];
         $metadata = $this->metadataPool->getMetadata(RuleInterface::class);

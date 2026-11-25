@@ -74,7 +74,7 @@ class Cache extends AbstractHelper
      * @param int|GiftRuleInterface $giftRule   Gift rule
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function saveCachedGiftRule(int|string $identifier, Rule $rule, int|GiftRuleInterface $giftRule): array|false
+    public function saveCachedGiftRule($identifier, Rule $rule, $giftRule)
     {
         $giftRuleData = $this->decode($this->cache->load(self::CACHE_IDENTIFIER . $identifier));
         if (!$giftRuleData) {
@@ -135,7 +135,7 @@ class Cache extends AbstractHelper
      * @param string|false $data Cached data
      * @return array|null Null on a cache miss or on data cached in another format
      */
-    private function decode(string|false $data): ?array
+    private function decode($data): ?array
     {
         if ($data === false || $data === '') {
             return null;
@@ -155,7 +155,7 @@ class Cache extends AbstractHelper
      * @param int|string $giftRuleCode Gift rule code
      * @return array|null
      */
-    public function getCachedGiftRule(int|string $giftRuleCode): ?array
+    public function getCachedGiftRule($giftRuleCode): ?array
     {
         $cachedData = $this->decode($this->cache->load(self::CACHE_IDENTIFIER . $giftRuleCode));
         if (!$cachedData) {
@@ -186,7 +186,7 @@ class Cache extends AbstractHelper
      *
      * @param int|string $giftRuleCode Gift rule code
      */
-    protected function extractRuleFromCode(int|string $giftRuleCode): Rule
+    protected function extractRuleFromCode($giftRuleCode): Rule
     {
         $explodedCode = explode('_', (string) $giftRuleCode);
         $ruleId = array_shift($explodedCode);

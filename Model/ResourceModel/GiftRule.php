@@ -111,7 +111,7 @@ class GiftRule extends AbstractDb
      * @param mixed       $value Value
      * @param string|null $field Field
      */
-    protected function getObjectId(mixed $value, ?string $field = null): mixed
+    protected function getObjectId($value, ?string $field = null)
     {
         $entityMetadata = $this->metadataPool->getMetadata(GiftRuleInterface::class);
         if ($field === null) {

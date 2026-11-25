@@ -84,7 +84,7 @@ class Rule extends Template
      * @param int|string $giftRuleId   Gift rule id
      * @param int|string $giftRuleCode Gift rule code
      */
-    public function getAddToCartUrl(int|string $giftRuleId, int|string $giftRuleCode): string
+    public function getAddToCartUrl($giftRuleId, $giftRuleCode): string
     {
         return $this->giftRuleHelper->getAddUrl($giftRuleId, $giftRuleCode);
     }

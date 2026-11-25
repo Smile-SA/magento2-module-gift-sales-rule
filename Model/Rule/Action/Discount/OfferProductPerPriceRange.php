@@ -59,7 +59,7 @@ class OfferProductPerPriceRange extends AbstractDiscount
      * @SuppressWarnings(PHPMD.ElseExpression)
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function calculate(mixed $rule, mixed $item, mixed $qty): DiscountData
+    public function calculate($rule, $item, $qty): DiscountData
     {
         /** @var \Magento\SalesRule\Model\Rule\Action\Discount\Data $discountData */
         $discountData = $this->discountFactory->create();

@@ -56,7 +56,7 @@ class OfferProduct extends AbstractDiscount
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function calculate(mixed $rule, mixed $item, mixed $qty): DiscountData
+    public function calculate($rule, $item, $qty): DiscountData
     {
         /** @var \Magento\SalesRule\Model\Rule\Action\Discount\Data $discountData */
         $discountData = $this->discountFactory->create();

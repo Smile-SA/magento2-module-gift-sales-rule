@@ -8,7 +8,6 @@ use Magento\Catalog\Block\Product\AbstractProduct;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Model\Product;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
-use Magento\Framework\View\Element\AbstractBlock;
 use Magento\Swatches\Helper\Data;
 use Smile\GiftSalesRule\Api\Data\GiftRuleDataInterface;
 
@@ -78,7 +77,7 @@ class ProductItem extends AbstractProduct
      * @param string|null $type Type
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    public function getDetailsRenderer(mixed $type = null): bool|AbstractBlock|null
+    public function getDetailsRenderer($type = null)
     {
         if ($type === null) {
             $type = 'default';
@@ -99,7 +98,7 @@ class ProductItem extends AbstractProduct
     /**
      * Get selected product quantity (quote item qty, may be a numeric string when loaded from DB).
      */
-    public function getProductQty(): float|int|string
+    public function getProductQty()
     {
         $qty = 0;
         $productId = $this->getProduct()->getId();

@@ -102,7 +102,7 @@ class GiftRule extends AbstractHelper
      * @param int|string $giftRuleId   Gift rule id
      * @param int|string $giftRuleCode Gift rule code
      */
-    public function getAddUrl(int|string $giftRuleId, int|string $giftRuleCode): string
+    public function getAddUrl($giftRuleId, $giftRuleCode): string
     {
         $routeParams = [
             ActionInterface::PARAM_NAME_URL_ENCODED => $this->urlEncoder->encode($this->_urlBuilder->getCurrentUrl()),
@@ -119,7 +119,7 @@ class GiftRule extends AbstractHelper
      * @param float|int|string|null $total      Total (address data, may be a numeric string)
      * @param float|int|string|null $priceRange Price range (DB decimal, may be a numeric string)
      */
-    public function getRange(float|int|string|null $total, float|int|string|null $priceRange): float
+    public function getRange($total, $priceRange): float
     {
         return floor((float) $total / (float) $priceRange);
     }
@@ -133,8 +133,8 @@ class GiftRule extends AbstractHelper
      */
     public function getNumberOfferedProduct(
         Quote $quote,
-        float|int|string|null $maximumNumberProduct,
-        float|int|string|null $priceRange
+        $maximumNumberProduct,
+        $priceRange
     ): int {
         $numberOfferedProduct = $maximumNumberProduct;
         if (floatval($priceRange) > 0) {
