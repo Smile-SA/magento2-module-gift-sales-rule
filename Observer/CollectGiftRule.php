@@ -113,6 +113,14 @@ class CollectGiftRule implements ObserverInterface
         /** @var Quote $quote */
         $quote = $observer->getEvent()->getQuote();
 
+        // trigger_recollect=1 means we are inside Quote::_afterLoad(), which may itself run inside
+        // Checkout\Model\Session::getQuote() (quote still loading). Adding the gift through
+        // Checkout\Model\Cart would re-enter getQuote() -> "Infinite loop detected" (500 on every
+        // request of that session). Skip here; the next collectTotals of the loaded quote does it.
+        if ((int) $quote->getTriggerRecollect() === 1) {
+            return;
+        }
+
         /** @var array $ruleIds */
         $ruleIds = explode(',', (string) $quote->getAppliedRuleIds());
 
