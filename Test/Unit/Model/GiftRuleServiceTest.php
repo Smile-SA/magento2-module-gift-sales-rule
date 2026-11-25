@@ -12,7 +12,7 @@ use Magento\Framework\Session\Storage;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Item\Option;
-use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\DataProvider as DataProviderAttribute;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -249,8 +249,10 @@ class GiftRuleServiceTest extends TestCase
 
     /**
      * Quantities must be positive integers.
+     *
+     * @dataProvider invalidQtyProvider
      */
-    #[DataProvider('invalidQtyProvider')]
+    #[DataProviderAttribute('invalidQtyProvider')]
     public function testInvalidQuantityIsRejected(mixed $qty): void
     {
         $this->givenSessionAndAppliedRules([self::RULE_ID => self::RULE_CODE], (string) self::RULE_ID);
