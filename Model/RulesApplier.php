@@ -52,10 +52,14 @@ class RulesApplier extends BaseRulesApplier
      *
      * Edit: Add an event skip actions validation for gift rule.
      *
+     * The last parameter is not typed on purpose: it is a coupon code (string) before Magento 2.4.7,
+     * and a list of coupon codes since Magento 2.4.7.
+     *
      * @inheritdoc
+     * @param string|string[] $couponCodes
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function applyRules($item, $rules, $skipValidation, array $couponCodes = [])
+    public function applyRules($item, $rules, $skipValidation, $couponCodes = [])
     {
         $address = $item->getAddress();
         $appliedRuleIds = [];

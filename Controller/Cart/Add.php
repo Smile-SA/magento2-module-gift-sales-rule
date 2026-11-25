@@ -97,6 +97,7 @@ class Add extends Action implements HttpPostActionInterface
      * Validate post parameters.
      *
      * @param array $params params
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function validatePostParameters(array $params): bool
     {
