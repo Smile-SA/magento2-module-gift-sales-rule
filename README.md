@@ -14,6 +14,15 @@ Gift products type can be:
 * simple product
 * configurable product
 
+## Compatibility
+
+| Module version | Magento | Mage-OS | PHP |
+| --- | --- | --- | --- |
+| 2.1.x | 2.4.6 and later (tested up to 2.4.9) | 1.0.0 and later (tested up to 4.0) | 8.1 to 8.5, as supported by the platform |
+| 1.2.x | 2.4.4 and 2.4.5 | not available | 8.1 |
+
+Earlier releases: 2.0.0 to 2.0.2 require Magento 2.4.7 or later. 1.1.x declared `magento/framework ^102.0.0 || ^103.0.0`, but does not work on Magento 2.4.7 and later, where the signature of `RulesApplier::applyRules()` changed. 2.1.x supports both signatures, and 1.2.x brings the 2.0.x fixes to Magento 2.4.4 and 2.4.5.
+
 ## Who is developing this module ? 
 
 ![Smile](doc/static/smile.png)
