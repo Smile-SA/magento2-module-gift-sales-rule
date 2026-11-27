@@ -112,7 +112,9 @@ class RuleRepositoryPlugin
     {
         $extensionAttributes = $rule->getExtensionAttributes();
         $giftRule = $extensionAttributes->getGiftRule();
-        $this->giftRuleRepository->save($giftRule);
+        if($giftRule instanceof GiftRuleInterface) {
+            $this->giftRuleRepository->save($giftRule);
+        }
 
         return $rule;
     }
