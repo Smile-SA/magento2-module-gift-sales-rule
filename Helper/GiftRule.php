@@ -1,16 +1,7 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Helper;
 
 use Magento\Framework\App\ActionInterface;
@@ -25,27 +16,14 @@ use Smile\GiftSalesRule\Api\GiftRuleRepositoryInterface;
 /**
  * Gift rule helper
  *
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
  * @copyright 2019 Smile
  */
 class GiftRule extends AbstractHelper
 {
     /**
-     * @var array
-     */
-    protected $giftRule = [];
-
-    /**
-     * @var GiftRuleRepositoryInterface
-     */
-    protected $giftRuleRepository;
-
-    /**
      * Gift rule id of the gift product currently added by the gift rule service.
-     *
-     * @var int|null
      */
-    private $giftRuleIdBeingAdded = null;
+    private ?int $giftRuleIdBeingAdded = null;
 
     /**
      * GiftRule constructor.
@@ -56,11 +34,9 @@ class GiftRule extends AbstractHelper
      */
     public function __construct(
         Context $context,
-        GiftRuleRepositoryInterface $giftRuleRepository,
-        array $giftRule = []
+        protected GiftRuleRepositoryInterface $giftRuleRepository,
+        protected array $giftRule = []
     ) {
-        $this->giftRuleRepository = $giftRuleRepository;
-        $this->giftRule = $giftRule;
 
         parent::__construct($context);
     }
@@ -69,10 +45,8 @@ class GiftRule extends AbstractHelper
      * Is gift sales rule
      *
      * @param Rule $rule Rule
-     *
-     * @return bool
      */
-    public function isGiftRule(Rule $rule)
+    public function isGiftRule(Rule $rule): bool
     {
         $isGiftRule = false;
         if (in_array($rule->getSimpleAction(), $this->giftRule)) {
@@ -87,11 +61,9 @@ class GiftRule extends AbstractHelper
      *
      * @param Rule  $rule  Rule
      * @param Quote $quote Quote
-     *
-     * @return bool
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function isValidGiftRule(Rule $rule, Quote $quote)
+    public function isValidGiftRule(Rule $rule, Quote $quote): bool
     {
         $valid = true;
 
@@ -127,12 +99,10 @@ class GiftRule extends AbstractHelper
     /**
      * Retrieve url for add gift product to cart
      *
-     * @param int    $giftRuleId   Gift rule id
-     * @param string $giftRuleCode Gift rule code
-     *
-     * @return string
+     * @param int|string $giftRuleId   Gift rule id
+     * @param int|string $giftRuleCode Gift rule code
      */
-    public function getAddUrl($giftRuleId, $giftRuleCode)
+    public function getAddUrl(int|string $giftRuleId, int|string $giftRuleCode): string
     {
         $routeParams = [
             ActionInterface::PARAM_NAME_URL_ENCODED => $this->urlEncoder->encode($this->_urlBuilder->getCurrentUrl()),
@@ -146,26 +116,26 @@ class GiftRule extends AbstractHelper
     /**
      * Get range of a gift rule for a quote.
      *
-     * @param float $total      Total
-     * @param float $priceRange Price range
-     *
-     * @return float
+     * @param float|int|string|null $total      Total (address data, may be a numeric string)
+     * @param float|int|string|null $priceRange Price range (DB decimal, may be a numeric string)
      */
-    public function getRange($total, $priceRange)
+    public function getRange(float|int|string|null $total, float|int|string|null $priceRange): float
     {
-        return floor($total / $priceRange);
+        return floor((float) $total / (float) $priceRange);
     }
 
     /**
      * Get number offered product for a quote.
      *
-     * @param Quote $quote                Quote
-     * @param float $maximumNumberProduct Maximum number product
-     * @param float $priceRange           Price range
-     * @return int
+     * @param Quote                 $quote                Quote
+     * @param float|int|string|null $maximumNumberProduct Maximum number product (DB value)
+     * @param float|int|string|null $priceRange           Price range (DB decimal)
      */
-    public function getNumberOfferedProduct($quote, $maximumNumberProduct, $priceRange)
-    {
+    public function getNumberOfferedProduct(
+        Quote $quote,
+        float|int|string|null $maximumNumberProduct,
+        float|int|string|null $priceRange
+    ): int {
         $numberOfferedProduct = $maximumNumberProduct;
         if (floatval($priceRange) > 0) {
             $shippingAddress = $quote->getShippingAddress();
@@ -174,7 +144,7 @@ class GiftRule extends AbstractHelper
             $total = $shippingAddress->getBaseSubtotalTotalInclTax()
                 ?: $shippingAddress->getOrigData('base_subtotal_total_incl_tax');
             $range = $this->getRange($total, $priceRange);
-            $numberOfferedProduct = $maximumNumberProduct * $range;
+            $numberOfferedProduct = (float) $maximumNumberProduct * $range;
         }
 
         return (int) $numberOfferedProduct;
@@ -184,7 +154,6 @@ class GiftRule extends AbstractHelper
      * Is gift item ?
      *
      * @param AbstractItem $item item
-     * @return bool
      */
     public function isGiftItem(AbstractItem $item): bool
     {
@@ -195,11 +164,13 @@ class GiftRule extends AbstractHelper
      * Is the item a top-level quote item (not the child of a composite product) ?
      *
      * @param AbstractItem $item item
-     * @return bool
      */
     public function isTopLevelItem(AbstractItem $item): bool
     {
-        return !$item->getParentItemId() && !$item->getParentItem();
+        /** @var AbstractItem|null $parentItem */
+        $parentItem = $item->getParentItem();
+
+        return !$item->getParentItemId() && !$parentItem;
     }
 
     /**
@@ -214,8 +185,6 @@ class GiftRule extends AbstractHelper
 
     /**
      * Get the gift rule id of the gift product being added by the gift rule service.
-     *
-     * @return int|null
      */
     public function getGiftRuleIdBeingAdded(): ?int
     {

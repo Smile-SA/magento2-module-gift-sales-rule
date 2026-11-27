@@ -1,74 +1,24 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Observer;
 
+use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Item\Option;
+use Smile\GiftSalesRule\Api\GiftRuleServiceInterface;
 use Smile\GiftSalesRule\Helper\Cache as GiftRuleCacheHelper;
 use Smile\GiftSalesRule\Helper\Config as GiftRuleConfigHelper;
 use Smile\GiftSalesRule\Helper\GiftRule as GiftRuleHelper;
-use Smile\GiftSalesRule\Api\GiftRuleServiceInterface;
 
-/**
- * Class CollectGiftRule
- *
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- */
 class CollectGiftRule implements ObserverInterface
 {
-    /**
-     * @var CheckoutSession
-     */
-    protected $checkoutSession;
-
-    /**
-     * @var GiftRuleServiceInterface
-     */
-    protected $giftRuleService;
-
-    /**
-     * @var GiftRuleCacheHelper
-     */
-    protected $giftRuleCacheHelper;
-
-    /**
-     * @var GiftRuleConfigHelper
-     */
-    protected $giftRuleConfigHelper;
-
-    /**
-     * @var GiftRuleHelper
-     */
-    protected $giftRuleHelper;
-
-    /**
-     * @var CartRepositoryInterface
-     */
-    protected $quoteRepository;
-
-    /**
-     * @var Http
-     */
-    protected $request;
-
     /**
      * CollectGiftRule constructor.
      *
@@ -81,26 +31,18 @@ class CollectGiftRule implements ObserverInterface
      * @param Http                     $request              Request
      */
     public function __construct(
-        CheckoutSession $checkoutSession,
-        GiftRuleServiceInterface $giftRuleService,
-        GiftRuleCacheHelper $giftRuleCacheHelper,
-        GiftRuleConfigHelper $giftRuleConfigHelper,
-        GiftRuleHelper $giftRuleHelper,
-        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
-        \Magento\Framework\App\Request\Http $request
+        protected CheckoutSession $checkoutSession,
+        protected GiftRuleServiceInterface $giftRuleService,
+        protected GiftRuleCacheHelper $giftRuleCacheHelper,
+        protected GiftRuleConfigHelper $giftRuleConfigHelper,
+        protected GiftRuleHelper $giftRuleHelper,
+        protected CartRepositoryInterface $quoteRepository,
+        protected Http $request
     ) {
-        $this->checkoutSession = $checkoutSession;
-        $this->giftRuleService = $giftRuleService;
-        $this->giftRuleCacheHelper = $giftRuleCacheHelper;
-        $this->giftRuleConfigHelper = $giftRuleConfigHelper;
-        $this->giftRuleHelper = $giftRuleHelper;
-        $this->quoteRepository = $quoteRepository;
-        $this->request = $request;
     }
 
     /**
-     * Update gift item quantity
-     * Add automatic gift item
+     * Update gift item quantity and add automatic gift item.
      *
      * @param Observer $observer Oberver
      * @SuppressWarnings(PHPMD.ElseExpression)
@@ -108,18 +50,17 @@ class CollectGiftRule implements ObserverInterface
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void // phpcs:ignore Generic.Metrics.NestingLevel.TooHigh
     {
         /** @var Quote $quote */
         $quote = $observer->getEvent()->getQuote();
 
-        /** @var array $ruleIds */
         $ruleIds = explode(',', (string) $quote->getAppliedRuleIds());
 
         // Remove every gift item whose rule is not applied to the quote, whatever the session holds.
         $saveQuote = $this->removeUnappliedGiftItems($quote, $ruleIds);
 
-        /** @var array $giftRules */
+        /** @var array|null $giftRules */
         $giftRules = $this->checkoutSession->getGiftRules();
 
         if ($giftRules) {
@@ -138,7 +79,7 @@ class CollectGiftRule implements ObserverInterface
 
                     /** @var Item $item */
                     foreach ($quote->getAllItems() as $item) {
-                        /** @var Option $option */
+                        /** @var Option|null $option */
                         $option = $item->getOptionByCode('option_gift_rule');
                         // A child item of a composite gift keeps its own qty (1 for a configurable): count its parent.
                         if (
@@ -172,8 +113,8 @@ class CollectGiftRule implements ObserverInterface
                                     'qty' => $numberOfferedProduct,
                                 ],
                             ],
-                            $giftRuleCode,
-                            $giftRuleId
+                            (string) $giftRuleCode,
+                            (int) $giftRuleId
                         );
                         $saveQuote = true;
                     }
@@ -207,8 +148,10 @@ class CollectGiftRule implements ObserverInterface
         /**
          * Save quote if it is not cart add controller and item changed
          */
-        if ($saveQuote
-            && !($this->request->getControllerName() == 'cart' && $this->request->getActionName() == 'add')) {
+        if (
+            $saveQuote
+            && !($this->request->getControllerName() == 'cart' && $this->request->getActionName() == 'add')
+        ) {
             $this->quoteRepository->save($quote);
         }
     }
@@ -218,7 +161,6 @@ class CollectGiftRule implements ObserverInterface
      *
      * @param Quote $quote   Quote
      * @param array $ruleIds Applied rule ids
-     *
      * @return bool True if at least one item was removed
      */
     protected function removeUnappliedGiftItems(Quote $quote, array $ruleIds): bool
@@ -227,6 +169,7 @@ class CollectGiftRule implements ObserverInterface
 
         /** @var Item $item */
         foreach ($quote->getAllItems() as $item) {
+            /** @var Option|null $option */
             $option = $item->getOptionByCode('option_gift_rule');
             if ($option && !in_array($option->getValue(), $ruleIds)) {
                 $quote->deleteItem($item);

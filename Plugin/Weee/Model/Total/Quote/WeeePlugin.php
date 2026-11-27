@@ -1,47 +1,33 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Pierre Le Maguer <pilem@smile.fr>
- * @copyright 2020 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Plugin\Weee\Model\Total\Quote;
 
 use Closure;
+use Magento\Quote\Api\Data\CartItemInterface;
 use Magento\Quote\Api\Data\ShippingAssignmentInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Address\Total;
+use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\Weee\Model\Total\Quote\Weee as Subject;
 use Smile\GiftSalesRule\Helper\GiftRule as GiftRuleHelper;
 
 /**
  * Plugin Weee
  *
- * @author    Pierre Le Maguer <pilem@smile.fr>
  * @copyright 2020 Smile
  */
 class WeeePlugin
 {
-    /**
-     * @var GiftRuleHelper
-     */
-    protected $giftRuleHelper;
-
     /**
      * WeeePlugin constructor.
      *
      * @param GiftRuleHelper $giftRuleHelper Gift rule helper
      */
     public function __construct(
-        GiftRuleHelper $giftRuleHelper
+        protected GiftRuleHelper $giftRuleHelper
     ) {
-        $this->giftRuleHelper = $giftRuleHelper;
     }
 
     /**
@@ -52,7 +38,6 @@ class WeeePlugin
      * @param Quote                       $quote              Quote
      * @param ShippingAssignmentInterface $shippingAssignment Shipping assignment
      * @param Total                       $total              Total
-     * @return Subject
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function aroundCollect(
@@ -64,11 +49,13 @@ class WeeePlugin
     ): Subject {
         $items = $shippingAssignment->getItems();
         $itemsForCollect = [];
+        /** @var AbstractItem $item */
         foreach ($items as $key => $item) {
             if (!$this->giftRuleHelper->isGiftItem($item)) {
                 $itemsForCollect[$key] = $item;
             }
         }
+        /** @var CartItemInterface[] $itemsForCollect */
         $shippingAssignment->setItems($itemsForCollect);
         $result = $proceed($quote, $shippingAssignment, $total);
         $shippingAssignment->setItems($items);

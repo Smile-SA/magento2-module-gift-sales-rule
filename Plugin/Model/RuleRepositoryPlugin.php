@@ -1,76 +1,43 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Plugin\Model;
 
 use Magento\Framework\Api\ExtensionAttributesFactory;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Api\SearchResults;
 use Magento\Framework\EntityManager\MetadataPool;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\SalesRule\Api\Data\RuleExtensionInterface;
 use Magento\SalesRule\Api\Data\RuleInterface;
 use Magento\SalesRule\Api\RuleRepositoryInterface;
-use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\Api\SearchResults;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\SalesRule\Model\RuleFactory;
 use Smile\GiftSalesRule\Api\Data\GiftRuleInterface;
 use Smile\GiftSalesRule\Api\GiftRuleRepositoryInterface;
 use Smile\GiftSalesRule\Model\GiftRuleFactory;
 
-/**
- * Rule Repository Plugin
- *
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- */
 class RuleRepositoryPlugin
 {
     /**
      * Extension attribute factory
-     *
-     * @var ExtensionAttributesFactory
      */
-    protected $extensionFactory;
+    protected ExtensionAttributesFactory $extensionFactory;
 
     /**
      * Search criteria builder
-     *
-     * @var SearchCriteriaBuilder
      */
-    protected $searchCriteriaBuilder;
+    protected SearchCriteriaBuilder $searchCriteriaBuilder;
 
     /**
      * Gift rule repository
-     *
-     * @var GiftRuleRepositoryInterface
      */
-    protected $giftRuleRepository;
+    protected GiftRuleRepositoryInterface $giftRuleRepository;
 
     /**
      * Gift rule factory
-     *
-     * @var GiftRuleFactory
      */
-    protected $giftRuleFactory;
-
-    /**
-     * @var MetadataPool
-     */
-    protected $metadataPool;
-
-    /**
-     * @var RuleFactory
-     */
-    protected $ruleFactory;
+    protected GiftRuleFactory $giftRuleFactory;
 
     /**
      * RuleRepositoryPlugin constructor.
@@ -87,15 +54,13 @@ class RuleRepositoryPlugin
         SearchCriteriaBuilder $searchCriteriaBuilder,
         GiftRuleRepositoryInterface $giftRuleRepository,
         GiftRuleFactory $giftRuleFactory,
-        MetadataPool $metadataPool,
-        RuleFactory $ruleFactory
+        protected MetadataPool $metadataPool,
+        protected RuleFactory $ruleFactory
     ) {
         $this->extensionFactory      = $extensionFactory;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->giftRuleRepository    = $giftRuleRepository;
         $this->giftRuleFactory       = $giftRuleFactory;
-        $this->metadataPool          = $metadataPool;
-        $this->ruleFactory           = $ruleFactory;
     }
 
     /**
@@ -103,14 +68,13 @@ class RuleRepositoryPlugin
      *
      * @param RuleRepositoryInterface $subject Subject
      * @param RuleInterface           $rule    Rule
-     *
-     * @return mixed
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function afterSave(RuleRepositoryInterface $subject, RuleInterface $rule)
+    public function afterSave(RuleRepositoryInterface $subject, RuleInterface $rule): RuleInterface
     {
         $extensionAttributes = $rule->getExtensionAttributes();
+        // @phpstan-ignore method.notFound (gift_rule is declared in etc/extension_attributes.xml, generated code)
         $giftRule = $extensionAttributes->getGiftRule();
         $this->giftRuleRepository->save($giftRule);
 
@@ -122,11 +86,9 @@ class RuleRepositoryPlugin
      *
      * @param RuleRepositoryInterface $subject Subject
      * @param RuleInterface           $rule    Rule
-     *
-     * @return RuleInterface
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function afterGetById(RuleRepositoryInterface $subject, RuleInterface $rule)
+    public function afterGetById(RuleRepositoryInterface $subject, RuleInterface $rule): RuleInterface
     {
         $extensionAttributes = $rule->getExtensionAttributes();
 
@@ -147,6 +109,7 @@ class RuleRepositoryPlugin
             $giftRule = $this->giftRuleFactory->create();
             $giftRule->setId($model->getData($metadata->getLinkField()));
         }
+        // @phpstan-ignore method.notFound (gift_rule is declared in etc/extension_attributes.xml, generated code)
         $extensionAttributes->setGiftRule($giftRule);
         $rule->setExtensionAttributes($extensionAttributes);
 
@@ -158,10 +121,8 @@ class RuleRepositoryPlugin
      *
      * @param RuleRepositoryInterface $subject       Subject
      * @param SearchResults           $searchResults Search results
-     *
-     * @return SearchResults
      */
-    public function afterGetList(RuleRepositoryInterface $subject, SearchResults $searchResults)
+    public function afterGetList(RuleRepositoryInterface $subject, SearchResults $searchResults): SearchResults
     {
         $newItem = [];
         /** @var RuleInterface $rule */
@@ -169,6 +130,7 @@ class RuleRepositoryPlugin
             $newItem[] = $this->afterGetById($subject, $rule);
         }
 
+        /** @var \Magento\SalesRule\Model\Data\Rule[] $newItem */
         return $searchResults->setItems($newItem);
     }
 }

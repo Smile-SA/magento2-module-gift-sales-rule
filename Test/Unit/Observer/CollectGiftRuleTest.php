@@ -26,6 +26,8 @@ use Smile\GiftSalesRule\Observer\CollectGiftRule;
 
 /**
  * Gift items of a quote are kept within the number of products the applied gift rule offers.
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class CollectGiftRuleTest extends TestCase
 {

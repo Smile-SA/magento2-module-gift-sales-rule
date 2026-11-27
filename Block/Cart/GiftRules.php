@@ -1,40 +1,16 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Pierre Le Maguer <pierre.lemaguer@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Block\Cart;
 
 use Magento\Checkout\Model\Cart as CheckoutCart;
+use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
 use Smile\GiftSalesRule\Api\GiftRuleServiceInterface;
 
-/**
- * Class GiftRules
- *
- * @author    Pierre Le Maguer <pierre.lemaguer@smile.fr>
- * @copyright 2019 Smile
- */
-class GiftRules extends \Magento\Framework\View\Element\Template
+class GiftRules extends Template
 {
-    /**
-     * @var GiftRuleServiceInterface
-     */
-    protected $giftRuleService;
-
-    /**
-     * @var CheckoutCart
-     */
-    protected $cart;
-
     /**
      * Cart constructor.
      *
@@ -45,21 +21,17 @@ class GiftRules extends \Magento\Framework\View\Element\Template
      */
     public function __construct(
         Context $context,
-        GiftRuleServiceInterface $giftRuleService,
-        CheckoutCart $cart,
+        protected GiftRuleServiceInterface $giftRuleService,
+        protected CheckoutCart $cart,
         array $data = []
     ) {
-        $this->giftRuleService = $giftRuleService;
-        $this->cart = $cart;
         parent::__construct($context, $data);
     }
 
     /**
      * Get gift rules
-     *
-     * @return array
      */
-    public function getGiftRules()
+    public function getGiftRules(): array
     {
         return $this->giftRuleService->getAvailableGifts($this->cart->getQuote());
     }

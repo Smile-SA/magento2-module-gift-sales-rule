@@ -14,7 +14,7 @@
  */
  -->
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
-    <route url="/V1/gift_rule/id/:objectId" method="GET">
+    <route url="/V1/gift_rule/id/:entityId" method="GET">
         <service class="Smile\GiftSalesRule\Api\GiftRuleRepositoryInterface" method="getById"/>
         <resources>
             <resource ref="Smile_GiftSalesRule::manageGiftRule"/>
@@ -35,7 +35,7 @@
         </resources>
     </route>
 
-    <route url="/V1/gift_rule/id/:objectId" method="DELETE">
+    <route url="/V1/gift_rule/id/:entityId" method="DELETE">
         <service class="Smile\GiftSalesRule\Api\GiftRuleRepositoryInterface" method="deleteById"/>
         <resources>
             <resource ref="Smile_GiftSalesRule::manageGiftRule"/>

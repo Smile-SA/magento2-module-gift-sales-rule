@@ -12,11 +12,12 @@ use Magento\Framework\Session\Storage;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Item\Option;
-use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\DataProvider as DataProviderAttribute;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
+use Smile\GiftSalesRule\Api\Data\GiftRuleDataInterfaceFactory;
 use Smile\GiftSalesRule\Helper\Cache as GiftRuleCacheHelper;
 use Smile\GiftSalesRule\Helper\GiftRule as GiftRuleHelper;
 use Smile\GiftSalesRule\Model\GiftRuleData;
@@ -24,6 +25,8 @@ use Smile\GiftSalesRule\Model\GiftRuleService;
 
 /**
  * Gift products can only be added for a gift rule held in the session and applied to the quote.
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class GiftRuleServiceTest extends TestCase
 {
@@ -189,12 +192,11 @@ class GiftRuleServiceTest extends TestCase
         ]);
         $reflection = new ReflectionClass(GiftRuleService::class);
         $reflection->getProperty('giftRuleCacheHelper')->setValue($this->service, $cacheHelper);
-        $reflection->getProperty('giftRuleDataFactory')->setValue($this->service, new class {
-            public function create(): GiftRuleData
-            {
-                return (new ReflectionClass(GiftRuleData::class))->newInstanceWithoutConstructor();
-            }
-        });
+        $giftRuleDataFactory = $this->createStub(GiftRuleDataInterfaceFactory::class);
+        $giftRuleDataFactory->method('create')->willReturnCallback(
+            static fn () => (new ReflectionClass(GiftRuleData::class))->newInstanceWithoutConstructor()
+        );
+        $reflection->getProperty('giftRuleDataFactory')->setValue($this->service, $giftRuleDataFactory);
 
         $parent = $this->createGiftItem(self::PRODUCT_ID, 2);
         $child = $this->createGiftItem(43, 1);
@@ -247,8 +249,10 @@ class GiftRuleServiceTest extends TestCase
 
     /**
      * Quantities must be positive integers.
+     *
+     * @dataProvider invalidQtyProvider
      */
-    #[DataProvider('invalidQtyProvider')]
+    #[DataProviderAttribute('invalidQtyProvider')]
     public function testInvalidQuantityIsRejected(mixed $qty): void
     {
         $this->givenSessionAndAppliedRules([self::RULE_ID => self::RULE_CODE], (string) self::RULE_ID);

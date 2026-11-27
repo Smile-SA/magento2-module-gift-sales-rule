@@ -1,0 +1,24 @@
+parameters:
+    level: 6
+    phpVersion: 80100
+    ignoreErrors:
+        -
+            # phpstan 2.3 no longer parses PHPMD suppressions such as @SuppressWarnings(PHPMD.Xxx)
+            message: '#PHPDoc tag @SuppressWarnings has invalid value#'
+            identifier: phpDoc.parseError
+            reportUnmatched: false
+        -
+            identifier: missingType.iterableValue
+            reportUnmatched: false
+        -
+            # psr/log 1 (Magento 2.4.4) documents the message as a string only
+            message: '#Parameter \#1 \$message of method Psr\\Log\\LoggerInterface::critical\(\) expects string, Exception given#'
+            reportUnmatched: false
+    paths:
+        - .
+    excludePaths:
+        - 'vendor/*'
+        - 'Test/*'
+
+includes:
+    - %currentWorkingDirectory%/vendor/smile/magento2-smilelab-phpstan/extension.neon

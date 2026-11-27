@@ -1,51 +1,29 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Smile\GiftSalesRule\Helper\GiftRule as GiftRuleHelper;
 
-/**
- * Class AddGiftRuleOption
- *
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- */
 class AddGiftRuleOption implements ObserverInterface
 {
     /**
-     * @var GiftRuleHelper
-     */
-    protected $giftRuleHelper;
-
-    /**
      * @param GiftRuleHelper $giftRuleHelper Gift rule helper
      */
-    public function __construct(GiftRuleHelper $giftRuleHelper)
+    public function __construct(protected GiftRuleHelper $giftRuleHelper)
     {
-        $this->giftRuleHelper = $giftRuleHelper;
     }
 
     /**
      * Add option for gift item
      *
      * @event checkout_cart_save_after
-     *
      * @param Observer $observer Observer
      */
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         /** @var \Magento\Framework\DataObject $buyRequest */
         $buyRequest = $observer->getEvent()->getBuyRequest();
