@@ -1,6 +1,8 @@
 "Added if there are only 1 gift product parameterized","Ajouté s'il n'y a qu'un seul produit cadeau paramétré"
 "Automatically add gift product","Ajouter automatiquement un produit cadeau"
+"Automatically open popup","Ouvrir automatiquement la popup"
 "Edit my choices","Modifier mes choix"
+"If yes, the gift selection popup is opened automatically if there is at least one product to offer.","Si la configuration est activée, la popup de sélection de produits offerts est ouverte automatiquement s'il y a au moins un produit à offrir."
 "Maximum number of products offered","Nombre maximum de produit offert"
 "Price range","Tranche de prix"
 "Select gift product:","Sélecteur des produits offerts:"

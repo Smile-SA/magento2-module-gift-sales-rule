@@ -1,24 +1,19 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Helper;
 
+use InvalidArgumentException;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Framework\App\CacheInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
+use Magento\Framework\App\ObjectManager;
+use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Rule\Model\Condition\Sql\Builder;
 use Magento\SalesRule\Model\Rule;
 use Magento\SalesRule\Model\RuleFactory;
@@ -28,46 +23,23 @@ use Smile\GiftSalesRule\Api\GiftRuleRepositoryInterface;
 /**
  * Rule helper
  *
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
  * @copyright 2019 Smile
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class Cache extends AbstractHelper
 {
     /**
      * Cache
      */
-    const CACHE_DATA_TAG   = "gift_rule_cache";
-    const CACHE_IDENTIFIER = "gift_rule_product_";
+    public const CACHE_DATA_TAG   = "gift_rule_cache";
+    public const CACHE_IDENTIFIER = "gift_rule_product_";
 
-    const DATA_PRODUCT_ITEMS          = "product_items";
-    const DATA_LABEL                  = "label";
-    const DATA_PRICE_RANGE            = "price_range";
-    const DATA_MAXIMUM_NUMBER_PRODUCT = "maximum_number_product";
+    public const DATA_PRODUCT_ITEMS          = "product_items";
+    public const DATA_LABEL                  = "label";
+    public const DATA_PRICE_RANGE            = "price_range";
+    public const DATA_MAXIMUM_NUMBER_PRODUCT = "maximum_number_product";
 
-    /**
-     * @var CacheInterface
-     */
-    protected $cache;
-
-    /**
-     * @var GiftRuleRepositoryInterface
-     */
-    protected $giftRuleRepository;
-
-    /**
-     * @var RuleFactory
-     */
-    protected $ruleFactory;
-
-    /**
-     * @var CollectionFactory
-     */
-    protected $productCollectionFactory;
-
-    /**
-     * @var Builder
-     */
-    protected $sqlBuilder;
+    private Json $serializer;
 
     /**
      * GiftSalesRuleCache constructor.
@@ -78,20 +50,18 @@ class Cache extends AbstractHelper
      * @param CollectionFactory           $productCollectionFactory Product collection factory
      * @param Builder                     $sqlBuilder               Sql builder
      * @param RuleFactory                 $ruleFactory              Rule factory
+     * @param Json|null                   $serializer               Serializer
      */
     public function __construct(
         Context $context,
-        CacheInterface $cache,
-        GiftRuleRepositoryInterface $giftRuleRepository,
-        CollectionFactory $productCollectionFactory,
-        Builder $sqlBuilder,
-        RuleFactory $ruleFactory
+        protected CacheInterface $cache,
+        protected GiftRuleRepositoryInterface $giftRuleRepository,
+        protected CollectionFactory $productCollectionFactory,
+        protected Builder $sqlBuilder,
+        protected RuleFactory $ruleFactory,
+        ?Json $serializer = null
     ) {
-        $this->cache = $cache;
-        $this->giftRuleRepository = $giftRuleRepository;
-        $this->productCollectionFactory = $productCollectionFactory;
-        $this->sqlBuilder = $sqlBuilder;
-        $this->ruleFactory = $ruleFactory;
+        $this->serializer = $serializer ?: ObjectManager::getInstance()->get(Json::class);
 
         parent::__construct($context);
     }
@@ -99,16 +69,14 @@ class Cache extends AbstractHelper
     /**
      * Save cached gift rule
      *
-     * @param string                $identifier Identifier
+     * @param int|string            $identifier Identifier (rule id, or "{rule id}_{range}")
      * @param Rule                  $rule       Rule
      * @param int|GiftRuleInterface $giftRule   Gift rule
-     *
-     * @return array
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function saveCachedGiftRule($identifier, $rule, $giftRule)
+    public function saveCachedGiftRule($identifier, Rule $rule, $giftRule)
     {
-        $giftRuleData = $this->cache->load(self::CACHE_IDENTIFIER . $identifier);
+        $giftRuleData = $this->decode($this->cache->load(self::CACHE_IDENTIFIER . $identifier));
         if (!$giftRuleData) {
             if (is_int($giftRule)) {
                 /**
@@ -123,6 +91,7 @@ class Cache extends AbstractHelper
 
             $collection->addStoreFilter();
 
+            /** @var \Magento\SalesRule\Model\Rule\Condition\Product\Combine $actions */
             $actions = $rule->getActions();
             $actions->collectValidatedAttributes($collection);
             $this->sqlBuilder->attachConditionToCollection($collection, $actions);
@@ -141,36 +110,59 @@ class Cache extends AbstractHelper
                 self::DATA_PRODUCT_ITEMS => $items,
             ];
 
+            // Dispatch an event to be able to add/change data in gift rule cache.
+            $dataObject = new DataObject($giftRuleData);
+            $this->_eventManager->dispatch(
+                'before_save_gift_rule_cache',
+                ['data_object' => $dataObject, 'rule' => $rule, 'gift_rule' => $giftRule, 'identifier' => $identifier]
+            );
+            $giftRuleData = $dataObject->getData();
+
             $this->cache->save(
-                serialize($giftRuleData),
+                $this->serializer->serialize($giftRuleData),
                 self::CACHE_IDENTIFIER . $identifier,
                 array_merge([self::CACHE_DATA_TAG], $productCacheTags),
                 3600
             );
         }
 
-        if (!is_array($giftRuleData)) {
-            $giftRuleData = unserialize($giftRuleData);
+        return $giftRuleData;
+    }
+
+    /**
+     * Decode cached gift rule data, never as PHP objects.
+     *
+     * @param string|false $data Cached data
+     * @return array|null Null on a cache miss or on data cached in another format
+     */
+    private function decode($data): ?array
+    {
+        if ($data === false || $data === '') {
+            return null;
+        }
+        try {
+            $decoded = $this->serializer->unserialize($data);
+        } catch (InvalidArgumentException $exception) {
+            return null;
         }
 
-        return $giftRuleData;
+        return is_array($decoded) ? $decoded : null;
     }
 
     /**
      * Get cached gift rule.
      *
      * @param int|string $giftRuleCode Gift rule code
-     *
-     * @return array
+     * @return array|null
      */
-    public function getCachedGiftRule($giftRuleCode)
+    public function getCachedGiftRule($giftRuleCode): ?array
     {
-        $cachedData = unserialize($this->cache->load(self::CACHE_IDENTIFIER . $giftRuleCode));
+        $cachedData = $this->decode($this->cache->load(self::CACHE_IDENTIFIER . $giftRuleCode));
         if (!$cachedData) {
             $rule = $this->extractRuleFromCode($giftRuleCode);
-            if ($rule && $rule->getId()) {
+            if ($rule->getId()) {
                 try {
-                    $giftRule = $this->giftRuleRepository->getById($rule->getId());
+                    $giftRule = $this->giftRuleRepository->getByRule($rule);
                     $cachedData = $this->saveCachedGiftRule($giftRuleCode, $rule, $giftRule);
                 } catch (LocalizedException $localizedException) {
                     $cachedData = null;
@@ -178,27 +170,25 @@ class Cache extends AbstractHelper
             }
         }
 
-        return $cachedData;
+        return is_array($cachedData) ? $cachedData : null;
     }
 
     /**
      * Flush cached gift rule.
      */
-    public function flushCachedGiftRule()
+    public function flushCachedGiftRule(): void
     {
-        $this->cache->clean(self::CACHE_DATA_TAG);
+        $this->cache->clean([self::CACHE_DATA_TAG]);
     }
 
     /**
      * Extract rule from gift rule code.
      *
-     * @param string $giftRuleCode Gift rule code
-     *
-     * @return \Magento\SalesRule\Api\Data\RuleInterface|null
+     * @param int|string $giftRuleCode Gift rule code
      */
-    protected function extractRuleFromCode($giftRuleCode)
+    protected function extractRuleFromCode($giftRuleCode): Rule
     {
-        $explodedCode = explode('_', $giftRuleCode);
+        $explodedCode = explode('_', (string) $giftRuleCode);
         $ruleId = array_shift($explodedCode);
 
         return $this->ruleFactory->create()->load($ruleId);

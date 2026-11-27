@@ -1,16 +1,7 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Model\Rule\Action\Discount;
 
 use Magento\Checkout\Model\Session as checkoutSession;
@@ -27,33 +18,10 @@ use Smile\GiftSalesRule\Helper\GiftRule as GiftRuleHelper;
 use Smile\GiftSalesRule\Model\GiftRule;
 
 /**
- * Class Offer Product Per Price Range
- *
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
+ * @SuppressWarnings(PHPMD.CookieAndSessionMisuse)
  */
 class OfferProductPerPriceRange extends AbstractDiscount
 {
-    /**
-     * @var checkoutSession
-     */
-    protected $checkoutSession;
-
-    /**
-     * @var GiftRuleCacheHelper
-     */
-    protected $giftRuleCacheHelper;
-
-    /**
-     * @var GiftRuleHelper
-     */
-    protected $giftRuleHelper;
-
-    /**
-     * @var GiftRuleRepositoryInterface
-     */
-    protected $giftRuleRepository;
-
     /**
      * OfferProductPerPriceRange constructor.
      *
@@ -69,15 +37,11 @@ class OfferProductPerPriceRange extends AbstractDiscount
         Validator $validator,
         DataFactory $discountDataFactory,
         PriceCurrencyInterface $priceCurrency,
-        checkoutSession $checkoutSession,
-        GiftRuleCacheHelper $giftRuleCacheHelper,
-        GiftRuleHelper $giftRuleHelper,
-        GiftRuleRepositoryInterface $giftRuleRepository
+        protected checkoutSession $checkoutSession,
+        protected GiftRuleCacheHelper $giftRuleCacheHelper,
+        protected GiftRuleHelper $giftRuleHelper,
+        protected GiftRuleRepositoryInterface $giftRuleRepository
     ) {
-        $this->checkoutSession = $checkoutSession;
-        $this->giftRuleCacheHelper = $giftRuleCacheHelper;
-        $this->giftRuleHelper = $giftRuleHelper;
-        $this->giftRuleRepository = $giftRuleRepository;
 
         parent::__construct(
             $validator,
@@ -87,15 +51,15 @@ class OfferProductPerPriceRange extends AbstractDiscount
     }
 
     /**
+     * Register the gift rule (session + cache); the returned discount data stays empty.
+     *
      * @param Rule         $rule Rule
      * @param AbstractItem $item Item
      * @param float        $qty  Qty
-     *
-     * @return DiscountData
      * @SuppressWarnings(PHPMD.ElseExpression)
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function calculate($rule, $item, $qty)
+    public function calculate($rule, $item, $qty): DiscountData
     {
         /** @var \Magento\SalesRule\Model\Rule\Action\Discount\Data $discountData */
         $discountData = $this->discountFactory->create();
@@ -103,7 +67,7 @@ class OfferProductPerPriceRange extends AbstractDiscount
         /** @var \Magento\Quote\Model\Quote $quote */
         $quote = $item->getQuote();
 
-        $calculateId = 'calculate_gift_rule_'.$rule->getRuleId();
+        $calculateId = 'calculate_gift_rule_' . $rule->getRuleId();
         if (!$quote->getData($calculateId)) {
             // Set only for performance (not save in DB).
             $quote->setData($calculateId, true);
@@ -112,7 +76,7 @@ class OfferProductPerPriceRange extends AbstractDiscount
              * Rules load by collection => extension attributes not present in rule entity
              */
             /** @var GiftRule $giftRule */
-            $giftRule = $this->giftRuleRepository->getById($rule->getRuleId());
+            $giftRule = $this->giftRuleRepository->getByRule($rule);
 
             if ($quote->getShippingAddress()->getBaseSubtotalTotalInclTax() >= $giftRule->getPriceRange()) {
                 $range = $this->giftRuleHelper->getRange(

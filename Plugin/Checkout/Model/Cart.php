@@ -1,27 +1,13 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Pierre Le Maguer <pilem@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Plugin\Checkout\Model;
 
+use Closure;
 use Magento\Checkout\Model\Cart as Subject;
 use Magento\Sales\Model\Order\Item;
 
-/**
- * Class Cart
- *
- * @author    Pierre Le Maguer <pilem@smile.fr>
- * @copyright 2019 Smile
- */
 class Cart
 {
     /**
@@ -30,16 +16,14 @@ class Cart
      * @param Subject  $subject   Subject
      * @param \Closure $proceed   Parent method
      * @param Item     $orderItem Order item
-     * @param bool     $qtyFlag   Quantity flag
-     *
-     * @return Subject
+     * @param mixed    $qtyFlag   Quantity flag
      */
     public function aroundAddOrderItem(
         Subject $subject,
-        \Closure $proceed,
+        Closure $proceed,
         $orderItem,
         $qtyFlag = null
-    ) {
+    ): Subject {
         $info = $orderItem->getProductOptionByCode('info_buyRequest');
         if (isset($info['gift_rule']) && $info['gift_rule']) {
             return $subject;

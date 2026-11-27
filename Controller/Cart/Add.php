@@ -1,24 +1,16 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Controller\Cart;
 
-use Magento\Framework\App\Action\Context;
-use Magento\Framework\App\Action\HttpPostActionInterface as HttpPostActionInterface;
-use Magento\Framework\Data\Form\FormKey\Validator;
-use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Catalog\Api\ProductRepositoryInterface;
+use Exception;
 use Magento\Checkout\Model\Cart;
+use Magento\Framework\App\Action\Action;
+use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\Action\HttpPostActionInterface;
+use Magento\Framework\Controller\Result\Redirect;
+use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Psr\Log\LoggerInterface;
 use Smile\GiftSalesRule\Api\GiftRuleServiceInterface;
@@ -26,36 +18,10 @@ use Smile\GiftSalesRule\Api\GiftRuleServiceInterface;
 /**
  * Controller for processing add to cart action.
  *
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
  * @copyright 2019 Smile
  */
-class Add extends \Magento\Framework\App\Action\Action
+class Add extends Action implements HttpPostActionInterface
 {
-    /**
-     * @var Validator
-     */
-    protected $formKeyValidator;
-
-    /**
-     * @var GiftRuleServiceInterface
-     */
-    protected $giftRuleService;
-
-    /**
-     * @var CartRepositoryInterface
-     */
-    protected $quoteRepository;
-
-    /**
-     * @var Cart
-     */
-    protected $cart;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
     /**
      * Add constructor.
      *
@@ -68,26 +34,19 @@ class Add extends \Magento\Framework\App\Action\Action
      */
     public function __construct(
         Context $context,
-        Validator $formKeyValidator,
-        GiftRuleServiceInterface $giftRuleService,
-        CartRepositoryInterface $quoteRepository,
-        Cart $cart,
-        LoggerInterface $logger
+        protected Validator $formKeyValidator,
+        protected GiftRuleServiceInterface $giftRuleService,
+        protected CartRepositoryInterface $quoteRepository,
+        protected Cart $cart,
+        protected LoggerInterface $logger
     ) {
-        $this->formKeyValidator = $formKeyValidator;
-        $this->giftRuleService = $giftRuleService;
-        $this->quoteRepository = $quoteRepository;
-        $this->cart = $cart;
-        $this->logger = $logger;
         parent::__construct($context);
     }
 
     /**
      * Add product to shopping cart action
-     *
-     * @return \Magento\Framework\Controller\Result\Redirect
      */
-    public function execute()
+    public function execute(): Redirect
     {
         if (!$this->formKeyValidator->validate($this->getRequest())) {
             $this->messageManager->addErrorMessage(
@@ -113,8 +72,8 @@ class Add extends \Magento\Framework\App\Action\Action
              $this->giftRuleService->replaceGiftProducts(
                  $this->cart->getQuote(),
                  $productData,
-                 $params['gift_rule_code'],
-                 $params['gift_rule_id']
+                 (string) $params['gift_rule_code'],
+                 (int) $params['gift_rule_id']
              );
 
             $this->quoteRepository->save($this->cart->getQuote());
@@ -124,7 +83,7 @@ class Add extends \Magento\Framework\App\Action\Action
             );
 
             return $this->resultRedirectFactory->create()->setPath('checkout/cart');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->critical($e);
             $this->messageManager->addErrorMessage(
                 __('We can\'t add this gift item to your shopping cart.')
@@ -138,44 +97,44 @@ class Add extends \Magento\Framework\App\Action\Action
      * Validate post parameters.
      *
      * @param array $params params
-     *
-     * @return bool
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function validatePostParameters(array $params): bool
     {
-        $return = true;
-
-        if (!isset($params['gift_rule_code'])
-            || !isset($params['gift_rule_id'])
-            || !isset($params['products'])
-            || !is_array($params['products'])) {
-            $return = false;
+        if (
+            !isset($params['gift_rule_code'], $params['gift_rule_id'], $params['products'])
+            || !is_string($params['gift_rule_code'])
+            || filter_var($params['gift_rule_id'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) === false
+            || !is_array($params['products'])
+        ) {
+            return false;
         }
 
-        if ($return) {
-            foreach ($params['products'] as $productData) {
-                if (!isset($productData['qty'])) {
-                    $return = false;
-                }
+        foreach ($params['products'] as $productId => $productData) {
+            if (
+                !is_int($productId)
+                || !is_array($productData)
+                || !isset($productData['qty'])
+                || !is_scalar($productData['qty'])
+            ) {
+                return false;
             }
         }
 
-        return $return;
+        return true;
     }
 
     /**
      * Format post parameters for the add to cart method.
      *
      * @param array $params params
-     *
-     * @return array
      */
-    protected function formatProductPostParameters($params)
+    protected function formatProductPostParameters(array $params): array
     {
         $filteredParams = [];
         foreach ($params['products'] as $productId => $productData) {
             if ($productData['qty']) {
-                $productData['uenc'] = $params['uenc'];
+                $productData['uenc'] = $params['uenc'] ?? null;
                 $productData['id'] = $productId;
                 $productData['product'] = $productId;
                 $productData['item'] = $productId;

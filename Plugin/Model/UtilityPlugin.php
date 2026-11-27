@@ -1,16 +1,7 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Pierre Le Maguer <pilem@smile.fr>
- * @copyright 2020 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Plugin\Model;
 
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -22,25 +13,18 @@ use Smile\GiftSalesRule\Helper\GiftRule as GiftRuleHelper;
 /**
  * Plugin Utility
  *
- * @author    Pierre Le Maguer <pilem@smile.fr>
  * @copyright 2020 Smile
  */
 class UtilityPlugin
 {
-    /**
-     * @var GiftRuleHelper
-     */
-    protected $giftRuleHelper;
-
     /**
      * UtilityPlugin constructor.
      *
      * @param GiftRuleHelper $giftRuleHelper Gift rule helper
      */
     public function __construct(
-        GiftRuleHelper $giftRuleHelper
+        protected GiftRuleHelper $giftRuleHelper
     ) {
-        $this->giftRuleHelper = $giftRuleHelper;
     }
 
     /**
@@ -50,8 +34,6 @@ class UtilityPlugin
      * @param bool    $result  Result
      * @param Rule    $rule    Model
      * @param Address $address address
-     *
-     * @return bool
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function afterCanProcessRule(

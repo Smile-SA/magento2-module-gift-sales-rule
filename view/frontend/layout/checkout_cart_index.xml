@@ -23,6 +23,9 @@
                 <block class="Smile\GiftSalesRule\Block\Cart\GiftRules\Rule"
                        name="checkout.cart.gift-rules.rule"
                        template="Smile_GiftSalesRule::cart/gift-rules/rule.phtml">
+                    <arguments>
+                        <argument name="giftRuleViewModel" xsi:type="object">Smile\GiftSalesRule\ViewModel\GiftRule</argument>
+                    </arguments>
                     <block class="Smile\GiftSalesRule\Block\Cart\GiftRules\ProductItem"
                            name="checkout.cart.gift-rules.product-item"
                            template="Smile_GiftSalesRule::cart/gift-rules/product-item.phtml">

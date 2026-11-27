@@ -30,6 +30,12 @@
     <type name="Magento\Checkout\Model\Cart">
         <plugin name="gift_sales_rules_avoid_reorder" type="Smile\GiftSalesRule\Plugin\Checkout\Model\Cart" />
     </type>
+    <type name="Magento\Weee\Model\Total\Quote\Weee">
+        <plugin name="gift_sales_rules_collect_weee" type="Smile\GiftSalesRule\Plugin\Weee\Model\Total\Quote\WeeePlugin" />
+    </type>
+    <type name="Magento\Quote\Model\Quote\Address\Item">
+        <plugin name="gift_sales_rules_addres_item" type="Smile\GiftSalesRule\Plugin\Quote\Model\Address\ItemPlugin" />
+    </type>
 
     <!-- Proxy -->
     <type name="Smile\GiftSalesRule\Model\GiftRuleService">

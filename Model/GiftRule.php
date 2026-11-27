@@ -1,16 +1,7 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Model;
 
 use Magento\Framework\DataObject\IdentityInterface;
@@ -20,31 +11,22 @@ use Smile\GiftSalesRule\Api\Data\GiftRuleInterface;
 /**
  * GiftRule model.
  *
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
  * @copyright 2019 Smile
  * @SuppressWarnings(PHPMD.CamelCasePropertyName)
  */
 class GiftRule extends AbstractModel implements GiftRuleInterface, IdentityInterface
 {
-    const CACHE_TAG = 'smile_gift_sales_rule_gift_rule';
+    public const CACHE_TAG = 'smile_gift_sales_rule_gift_rule';
 
-    /**
-     * @var string
-     */
+    // phpcs:disable SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingAnyTypeHint
     protected $_eventPrefix = 'smile_gift_sales_rule_gift_rule';
 
-    /**
-     * @var string
-     */
     protected $_eventObject = 'smile_gift_sales_rule_gift_rule';
 
-    /**
-     * @var string
-     */
     protected $_cacheTag = self::CACHE_TAG;
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getIdentities()
     {
@@ -52,7 +34,7 @@ class GiftRule extends AbstractModel implements GiftRuleInterface, IdentityInter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getMaximumNumberProduct()
     {
@@ -60,7 +42,7 @@ class GiftRule extends AbstractModel implements GiftRuleInterface, IdentityInter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setMaximumNumberProduct($maximumNumberProduct)
     {
@@ -68,7 +50,7 @@ class GiftRule extends AbstractModel implements GiftRuleInterface, IdentityInter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getPriceRange()
     {
@@ -76,7 +58,7 @@ class GiftRule extends AbstractModel implements GiftRuleInterface, IdentityInter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setPriceRange($priceRange)
     {
@@ -84,14 +66,13 @@ class GiftRule extends AbstractModel implements GiftRuleInterface, IdentityInter
     }
 
     /**
-     * Populate the object from array values
+     * Populate the object from array values.
+     *
      * It is better to use setters instead of the generic setData method
      *
      * @param array $values values
-     *
-     * @return GiftRule
      */
-    public function populateFromArray(array $values)
+    public function populateFromArray(array $values): GiftRule
     {
         $this->setMaximumNumberProduct($values['maximum_number_product']);
         $this->setPriceRange($values['price_range']);
@@ -100,7 +81,7 @@ class GiftRule extends AbstractModel implements GiftRuleInterface, IdentityInter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      * @SuppressWarnings(PHPMD.CamelCaseMethodName)
      */
     protected function _construct()

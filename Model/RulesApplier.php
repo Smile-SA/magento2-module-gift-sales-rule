@@ -1,22 +1,12 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Pierre Le Maguer <pilem@smile.fr>
- * @copyright 2020 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Model;
 
 use Magento\Framework\DataObject;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\SalesRule\Model\Quote\ChildrenValidationLocator;
-use Magento\SalesRule\Model\Rule;
 use Magento\SalesRule\Model\Rule\Action\Discount\CalculatorFactory;
 use Magento\SalesRule\Model\RulesApplier as BaseRulesApplier;
 use Magento\SalesRule\Model\Utility;
@@ -24,22 +14,19 @@ use Magento\SalesRule\Model\Utility;
 /**
  * Model Rules Applier
  *
- * @author    Pierre Le Maguer <pilem@smile.fr>
  * @copyright 2020 Smile
  */
 class RulesApplier extends BaseRulesApplier
 {
     /**
      * Is a private parent property.
-     * @var ChildrenValidationLocator
      */
-    protected $childrenValidationLocator;
+    protected ChildrenValidationLocator $childrenValidationLocator;
 
     /**
      * Is a private parent property.
-     * @var CalculatorFactory
      */
-    protected $calculatorFactory;
+    protected CalculatorFactory $calculatorFactory;
 
     /**
      * RulesApplier constructor.
@@ -47,7 +34,7 @@ class RulesApplier extends BaseRulesApplier
      * @param CalculatorFactory              $calculatorFactory         calculator factory
      * @param ManagerInterface               $eventManager              event manager
      * @param Utility                        $utility                   utility
-     * @param ChildrenValidationLocator|null $childrenValidationLocator children validation locator
+     * @param ChildrenValidationLocator      $childrenValidationLocator children validation locator
      */
     public function __construct(
         CalculatorFactory $calculatorFactory,
@@ -61,12 +48,18 @@ class RulesApplier extends BaseRulesApplier
     }
 
     /**
+     * Apply rules to current order item.
+     *
      * Edit: Add an event skip actions validation for gift rule.
      *
-     * {@inheritdoc}
+     * The last parameter is not typed on purpose: it is a coupon code (string) before Magento 2.4.7,
+     * and a list of coupon codes since Magento 2.4.7.
+     *
+     * @inheritdoc
+     * @param string|string[] $couponCodes
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function applyRules($item, $rules, $skipValidation, $couponCode)
+    public function applyRules($item, $rules, $skipValidation, $couponCodes = [])
     {
         $address = $item->getAddress();
         $appliedRuleIds = [];
@@ -102,7 +95,7 @@ class RulesApplier extends BaseRulesApplier
                 }
             }
 
-            $this->applyRule($item, $rule, $address, $couponCode);
+            $this->applyRule($item, $rule, $address, $couponCodes);
             $appliedRuleIds[$rule->getRuleId()] = $rule->getRuleId();
 
             if ($rule->getStopRulesProcessing()) {

@@ -1,16 +1,7 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Pierre Le Maguer <pierre.lemaguer@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Block\Cart\GiftRules;
 
 use Magento\Catalog\Block\Product\AbstractProduct;
@@ -19,26 +10,14 @@ use Magento\Catalog\Model\Product;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Swatches\Helper\Data;
 use Smile\GiftSalesRule\Api\Data\GiftRuleDataInterface;
-use Smile\GiftSalesRule\Helper\GiftRule as GiftRuleHelper;
 
 /**
  * Class GiftRules
  *
- * @author    Pierre Le Maguer <pierre.lemaguer@smile.fr>
  * @copyright 2019 Smile
  */
 class ProductItem extends AbstractProduct
 {
-    /**
-     * @var GiftRuleHelper
-     */
-    protected $giftRuleHelper;
-
-    /**
-     * @var Data
-     */
-    protected $swatchHelper;
-
     /**
      * Cart constructor.
      *
@@ -48,19 +27,16 @@ class ProductItem extends AbstractProduct
      */
     public function __construct(
         Context $context,
-        Data $swatchHelper,
+        protected Data $swatchHelper,
         array $data = []
     ) {
-        $this->swatchHelper = $swatchHelper;
         parent::__construct($context, $data);
     }
 
     /**
      * Get product.
-     *
-     * @return Product
      */
-    public function getProduct()
+    public function getProduct(): ?Product
     {
         return $this->getData('product');
     }
@@ -69,20 +45,17 @@ class ProductItem extends AbstractProduct
      * Set product.
      *
      * @param Product $product Product
-     *
      * @return $this
      */
-    public function setProduct($product)
+    public function setProduct(Product $product)
     {
         return $this->setData('product', $product);
     }
 
     /**
      * Get gift rule.
-     *
-     * @return GiftRuleDataInterface
      */
-    public function getGiftRule(): GiftRuleDataInterface
+    public function getGiftRule(): ?GiftRuleDataInterface
     {
         return $this->getData('gift_rule');
     }
@@ -91,7 +64,6 @@ class ProductItem extends AbstractProduct
      * Set gift rule.
      *
      * @param GiftRuleDataInterface $giftRule Gift rule
-     *
      * @return $this
      */
     public function setGiftRule(GiftRuleDataInterface $giftRule)
@@ -102,9 +74,7 @@ class ProductItem extends AbstractProduct
     /**
      * Get details renderer. Either render swatch or select attributes for configurable products.
      *
-     * @param string $type Type
-     *
-     * @return bool|\Magento\Framework\View\Element\AbstractBlock
+     * @param string|null $type Type
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function getDetailsRenderer($type = null)
@@ -126,9 +96,7 @@ class ProductItem extends AbstractProduct
     }
 
     /**
-     * Get selected product quantity.
-     *
-     * @return int
+     * Get selected product quantity (quote item qty, may be a numeric string when loaded from DB).
      */
     public function getProductQty()
     {
@@ -144,10 +112,8 @@ class ProductItem extends AbstractProduct
 
     /**
      * Get swatch attributes data.
-     *
-     * @return array
      */
-    protected function getSwatchAttributesData()
+    protected function getSwatchAttributesData(): array
     {
         return $this->swatchHelper->getSwatchAttributesAsArray($this->getProduct());
     }

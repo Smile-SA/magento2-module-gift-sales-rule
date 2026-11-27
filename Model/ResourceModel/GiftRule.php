@@ -1,61 +1,44 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\GiftSalesRule
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\GiftSalesRule\Model\ResourceModel;
 
+use Magento\Framework\DB\Select;
 use Magento\Framework\EntityManager\EntityManager;
 use Magento\Framework\EntityManager\MetadataPool;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 use Magento\Framework\Model\ResourceModel\Db\Context;
+use Magento\SalesRule\Api\Data\RuleInterface;
 use Smile\GiftSalesRule\Api\Data\GiftRuleInterface;
 
 /**
  * GiftRule resource model.
  *
- * @author    Maxime Queneau <maxime.queneau@smile.fr>
  * @copyright 2019 Smile
  */
 class GiftRule extends AbstractDb
 {
-    /** @var EntityManager */
-    protected $entityManager;
-
-    /** @var MetadataPool */
-    protected $metadataPool;
-
     /**
      * GiftRule constructor.
      *
      * @param Context       $context        Context
      * @param EntityManager $entityManager  Entity manage
      * @param MetadataPool  $metadataPool   Metadata poll
-     * @param null          $connectionName Connection name
+     * @param string|null   $connectionName Connection name
      */
     public function __construct(
         Context       $context,
-        EntityManager $entityManager,
-        MetadataPool  $metadataPool,
-        $connectionName = null
+        protected EntityManager $entityManager,
+        protected MetadataPool  $metadataPool,
+        ?string $connectionName = null
     ) {
         parent::__construct($context, $connectionName);
-
-        $this->entityManager = $entityManager;
-        $this->metadataPool = $metadataPool;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getConnection()
     {
@@ -65,8 +48,8 @@ class GiftRule extends AbstractDb
     }
 
     /**
-    * {@inheritdoc}
-    */
+     * @inheritdoc
+     */
     public function load(AbstractModel $object, $value, $field = null)
     {
         $objectId = $this->getObjectId($value, $field);
@@ -81,7 +64,7 @@ class GiftRule extends AbstractDb
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function save(AbstractModel $object)
     {
@@ -91,7 +74,7 @@ class GiftRule extends AbstractDb
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function delete(AbstractModel $object)
     {
@@ -101,7 +84,17 @@ class GiftRule extends AbstractDb
     }
 
     /**
-     * {@inheritdoc}
+     * Get rule link field name.
+     *
+     * @throws \Exception
+     */
+    public function getLinkFieldName(): string
+    {
+        return $this->metadataPool->getMetadata(RuleInterface::class)->getLinkField();
+    }
+
+    /**
+     * @inheritdoc
      * @SuppressWarnings(PHPMD.CamelCaseMethodName)
      */
     protected function _construct()
@@ -117,10 +110,8 @@ class GiftRule extends AbstractDb
      *
      * @param mixed       $value Value
      * @param string|null $field Field
-     *
-     * @return bool|int|string
      */
-    protected function getObjectId($value, $field = null)
+    protected function getObjectId($value, ?string $field = null)
     {
         $entityMetadata = $this->metadataPool->getMetadata(GiftRuleInterface::class);
         if ($field === null) {
